@@ -2,8 +2,9 @@
 
 **https://nkuma-platform.github.io/**
 
-nkuma (南国ソフトの AI 開発基盤) のセットアップ・サポートページ。「最初に何を揃えるか」「管理者に伝えるもの」「困った時の手引き」の**正本**はこのリポジトリの `index.html`。
+nkuma のセットアップ・サポートページの配信リポジトリ (GitHub Pages)。
 
+- **正本は [nangok-ai-workflow](https://github.com/noto7659/nangok-ai-workflow) の `nkuma/support-site/`**。
+  本リポジトリは `nkuma/scripts/sync-support-site.sh` による一方向 sync の産物 —
+  **直接編集しない** (Issue / PR も受けない。次回 sync で消える)
 - 使い始める人は上の URL を開いてください (このリポジトリを読む必要はありません)
-- 内容の更新はこのリポジトリへの commit で行う (main へ push すると GitHub Pages が自動配信)
-- 旧正本 `nkuma/docs/ONBOARDING.md` (開発リポジトリ) は本サイトへの案内 1 枚に痩身済み — セットアップ手順をそちらに書き足さないこと (二重正本の禁止)
