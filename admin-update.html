@@ -57,12 +57,12 @@
 
     <section id="engine">
       <h2>4.2 顧客環境のエンジンを新版にする</h2>
-      <p>エンジンの新版はデータのマイグレーションを含むことがあるため、顧客環境への適用は<b>自動にせず、人の意図で行います</b>。2 手です:</p>
+      <p>エンジンの新版はデータのマイグレーションを含むことがあるため、顧客環境への適用は<b>自動にせず、人の意図で行います</b>。やることは環境整備と同じ 2 手です:</p>
       <ol class="steps">
-        <li><b>取り込み</b> — 配布置き場 (ghcr.io) から顧客の Container Registry へ、版タグを指定して <code>az acr import</code>。取り込みに使う read:packages PAT は管理者の手元にだけ置き、顧客環境・リポジトリには残しません</li>
-        <li><b>差し替え</b> — 記入用紙 (<a href="./admin-environment.html#bicep">1.2</a>) の <code>dataplaneImage</code> を新しい版タグへ変えて foundation を再実行</li>
+        <li>記入用紙 (<a href="./admin-environment.html#bicep">1.2</a>) の <code>engineVersion</code> を新しい版に書き換える — <b>または欄を触らず <code>-LatestEngine</code> を付ける</b> (script が最新版を照会し、confirm の上で記入用紙を書き換える。情報源はローカルの運転係と同じ ghcr タグ照会)</li>
+        <li><code>deploy-foundation.ps1 -Customer &lt;顧客&gt; -LatestEngine</code> を実行 — <b>取り込み (ghcr → 顧客 Container Registry) と差し替えは script が自動</b>で行います (認証は gh 相乗り、PAT 不要)。判子は二重 (版更新の confirm + what-if の承認) — 黙って上がる経路はありません</li>
       </ol>
-      <div class="note">エンジンのシステムテーブル移行が絡む版は、エンジン側のリリースノートの手順に従ってください。コマンドの正本は開発リポジトリの infra/README「エンジンイメージの取り込み」。</div>
+      <div class="note">エンジンのシステムテーブル移行が絡む版は、エンジン側のリリースノートの手順に従ってください。手動での取り込み (非常用) は開発リポジトリの infra/README「エンジンイメージの取り込み」。</div>
     </section>
 
     <div class="pager">
