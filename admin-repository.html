@@ -61,8 +61,8 @@
         <li><b><code>tokenstore-setup.ps1</code> を実行</b> — このアプリ用のログイントークン置き場づくり。<b>Storage アカウントは増えません</b> — 顧客共通のトークンストア用 Storage (<a href="./admin-environment.html#manual">1 章 手順 5</a> で作成済みの金庫室) の中に、このアプリ専用のコンテナ (部屋) <code>easyauth-&lt;アプリ名&gt;</code> を 1 つ切り、<b>その部屋だけ開く鍵 (SAS、期限 1 年)</b> を発行して Key Vault へ格納します (値は画面にもログにも表示されない。部屋を分けるのは、鍵が漏れても他アプリのトークンに届かないようにする分離)。これが無いと公開時のログイン構成が組めません。再実行すると SAS が上書きされる = <b>鍵のローテーションも同じスクリプト</b></li>
         <li><b>① が出力した <code>gh variable set</code> コマンド一式をドライバーへ返信する</b> — すべて非秘密の識別子です。実行は案件リポジトリに書き込めるドライバー側 (社内で同一アカウント運用なら管理者がそのまま実行しても OK)</li>
         <li><b>(顧客初回のみ) 運用者名簿に CI を載せる</b> — 記入用紙 (<a href="./admin-environment.html#bicep">1.2</a>) の <code>opsOperatorOids</code> に ① が表示した CI 身元の objectId を追記して <code>deploy-foundation.ps1</code> を再実行。これで CI がスキーマの宣言登録を行えるようになります</li>
-        <li><b>(顧客初回のみ) ログイン用登録の受付向け設定</b> — Application ID URI の設定 + 委任スコープの公開 + Azure CLI の事前承認 (Graph API の 2 段操作。順序に注意 — スコープ登録前に事前承認を送ると拒否されます)</li>
       </ol>
+      <div class="note"><b>受付向け設定は自動化済み</b> — ログイン用登録への「API の公開」3 点セット (宛先の正式名称 / 委任スコープ / Azure CLI の事前承認) は、<b>oidc-setup が毎回冪等に確保します</b>。順序を間違えると拒否される Graph 操作の罠ごと script が吸収しているので、手作業はありません。</div>
       <div class="note"><b>Entra への書き込みは管理者側に残しています</b> — CI に Graph 権限を渡すと権限も判子も増えるため、戻り先 URL の追記などはこの受け入れ作業のついでに管理者が済ませる設計です。コマンドの正本は開発リポジトリの infra/README「アプリの受け入れ」。</div>
     </section>
 

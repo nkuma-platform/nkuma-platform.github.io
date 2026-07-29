@@ -71,9 +71,8 @@
       <div class="note"><b>管理者の定型は「記入用紙を編集する → <code>deploy-foundation.ps1</code> を実行する」の 2 手だけ</b>です。宛先の照合・what-if・エンジン取り込み・DB 名簿登録・完了チェックは script が面倒を見ます (人に残る判断は what-if を読んで承認することだけ)。</div>
       <ol class="steps">
         <li><b>権限の確認</b> — 実行者は対象 RG への <b>Owner 相当</b> (ロール割り当て権限込み) が必要。<b>純 Contributor では不可</b>: リソースは建つのにロール割り当てで失敗する「半建ち」になります。無ければ建て始めずに情シスへ依頼 (「RG を作成し Owner を付与してほしい」)</li>
-        <li><b>Entra アプリ登録 2 本を作る</b> — ログイン用 <code>app-nkuma-&lt;customer&gt;</code> とエンジン用 <code>app-nkuma-data-&lt;customer&gt;</code> (作り方は <a href="#manual-entra">1.3 の該当節</a> と同じ。CI 用の 3 本目は 3 章のスクリプトが自動で作ります)</li>
         <li><b>記入用紙を書く</b> — <code>params/sample.bicepparam</code> を <code>&lt;顧客&gt;.bicepparam</code> の名前でコピーして記入 (下の表)。実物 (台帳) は gitignore 済みで手元にだけ残ります</li>
-        <li><b>実行する</b> — <code>.\deploy-foundation.ps1 -Customer &lt;顧客&gt;</code>。宛先ガード (記入用紙の subscriptionId × az セッション現在地の照合 — 不一致は停止、切替は人) → what-if の差分提示 → <b>読んで y</b> → 適用 → 初回は「プレースホルダ → エンジン取り込み → 実イメージ」の二段を自動実行 → PG 名簿登録 (pg-bootstrap) → 完了チェック表示、まで一気に進みます</li>
+        <li><b>実行する</b> — <code>.\deploy-foundation.ps1 -Customer &lt;顧客&gt;</code>。宛先ガード (記入用紙の subscriptionId × az セッション現在地の照合 — 不一致は停止、切替は人) → <b>Entra アプリ登録 2 本 (ログイン用・エンジン用) の確保</b> (規約名で検索し、無ければ confirm で作成して ID を記入用紙へ自動で書き戻す) → what-if の差分提示 → <b>読んで y</b> → 適用 → 初回は「プレースホルダ → エンジン取り込み → 実イメージ」の二段を自動実行 → PG 名簿登録 (pg-bootstrap) → 完了チェック表示、まで一気に進みます</li>
       </ol>
 
       <h3>記入用紙 (bicepparam) の意味</h3>
@@ -87,10 +86,10 @@
         <tr><td><code>pgEntraAdminObjectId</code> / <code>...PrincipalName</code></td><td>✅</td><td>PostgreSQL の管理者 = <b>自分</b> (<code>az ad signed-in-user show</code> で取得)</td><td>管理者交代時</td></tr>
         <tr><td><code>pgEntraAdminPrincipalType</code></td><td>—</td><td><code>User</code> (既定)</td><td>ほぼ変えない</td></tr>
         <tr><td><code>engineVersion</code></td><td>—</td><td>エンジン版 (例 v20260727-1)。<b>初回は空のまま</b> — 取り込みと二段実行は script が自動 (下の約束事)</td><td><b>一番よく変える欄①</b> — エンジン版更新のたび (<a href="./admin-update.html">4 章</a>)</td></tr>
-        <tr><td><code>dataplaneAppIdUri</code></td><td>—</td><td>エンジン用登録の <code>api://&lt;appId&gt;</code></td><td>登録作成後 1 回</td></tr>
+        <tr><td><code>dataplaneAppIdUri</code></td><td>—</td><td>エンジン用登録の宛先名。<b>通常は空のまま</b> — script が登録を確保して自動で書き戻す (既存の別名登録を使うときだけ手で記入)</td><td>触らない (自動)</td></tr>
         <tr><td><code>kvOfficerObjectId</code></td><td>—</td><td>Key Vault に秘密を入れる人 (通常 = 自分)</td><td>ほぼ変えない</td></tr>
         <tr><td><code>opsOperatorOids</code></td><td>—</td><td><b>受付の運用者名簿</b> (objectId のカンマ区切り)。<b>空 = 誰も通さない</b></td><td><b>一番よく変える欄②</b> — リポジトリ登録の顧客初回 (<a href="./admin-repository.html">3 章</a>)</td></tr>
-        <tr><td><code>opsLoginClientId</code></td><td>—</td><td>ログイン用登録の clientId (受付の認証用)。空 = 認証なしで建つ</td><td>お試し後、<b>公開前に必須</b></td></tr>
+        <tr><td><code>opsLoginClientId</code></td><td>—</td><td>ログイン用登録の clientId (受付の認証用)。<b>通常は空のまま</b> — script が確保して自動で書き戻す</td><td>触らない (自動)</td></tr>
       </table>
       <div class="note">覚え方: 最初に埋めるのは「顧客名 + 自分」だけ。イメージとログインの欄は<b>建ててから育てる欄</b>。</div>
 
@@ -106,7 +105,7 @@
         <tr><th>場面</th><th>記入用紙で変える欄</th></tr>
         <tr><td>実エンジンへの切替 (初回直後)</td><td><code>engineVersion</code> (初回に版を書いていれば不要 — script が二段でやる)</td></tr>
         <tr><td>リポジトリ登録の顧客初回 (<a href="./admin-repository.html">3 章</a>)</td><td><code>opsOperatorOids</code> に CI の身元を追記</td></tr>
-        <tr><td>公開前</td><td><code>opsLoginClientId</code></td></tr>
+        <tr><td>公開前</td><td>(なし — ログイン設定は script が確保済み)</td></tr>
         <tr><td>エンジン版更新 (<a href="./admin-update.html">4 章</a>)</td><td><code>engineVersion</code> を新しい版に</td></tr>
         <tr><td>テスト面 (<a href="./admin-operations.html">5 章</a>)</td><td><code>environment = 'test'</code> (別 RG へ)</td></tr>
       </table>
