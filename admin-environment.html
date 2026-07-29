@@ -68,7 +68,7 @@
       <p>標準は IaC (foundation.bicep) による構築です。<b>冪等 = 何度流しても安全</b>で、初回の建設も、後日の設定変更・エンジン版更新も、すべて「記入用紙を変えて再実行」という同じ操作になります。</p>
 
       <h3>手順の流れ — 定型は 2 手</h3>
-      <div class="note"><b>管理者の定型は「記入用紙を編集する → <code>deploy-foundation.ps1</code> を実行する」の 2 手だけ</b>です。宛先の照合・Entra 登録の確保・what-if・エンジン取り込み・DB 名簿登録・完了チェックは script が面倒を見ます (人に残る判断は confirm だけ)。道具一式は <a href="https://github.com/nkuma-platform/nkuma-infra">nkuma-infra リポジトリ</a>から clone して使います。</div>
+      <div class="note"><b>管理者の定型は「記入用紙を編集する → <code>deploy-foundation.ps1</code> を実行する」の 2 手だけ</b>です。宛先の照合・Entra 登録の確保・what-if・エンジン取り込み・DB 名簿登録・完了チェックは script が面倒を見ます (人に残る判断は confirm だけ)。道具一式は <a href="https://github.com/nkuma-platform/nkuma-infra">nkuma-infra リポジトリ</a> (管理者専用・private) から clone して使います。</div>
       <ol class="steps">
         <li><b>権限の確認</b> — 実行者は対象 RG への <b>Owner 相当</b> (ロール割り当て権限込み) が必要。<b>純 Contributor では不可</b>: リソースは建つのにロール割り当てで失敗する「半建ち」になります。無ければ建て始めずに情シスへ依頼 (「RG を作成し Owner を付与してほしい」)</li>
         <li><b>記入用紙を書く</b> — <code>params/sample.bicepparam</code> を <code>&lt;顧客&gt;.bicepparam</code> の名前でコピーして記入 (下の表)。実物 (台帳) は gitignore 済みで手元にだけ残ります</li>
