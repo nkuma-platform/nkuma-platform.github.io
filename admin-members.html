@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2. Nkuma 環境にメンバーを招待する — 管理者ハンドブック</title>
+<meta name="description" content="新しく nkuma を使い始める人を迎える管理者の手順。">
+<link rel="stylesheet" href="./site.css">
+</head>
+<body class="admin-page">
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./guide.html">利用者ガイド</a>
+      <a href="./admin.html" class="current">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero admin">
+  <div class="wrap">
+    <div class="kicker">ADMIN HANDBOOK — 2</div>
+    <h1>Nkuma 環境にメンバーを招待する</h1>
+    <p class="lead">新しく nkuma を使い始める人を迎えます。管理者がやることは GitHub の招待だけで、あとは本人が<a href="./guide.html">利用者ガイド</a>を見て進められます。</p>
+    <div class="badge">頻度: メンバーごとに 1 回 ・ 触るのは GitHub のみ (Azure には何も起きない)</div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section>
+      <h2>手順</h2>
+      <ol class="steps">
+        <li><b>GitHub アカウント名を聞く</b> — 本人から受け取る (利用者ガイド「1.1 管理者に伝えるもの」で、本人側にもこの依頼が案内されています)</li>
+        <li><b>GitHub organization <code>nkuma-platform</code> のチームへ招待する</b> — これで次の 2 つが一度に付きます:
+          <ul>
+            <li>配布リポジトリの読み取り (nkuma plugin とアプリテンプレの取得に必要)</li>
+            <li>エンジンイメージ (ghcr.io、private) の読み取り</li>
+          </ul>
+        </li>
+        <li><b>「<a href="./guide.html">利用者ガイド</a>を見てセットアップしてね」と URL を渡す</b> — 前提ツール、権限づけ、plugin 導入は本人が進められます。詰まったら AI が案内する仕掛け (運転係) も入っています</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>クラウド版 Claude Code を使いたい人がいたら (任意)</h2>
+      <p>クラウド版はセッションの GitHub アクセスが対象リポジトリ 1 つに絞られるため、private 配布物の取得に<b>管理者側の追加設定</b>が要ります:</p>
+      <ol class="steps">
+        <li>配布リポジトリ限定・読み取り専用の fine-grained PAT を発行する</li>
+        <li>クラウド環境 (environment) にセットアップスクリプトと合わせて配線する</li>
+      </ol>
+      <p class="muted">手順の正本は開発リポジトリの cloud-environment.md (発行手順 / environment 設定 / 検証チェックリスト)。</p>
+    </section>
+
+    <section>
+      <h2>迎えたあとの日常</h2>
+      <ul>
+        <li><b>更新のアナウンス</b> — nkuma の新版を配布したら (<a href="./admin-update.html">4 章</a>)、メンバーに「<code>/plugin update</code> してね」と連絡します。更新は自動では届きません</li>
+        <li><b>質問の受け口</b> — 利用者ガイドは「分からなければ管理者に聞く」設計です。よくある質問はガイドへ追記して育てます</li>
+      </ul>
+    </section>
+
+    <div class="pager">
+      <a href="./admin-environment.html">← 1. 環境を整備する</a>
+      <a href="./admin-repository.html">3. リポジトリを登録する →</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>

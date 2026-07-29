@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>管理者ハンドブック — nkuma サポート</title>
+<meta name="description" content="nkuma 環境管理者のためのハンドブック。環境の整備・メンバー招待・リポジトリ登録・アップデート。">
+<link rel="stylesheet" href="./site.css">
+</head>
+<body class="admin-page">
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./guide.html">利用者ガイド</a>
+      <a href="./admin.html" class="current">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero admin">
+  <div class="wrap">
+    <div class="kicker">ADMIN HANDBOOK</div>
+    <h1>管理者ハンドブック</h1>
+    <p class="lead">nkuma の<b>環境管理者</b>のためのハンドブックです。管理者の仕事を 1 つずつ、初めての人 (あるいは全部忘れた半年後の自分) が上から読んで実施できるように書いています。お客様側のインフラ担当の方が環境の中身を確認する用途にも使えます。</p>
+    <div class="badge">nkuma を「使う」側の話は<a href="./guide.html" style="margin-left:4px">利用者ガイド</a>へ</div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section>
+      <h2>章立て</h2>
+      <div class="chapter-list">
+        <a class="chapter-card" href="./admin-environment.html">
+          <b>1. Nkuma 環境を整備する</b>
+          <p>顧客 (または社内) の環境をゼロから開設する。全体像 → bicep で整備する (標準) → 手動で 1 つずつ建てる (理解と検証のための完全仕様)</p>
+        </a>
+        <a class="chapter-card" href="./admin-members.html">
+          <b>2. Nkuma 環境にメンバーを招待する</b>
+          <p>新しく使い始める人を迎える。GitHub org への招待と、その後に本人がやること</p>
+        </a>
+        <a class="chapter-card" href="./admin-repository.html">
+          <b>3. Nkuma 環境にアプリを公開できるようにリポジトリを登録する</b>
+          <p>案件から「公開したい」と依頼が来たら。フェデレーション認証の登録から Variables の返信まで (受け入れ)</p>
+        </a>
+        <a class="chapter-card" href="./admin-update.html">
+          <b>4. Nkuma 環境を最新版にアップデートする</b>
+          <p>nkuma 本体 (plugin / テンプレ / エンジン / SDK / サポートページ) の配布と、顧客環境のエンジン更新</p>
+        </a>
+        <a class="chapter-card" href="./admin-operations.html">
+          <b>5. 困ったとき・その他の作業</b>
+          <p>秘密 (API キー等) の投入、破壊的マイグレーションの承認、ロールバック、非常口、テスト面の建て壊し</p>
+        </a>
+      </div>
+      <div class="note">コマンド・スクリプトの正本は開発リポジトリの手順書 (infra/README ほか) です。本ハンドブックは「何を・なぜ・どの順で」を掴むための正本で、実行時は両方を並べて使ってください。</div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><a href="./index.html">トップ</a> ・ <a href="./guide.html">利用者ガイド</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>

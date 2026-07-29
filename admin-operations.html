@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5. 困ったとき・その他の作業 — 管理者ハンドブック</title>
+<meta name="description" content="秘密の投入、破壊的マイグレーションの承認、ロールバック、非常口、テスト面の建て壊し。">
+<link rel="stylesheet" href="./site.css">
+</head>
+<body class="admin-page">
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./guide.html">利用者ガイド</a>
+      <a href="./admin.html" class="current">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero admin">
+  <div class="wrap">
+    <div class="kicker">ADMIN HANDBOOK — 5</div>
+    <h1>困ったとき・その他の作業</h1>
+    <p class="lead">定常章 (1〜4) に入らない、発生したときにやる作業をまとめています。</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#secrets">秘密の投入</a>
+    <a href="#confirm">破壊的マイグレーションの承認</a>
+    <a href="#rollback">ロールバック</a>
+    <a href="#emergency">非常口</a>
+    <a href="#test-env">テスト面</a>
+    <a href="#members">メンバーの環境トラブル</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <section id="secrets">
+      <h2>アプリに外部 API キー等の秘密が必要になったら</h2>
+      <ol class="steps">
+        <li>アプリの身元 (Managed Identity) に Key Vault の読み取り (Secrets User) を付与する</li>
+        <li><b>値は人が自分の az セッションで Key Vault へ直接投入する</b> — チャット・env ファイル・AI への貼り付けなど中間経路を通さない (AI に頼めるのはコマンドの組み立てまで。値を扱うのは人だけ)</li>
+        <li>Container Apps の Key Vault 参照で環境変数に配線する (秘密の実体はアプリに配らない)</li>
+      </ol>
+      <p class="muted">コマンドの正本は開発リポジトリの infra/README「秘密の置き場」。</p>
+    </section>
+
+    <section id="confirm">
+      <h2>破壊的マイグレーションで CI が止まったら</h2>
+      <p>データが消えうるスキーマ変更 (列の削除など) を CI が検出すると、<b>実行される SQL の計画を表示して停止します</b>。これは事故ではなく、設計どおりの「人の判子待ち」です。</p>
+      <ol class="steps">
+        <li>Actions のサマリで計画 (何が消えるか) を読む</li>
+        <li>意図どおりなら、<b>計画 ID (planId) を自分でタイプ</b>して承認ワークフロー (confirm-migration) を起動する — タイプさせるのは「読んだ」を担保する儀式です</li>
+        <li>スキーマが古くなっていれば照合が不一致になり適用されません (安全側)</li>
+      </ol>
+      <div class="note">承認の記録は GitHub に残ります (誰がいつ confirm したか)。エンジン側の監査と合わせて、変更の三点 (変えた人 = git / 承認した人 = GitHub / 実行した身元 = CI) が追えます。</div>
+    </section>
+
+    <section id="rollback">
+      <h2>リリースを戻したいとき (ロールバック)</h2>
+      <p>1 つ前の版のイメージへ差し戻します — 版は <b>git タグ / Container Registry のタグ / 配備台帳 (registry.json)</b> の 3 点に残っているので、迷子になりません。案件リポジトリ同梱のロールバック用ワークフロー (版タグを人が入力) か、<code>az containerapp update</code> で戻します。</p>
+    </section>
+
+    <section id="emergency">
+      <h2>受付が不通のとき (非常口)</h2>
+      <p>管理操作の正規経路は受付 (<a href="./admin-environment.html#manual">1 章 手順 10</a>) ですが、受付自体が動かない緊急時に限り、<code>az containerapp exec</code> でエンジンのコンテナへ直接入る非常口があります。</p>
+      <div class="note"><b>小さな緊急操作 (ADMIN 登録など) 限定</b> — コマンド長 (約 3KB) とレート制限があり、スキーマの宣言登録のような大きな操作には使えません。使ったら受付の復旧を先に。</div>
+    </section>
+
+    <section id="test-env">
+      <h2>テスト面を建てて壊す</h2>
+      <p>常設のテスト環境は持ちません。必要になったら記入用紙に <code>environment = 'test'</code> を指定して<b>同じ IaC で別 RG に建て</b> (構成差はスペックのみ、分離・鍵レス・認証の規律は本番と同一)、済んだら RG ごと削除します。</p>
+    </section>
+
+    <section id="members">
+      <h2>メンバーの環境が壊れたと言われたら</h2>
+      <p>nkuma の配布物 (skill / 設定 / エンジン) は<b>「入れ直せば直る」</b>ように作られています。手で直そうとする前に、<a href="./guide.html#trouble">利用者ガイドの「困った時の手引き」</a>へ誘導してください (update / 再実行で大半が解決します)。</p>
+    </section>
+
+    <div class="pager">
+      <a href="./admin-update.html">← 4. 最新版にアップデートする</a>
+      <a href="./admin.html">目次へ →</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>

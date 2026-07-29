@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>利用者ガイド — nkuma サポート</title>
+<meta name="description" content="nkuma を使い始めるための準備・セットアップ・困った時の手引き。">
+<link rel="stylesheet" href="./site.css">
+</head>
+<body>
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./guide.html" class="current">利用者ガイド</a>
+      <a href="./admin.html">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">USER GUIDE</div>
+    <h1>利用者ガイド — セットアップからサポートまで</h1>
+    <p class="lead">nkuma は、Claude Code の上で動く南国ソフトの AI 開発基盤です。専門家 skill たちと対話しながら、顧客理解 → 設計 → 実装 → 公開まで一本の道で進めます。このページは「最初に何を揃えるか」から「困った時」までの正本です。</p>
+    <div class="badge">対象: nkuma を使い始める人 (エンジニアでなくても大丈夫)</div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#prepare">1. 使う前の準備</a>
+    <a href="#install">2. nkuma の受け取り方</a>
+    <a href="#first-step">3. 最初の一歩</a>
+    <a href="#run">4. アプリを動かす</a>
+    <a href="#trouble">5. 困った時</a>
+    <a href="#update">6. 更新の受け取り方</a>
+    <a href="#ask">7. 質問するには</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <section id="prepare">
+      <h2>1. 使う前の準備</h2>
+
+      <h3>1.1 管理者に伝えるもの (最初に 1 回)</h3>
+      <div class="card accent">
+        <p>管理者 (taiga) に <b>GitHub アカウント名</b>を伝えて、以下を依頼してください:</p>
+        <ul>
+          <li>GitHub organization <b>nkuma-platform</b> のチーム招待 (= 配布物の取得権限が付きます)</li>
+          <li>クラウド版 Claude Code を使いたい場合は、その旨もあわせて伝える (管理者側の設定が必要です)</li>
+        </ul>
+      </div>
+
+      <h3>1.2 前提ツール (チェックリスト)</h3>
+      <table>
+        <tr><th>ツール</th><th>確認方法</th><th>入れ方</th></tr>
+        <tr><td><b>Claude Code</b> (サブスクリプション + インストール)</td><td><code>claude --version</code></td><td><a href="https://claude.com/claude-code">claude.com/claude-code</a></td></tr>
+        <tr><td><b>git</b></td><td><code>git --version</code></td><td><a href="https://git-scm.com/">git-scm.com</a></td></tr>
+        <tr><td><b>GitHub アカウント + gh CLI</b> (認証済み)</td><td><code>gh auth status</code></td><td><a href="https://cli.github.com/">cli.github.com</a> → <code>gh auth login --web</code></td></tr>
+        <tr><td><b>bun</b> (1.0 以上)</td><td><code>bun --version</code></td><td><a href="https://bun.sh/">bun.sh</a></td></tr>
+        <tr><td><b>Docker</b> (Desktop)</td><td><code>docker --version</code></td><td><a href="https://www.docker.com/products/docker-desktop/">docker.com</a></td></tr>
+      </table>
+      <div class="note">
+        <b>OS の前提</b>: Windows は Git Bash 同梱の環境で使います (git のインストールで一緒に入ります)。Mac / Linux はそのままで OK。<br>
+        <b>ネットワークの前提</b>: 初回のブラウザ確認機能が自動でブラウザ実体 (約 150MB) をダウンロードします。外部ダウンロードが制限されている環境では管理者へ相談してください。
+      </div>
+
+      <h3 id="ghcr">1.3 エンジン取得の権限づけ (最初に 1 回、チーム招待が済んでから)</h3>
+      <p>アプリのデータ保存を担う<b>共通基盤エンジン</b>は、private 置き場 (ghcr.io) の Docker イメージで届きます。取得できるように、gh の認証に権限を 1 つ足して docker をログインさせておきます:</p>
+      <pre>gh auth refresh -h github.com -s read:packages</pre>
+      <p class="muted">ブラウザが開くので、表示されたコードを入力して承認します。承認画面に organization の一覧が出ますが、これは gh が既に持っているアクセス範囲の確認表示で、この操作で新たに加わるのは「パッケージの読み取り」だけです。</p>
+      <pre>gh auth token | docker login ghcr.io -u $(gh api user -q .login) --password-stdin</pre>
+      <div class="note"><b>この手順は期限切れがなく、マシンごとに 1 回だけ</b>です。やり忘れても、エンジンが必要になった場面で AI (運転係) が同じ手順を案内してくれます。</div>
+    </section>
+
+    <section id="install">
+      <h2>2. nkuma の受け取り方 (plugin の導入)</h2>
+      <p>Claude Code を開いて、次の 2 コマンドを実行します (gh 認証済みの資格で取得されます):</p>
+      <pre>/plugin marketplace add nkuma-platform/nkuma-marketplace
+/plugin install nkuma@nkuma-marketplace</pre>
+      <p>導入できたかの確認: Claude Code を<b>再起動</b>して <code>/nkuma:nk-master</code> と打ち、skill が起動すれば OK です。</p>
+      <div class="note">skill の呼び出しは常に <b><code>/nkuma:</code> 付き</b> (例: <code>/nkuma:nk-init</code>)。名前空間なし (<code>/nk-init</code>) では起動しません。</div>
+    </section>
+
+    <section id="first-step">
+      <h2>3. 最初の一歩 (新しい案件の始め方)</h2>
+      <ol class="steps">
+        <li>案件用の<b>空のフォルダ</b>を作り、そこで Claude Code を開く</li>
+        <li><code>/nkuma:nk-init</code> を実行 — キックオフの専門家が、環境チェック → 案件リポジトリの初期化 → 顧客理解のインタビューまで対話で導きます</li>
+        <li>以降は迷ったら <code>/nkuma:nk-master</code> — チームリーダー役が現在地を把握して、次に話すべき専門家 (設計対話 / 実装 / QA など) へ案内します</li>
+      </ol>
+      <p class="muted">旅の全体像 (各 skill が案内するので暗記は不要です):</p>
+      <pre><code>nk-init (キックオフ) → nk-domain-talk (顧客理解・設計) → nk-sprint-talk (何を作るか決める)
+→ nk-poc-setup (動く土台を展開) → nk-dev-worker (実装) → nk-qa (テスト) → nk-ship (公開)</code></pre>
+    </section>
+
+    <section id="run">
+      <h2>4. アプリを動かすとき (共通基盤エンジンの起動)</h2>
+      <p>アプリの土台は、データ保存を担う<b>共通基盤エンジン</b> (Docker イメージ) と一緒に動きます。エンジンの起動は、案件で nkuma (AI) に頼めば<b>運転係</b>が行います — 起動前に最新エンジン版と照合し、差があれば「更新するか今のままか」を確認されるので、選ぶだけで大丈夫です。</p>
+      <p class="muted">手で起動する場合は、案件フォルダで <code>bun run dataplane</code> (テンプレに同梱のコマンド)。イメージ取得で 403 が出る場合は <a href="#ghcr">1.3 の権限づけ</a>が未実施です。</p>
+    </section>
+
+    <section id="trouble">
+      <h2>5. 困った時の手引き</h2>
+      <table>
+        <tr><th>症状</th><th>対処</th></tr>
+        <tr><td><code>/nkuma:nk-XXX</code> が見つからない</td><td><code>/plugin update</code> → Claude Code 再起動。直らなければ <code>/plugin uninstall nkuma@nkuma-marketplace</code> → install し直し (何度やっても安全)</td></tr>
+        <tr><td>skill が古い挙動をする</td><td>同上 (= 新しい版が配布されたのに update していない可能性)</td></tr>
+        <tr><td><code>gh</code> 関連のエラーで止まる</td><td><code>gh auth status</code> を確認 → 未認証なら <code>gh auth login --web</code></td></tr>
+        <tr><td>エンジンイメージの取得で 403</td><td><a href="#ghcr">1.3 の 2 コマンド</a>をやり直し (= read:packages が付いていない)</td></tr>
+        <tr><td>エンジンの版が合わないと言われる</td><td>AI に起動を頼めば版の照合ごとやってくれます (手動なら案件の <code>docker-compose.yml</code> の版を案内された版に変更して起動し直し)</td></tr>
+        <tr><td>案件の CLAUDE.md の nkuma 欄が古い</td><td><code>/nkuma:nk-init</code> を再実行 — 初期化は<b>何度実行しても安全</b> (既存の成果物は壊さず、設定・看板だけ最新化)</td></tr>
+      </table>
+      <div class="note"><b>原則: nkuma の配布物 (skill / 設定 / エンジン) は「入れ直せば直る」ように作られています。</b>手で直そうとする前に、update / 再実行を試してください。</div>
+    </section>
+
+    <section id="update">
+      <h2>6. 更新の受け取り方 (日々の運用)</h2>
+      <ul>
+        <li>更新は<b>自動では届きません</b>。管理者が新しい版を配布した時だけ <code>/plugin update</code> で届きます (更新の案内は管理者から流れます)</li>
+        <li>エンジンの版更新は<b>起動時に AI が自動で照合</b>します (最新版があれば「更新するか今のままか」を確認されるので、選ぶだけで届きます)</li>
+      </ul>
+    </section>
+
+    <section id="ask">
+      <h2>7. 質問するには</h2>
+      <p>分からないところは管理者 (taiga) に聞いてください — 全部を独力で突破する必要はありません。よくある質問はこのページに順次追記していきます。</p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>このページが nkuma セットアップ・サポートの<b>正本</b>です。</p>
+    <p><a href="./index.html">トップ</a> ・ <a href="./admin.html">管理者ハンドブック</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>

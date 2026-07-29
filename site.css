@@ -1,0 +1,111 @@
+/* nkuma サポートサイト共通スタイル */
+:root {
+  --bg: #faf7f2;
+  --white: #ffffff;
+  --ink: #26221c;
+  --muted: #6b6459;
+  --line: #e6e0d6;
+  --accent: #d96c2c;
+  --accent-deep: #b5541a;
+  --admin: #2c5dd9;
+  --admin-deep: #1f47ad;
+  --cream: #f3eee5;
+  --code-bg: #2b2722;
+  --code-ink: #f3eee5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif;
+  font-size: 15px; line-height: 1.9;
+}
+code, pre { font-family: Consolas, "SF Mono", Menlo, monospace; }
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+/* サイト共通ヘッダ */
+.site-header { background: var(--white); border-bottom: 1px solid var(--line); }
+.site-header .wrap { display: flex; align-items: center; gap: 22px; padding-top: 14px; padding-bottom: 14px; flex-wrap: wrap; }
+.site-header .brand { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); letter-spacing: .02em; }
+.site-header .brand span { color: var(--accent-deep); }
+.site-header nav { display: flex; gap: 16px; flex-wrap: wrap; }
+.site-header nav a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; }
+.site-header nav a:hover, .site-header nav a.current { color: var(--accent-deep); }
+
+/* ヒーロー */
+header.hero { padding: 44px 0 30px; border-bottom: 1px solid var(--line); background: var(--white); }
+.hero .kicker { font-size: 12px; letter-spacing: .18em; color: var(--accent-deep); font-weight: 700; }
+.hero.admin .kicker { color: var(--admin-deep); }
+.hero h1 { font-size: 27px; margin: 10px 0 12px; line-height: 1.4; }
+.hero p.lead { color: var(--muted); max-width: 680px; }
+.hero .badge { display: inline-block; margin-top: 14px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; color: var(--muted); background: var(--cream); }
+
+/* ページ内目次 (sticky) */
+nav.toc { position: sticky; top: 0; z-index: 10; background: rgba(250,247,242,.95); backdrop-filter: blur(4px); border-bottom: 1px solid var(--line); }
+nav.toc .wrap { display: flex; gap: 4px 18px; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
+nav.toc a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; }
+nav.toc a:hover { color: var(--accent-deep); }
+
+main { padding: 12px 0 72px; }
+section { padding-top: 40px; }
+section > h2 { font-size: 21px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); display: inline-block; margin-bottom: 10px; }
+.admin-page section > h2 { border-bottom-color: var(--admin); }
+h3 { font-size: 16.5px; margin: 26px 0 8px; padding-left: 10px; border-left: 4px solid var(--accent); }
+.admin-page h3 { border-left-color: var(--admin); }
+h4 { font-size: 14.5px; margin: 18px 0 6px; color: var(--accent-deep); }
+.admin-page h4 { color: var(--admin-deep); }
+p { margin: 8px 0; }
+.muted { color: var(--muted); font-size: 13.5px; }
+
+table { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 12px 0; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--cream); font-size: 12.5px; }
+tr:last-child td { border-bottom: none; }
+td code, p code, li code { background: var(--cream); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; font-size: 12px; }
+
+pre { background: var(--code-bg); color: var(--code-ink); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 12.5px; line-height: 1.7; margin: 10px 0; }
+pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+
+ol.steps { margin: 10px 0 10px 22px; }
+ol.steps li { margin: 7px 0; }
+ul { margin: 8px 0 8px 22px; }
+ul li { margin: 6px 0; }
+
+.card { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin: 14px 0; }
+.card.accent { border-left: 4px solid var(--accent); }
+.admin-page .card.accent { border-left-color: var(--admin); }
+.note { background: var(--cream); border-radius: 10px; padding: 12px 16px; font-size: 13.5px; color: var(--muted); margin: 10px 0; }
+.note b { color: var(--ink); }
+.meta { font-size: 13px; color: var(--muted); margin: 4px 0 10px; }
+.meta b { color: var(--ink); }
+
+/* トップページの入口カード */
+.entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.entry-card { display: block; background: var(--white); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 16px; padding: 22px 24px; text-decoration: none; color: var(--ink); }
+.entry-card.admin { border-top-color: var(--admin); }
+.entry-card:hover { border-color: var(--accent); }
+.entry-card.admin:hover { border-color: var(--admin); }
+.entry-card b { font-size: 17px; }
+.entry-card p { color: var(--muted); font-size: 13.5px; margin-top: 8px; }
+.entry-card .go { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--accent-deep); }
+.entry-card.admin .go { color: var(--admin-deep); }
+
+/* 章カード (管理者目次) */
+.chapter-list { display: grid; gap: 12px; margin: 20px 0; }
+.chapter-card { display: block; background: var(--white); border: 1px solid var(--line); border-left: 4px solid var(--admin); border-radius: 12px; padding: 16px 20px; text-decoration: none; color: var(--ink); }
+.chapter-card:hover { border-color: var(--admin); }
+.chapter-card b { font-size: 15.5px; }
+.chapter-card p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+/* ページ送り */
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13.5px; }
+.pager a { color: var(--admin-deep); text-decoration: none; font-weight: 600; }
+
+footer.site-footer { border-top: 1px solid var(--line); padding: 26px 0 48px; color: var(--muted); font-size: 12.5px; background: var(--white); }
+footer.site-footer a { color: var(--accent-deep); }
+
+@media (max-width: 640px) {
+  .hero h1 { font-size: 23px; }
+  th, td { padding: 8px 9px; }
+  .entry-grid { grid-template-columns: 1fr; }
+}

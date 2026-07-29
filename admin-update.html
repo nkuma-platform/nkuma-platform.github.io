@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4. Nkuma 環境を最新版にアップデートする — 管理者ハンドブック</title>
+<meta name="description" content="nkuma の配布物 (plugin / テンプレ / エンジン / SDK / サポートページ) の届け方と、顧客環境のエンジン更新。">
+<link rel="stylesheet" href="./site.css">
+</head>
+<body class="admin-page">
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./guide.html">利用者ガイド</a>
+      <a href="./admin.html" class="current">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero admin">
+  <div class="wrap">
+    <div class="kicker">ADMIN HANDBOOK — 4</div>
+    <h1>Nkuma 環境を最新版にアップデートする</h1>
+    <p class="lead">nkuma の配布はすべて <b>pull 型</b>です — 開発リポジトリにマージしただけでは誰にも届かず、<b>管理者が版を刻んで publish した時だけ</b>利用側が受け取れるようになります (マージ ≠ 配布)。この章は「何をどう publish し、それがどう届くか」の一覧です。</p>
+    <div class="badge">頻度: 更新のたび (版は人の意図で bump)</div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#publish">4.1 配布物を publish する</a>
+    <a href="#engine">4.2 顧客環境のエンジンを新版にする</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <section id="publish">
+      <h2>4.1 配布物を publish する (5 種)</h2>
+      <table>
+        <tr><th>配布物</th><th>publish の仕方</th><th>版の文法</th><th>利用側への届き方</th></tr>
+        <tr><td><b>plugin</b> (skill / subagent / hook)</td><td><code>sync-marketplace.sh &lt;版&gt;</code></td><td>vYYYYMMDD-連番</td><td>各案件で <code>/plugin update</code> — <b>メンバーへのアナウンスが必要</b> (自動では届かない)</td></tr>
+        <tr><td><b>アプリテンプレ</b></td><td><code>sync-template.sh &lt;版&gt;</code></td><td>vYYYYMMDD-連番</td><td>新規案件の展開 (nk-poc-setup) から。<b>既存案件には反映されない</b> (スナップショット)</td></tr>
+        <tr><td><b>エンジンイメージ</b></td><td>GitHub Actions <b>release-dataplane-image</b> を手動起動 (版名を入力)</td><td>vYYYYMMDD-連番</td><td>ローカル: 起動時に AI (運転係) が最新版と照合し、人が「更新するか」を選ぶ / 顧客環境: <b>4.2 の取り込み</b></td></tr>
+        <tr><td><b>SDK</b> (nkuma-sdk)</td><td><code>publish-sdk.sh &lt;semver&gt;</code> (npm login 済みで)</td><td>semver (例 0.1.0)</td><td>公開 npm — 案件の <code>bun update</code></td></tr>
+        <tr><td><b>サポートページ</b> (このサイト)</td><td><code>sync-support-site.sh</code> (版なし)</td><td>—</td><td>即時 (push 後 1〜2 分で配信)</td></tr>
+      </table>
+      <div class="note">
+        <b>必要な持ち物</b>: 配布リポジトリへの push 権 (org owner で充足) / エンジン publish 用の Actions secret <code>NKUMA_GHCR_TOKEN</code> (write:packages、設定済み) / npm の publish 権。<br>
+        <b>スクリプトの正本</b>: 開発リポジトリの <code>nkuma/scripts/</code> (各スクリプト冒頭に使い方コメントあり)。配布先リポジトリは毎回ゼロから再生成される sync の産物なので<b>直接編集しない</b>。
+      </div>
+      <p class="muted">publish したら忘れずに: plugin の新版はメンバーに「<code>/plugin update</code> してね」のアナウンスを流す (<a href="./admin-members.html">2 章</a>の連絡経路)。</p>
+    </section>
+
+    <section id="engine">
+      <h2>4.2 顧客環境のエンジンを新版にする</h2>
+      <p>エンジンの新版はデータのマイグレーションを含むことがあるため、顧客環境への適用は<b>自動にせず、人の意図で行います</b>。2 手です:</p>
+      <ol class="steps">
+        <li><b>取り込み</b> — 配布置き場 (ghcr.io) から顧客の Container Registry へ、版タグを指定して <code>az acr import</code>。取り込みに使う read:packages PAT は管理者の手元にだけ置き、顧客環境・リポジトリには残しません</li>
+        <li><b>差し替え</b> — 記入用紙 (<a href="./admin-environment.html#bicep">1.2</a>) の <code>dataplaneImage</code> を新しい版タグへ変えて foundation を再実行</li>
+      </ol>
+      <div class="note">エンジンのシステムテーブル移行が絡む版は、エンジン側のリリースノートの手順に従ってください。コマンドの正本は開発リポジトリの infra/README「エンジンイメージの取り込み」。</div>
+    </section>
+
+    <div class="pager">
+      <a href="./admin-repository.html">← 3. リポジトリを登録する</a>
+      <a href="./admin-operations.html">5. 困ったとき・その他 →</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>

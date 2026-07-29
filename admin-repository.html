@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3. アプリを公開できるようにリポジトリを登録する — 管理者ハンドブック</title>
+<meta name="description" content="案件リポジトリを Nkuma 環境へ受け入れる管理者の手順 (フェデレーション認証の登録から Variables の返信まで)。">
+<link rel="stylesheet" href="./site.css">
+</head>
+<body class="admin-page">
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./guide.html">利用者ガイド</a>
+      <a href="./admin.html" class="current">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero admin">
+  <div class="wrap">
+    <div class="kicker">ADMIN HANDBOOK — 3</div>
+    <h1>Nkuma 環境にアプリを公開できるようにリポジトリを登録する</h1>
+    <p class="lead">案件から「公開したい」と依頼が来たら行う<b>受け入れ</b>の作業です。これが済むと、以降その案件は「main → deploy ブランチへのマージ」だけで公開まで自動で届くようになります — 作る人 (ドライバー) に Azure の権限は一切要りません。</p>
+    <div class="badge">頻度: 案件リポジトリごとに 1 回 ・ 権限: 対象 RG + Entra アプリ登録の所有</div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#how">仕組み</a>
+    <a href="#steps">手順</a>
+    <a href="#after">登録のあと</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <section id="how">
+      <h2>仕組み — 何を「登録」するのか</h2>
+      <p>アプリの配備は、案件リポジトリに同梱された GitHub Actions が <b>CI 用の身元</b> (<code>app-nkuma-gha-&lt;customer&gt;</code>) で全自動実行します。この CI 身元の認証は <b>GitHub OIDC (フェデレーション認証) 限定</b> — つまり「この GitHub リポジトリの、このブランチの Actions である」こと自体が身分証明になり、<b>シークレットも証明書も一切発行しません</b>。</p>
+      <p>受け入れとは、この CI 身元に対して:</p>
+      <ul>
+        <li><b>フェデレーション資格情報 (FIC)</b> を追加して「この案件リポジトリを信じる」と教え、</li>
+        <li><b>必要最小限のロール</b> (RG の Contributor + 付与できるロールを 2 つに限定した条件付き RBAC Administrator) を付け、</li>
+        <li>アプリのログイン戻り先 URL と、エンジンへの宣言登録の通行証 (運用者名簿) を配線する</li>
+      </ul>
+      <p>ことです。ほぼ全部スクリプトが冪等にやってくれます。</p>
+
+      <p>もう 1 つ、身元の話とは別に用意するものがあります — <b>アプリ専用のログイントークン金庫</b>です。公開されたアプリでは利用者が Entra ID でログインしますが (Easy Auth)、Container Apps は「ログインした人のトークンの預け先 (Blob) と、その鍵 (SAS URL)」を外から要求します (置き場を内蔵していない)。この鍵はこの環境で数少ない<b>本物の秘密</b>なので、CI には作らせず、<b>管理者がアプリを迎えるこのタイミングで 1 回だけ用意して Key Vault に格納</b>します。CI と アプリは Key Vault にある鍵を参照するだけです。</p>
+    </section>
+
+    <section id="steps">
+      <h2>手順</h2>
+      <p><b>入力</b>: ドライバーからの依頼に <b>リポジトリ名 / アプリ名 / 顧客名 / 初期 ADMIN にする人の UPN</b> が含まれます (案件側のガイドが雛形を出します)。</p>
+      <ol class="steps">
+        <li><b><code>oidc-setup.ps1</code> を実行</b> — CI 用登録の作成 (初回のみ) + 案件リポジトリの FIC 追加 + ロール付与 + ログイン用登録への戻り先 URL 追記 + <b>Variables 設定コマンド一式の出力</b>、まで一括 (冪等)</li>
+        <li><b><code>tokenstore-setup.ps1</code> を実行</b> — このアプリ用のログイントークン置き場づくり。<b>Storage アカウントは増えません</b> — 顧客共通のトークンストア用 Storage (<a href="./admin-environment.html#manual">1 章 手順 5</a> で作成済みの金庫室) の中に、このアプリ専用のコンテナ (部屋) <code>easyauth-&lt;アプリ名&gt;</code> を 1 つ切り、<b>その部屋だけ開く鍵 (SAS、期限 1 年)</b> を発行して Key Vault へ格納します (値は画面にもログにも表示されない。部屋を分けるのは、鍵が漏れても他アプリのトークンに届かないようにする分離)。これが無いと公開時のログイン構成が組めません。再実行すると SAS が上書きされる = <b>鍵のローテーションも同じスクリプト</b></li>
+        <li><b>① が出力した <code>gh variable set</code> コマンド一式をドライバーへ返信する</b> — すべて非秘密の識別子です。実行は案件リポジトリに書き込めるドライバー側 (社内で同一アカウント運用なら管理者がそのまま実行しても OK)</li>
+        <li><b>(顧客初回のみ) 運用者名簿に CI を載せる</b> — 記入用紙 (<a href="./admin-environment.html#bicep">1.2</a>) の <code>opsOperatorOids</code> に ① が表示した CI 身元の objectId を追記して foundation を再実行。これで CI がスキーマの宣言登録を行えるようになります</li>
+        <li><b>(顧客初回のみ) ログイン用登録の受付向け設定</b> — Application ID URI の設定 + 委任スコープの公開 + Azure CLI の事前承認 (Graph API の 2 段操作。順序に注意 — スコープ登録前に事前承認を送ると拒否されます)</li>
+      </ol>
+      <div class="note"><b>Entra への書き込みは管理者側に残しています</b> — CI に Graph 権限を渡すと権限も判子も増えるため、戻り先 URL の追記などはこの受け入れ作業のついでに管理者が済ませる設計です。コマンドの正本は開発リポジトリの infra/README「アプリの受け入れ」。</div>
+    </section>
+
+    <section id="after">
+      <h2>登録のあと — 管理者に残る仕事</h2>
+      <ul>
+        <li><b>通常時: 何もしない</b>。ドライバーの deploy マージごとに CI が「宣言登録 → ビルド → 差し替え → 版の記録」まで自動で行います</li>
+        <li><b>破壊的マイグレーションの承認だけは人</b> — データが消えうるスキーマ変更を CI が検出すると、計画を表示して止まります。内容を確認し、計画 ID をタイプして承認ワークフローを起動した時だけ適用されます (<a href="./admin-operations.html">5 章</a>)</li>
+        <li>初期 ADMIN の登録が依頼に含まれていれば、受付経由で 1 回シードします (以降のロール変更はアプリの管理画面で完結)</li>
+      </ul>
+    </section>
+
+    <div class="pager">
+      <a href="./admin-members.html">← 2. メンバーを招待する</a>
+      <a href="./admin-update.html">4. 最新版にアップデートする →</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>
