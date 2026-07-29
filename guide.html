@@ -69,12 +69,17 @@
         <b>ネットワークの前提</b>: 初回のブラウザ確認機能が自動でブラウザ実体 (約 150MB) をダウンロードします。外部ダウンロードが制限されている環境では管理者へ相談してください。
       </div>
 
-      <h3 id="ghcr">1.3 エンジン取得の権限づけ (最初に 1 回、チーム招待が済んでから)</h3>
-      <p>アプリのデータ保存を担う<b>共通基盤エンジン</b>は、private 置き場 (ghcr.io) の Docker イメージで届きます。取得できるように、gh の認証に権限を 1 つ足して docker をログインさせておきます:</p>
-      <pre>gh auth refresh -h github.com -s read:packages</pre>
-      <p class="muted">ブラウザが開くので、表示されたコードを入力して承認します。承認画面に organization の一覧が出ますが、これは gh が既に持っているアクセス範囲の確認表示で、この操作で新たに加わるのは「パッケージの読み取り」だけです。</p>
+      <h3 id="ghcr">1.3 gh の権限づけ (最初に 1 回、チーム招待が済んでから)</h3>
+      <p>gh の標準ログインでは足りない権限が 2 つあるので、まとめて 1 回で足しておきます:</p>
+      <ul>
+        <li><b>workflow</b> — 案件リポジトリには CI 設定 (ワークフローファイル) が含まれ、この権限がないと GitHub が push を拒否します</li>
+        <li><b>read:packages</b> — アプリのデータ保存を担う<b>共通基盤エンジン</b>が private 置き場 (ghcr.io) の Docker イメージで届くため、その取得に必要です</li>
+      </ul>
+      <pre>gh auth refresh -h github.com -s repo,workflow,read:packages</pre>
+      <p class="muted">ブラウザが開くので、表示されたコードを入力して承認します。承認画面に organization の一覧が出ますが、これは gh が既に持っているアクセス範囲の確認表示で、この操作で新たに加わるのは「ワークフローファイルの更新」と「パッケージの読み取り」だけです。</p>
+      <p>続けて、エンジンを取得できるように docker をログインさせておきます:</p>
       <pre>gh auth token | docker login ghcr.io -u $(gh api user -q .login) --password-stdin</pre>
-      <div class="note"><b>この手順は期限切れがなく、マシンごとに 1 回だけ</b>です。やり忘れても、エンジンが必要になった場面で AI (運転係) が同じ手順を案内してくれます。</div>
+      <div class="note"><b>この手順は期限切れがなく、マシンごとに 1 回だけ</b>です (同じ GitHub アカウントでも、PC が変われば再度必要です)。やり忘れても、必要になった場面で AI が同じ手順を案内してくれます (workflow は nk-init の環境チェック、read:packages はエンジン取得時の運転係)。</div>
     </section>
 
     <section id="install">
@@ -111,6 +116,7 @@
         <tr><td><code>/nkuma:nk-XXX</code> が見つからない</td><td><code>/plugin update</code> → Claude Code 再起動。直らなければ <code>/plugin uninstall nkuma@nkuma-marketplace</code> → install し直し (何度やっても安全)</td></tr>
         <tr><td>skill が古い挙動をする</td><td>同上 (= 新しい版が配布されたのに update していない可能性)</td></tr>
         <tr><td><code>gh</code> 関連のエラーで止まる</td><td><code>gh auth status</code> を確認 → 未認証なら <code>gh auth login --web</code></td></tr>
+        <tr><td>nk-init が「スコープ不足」で止まる / push が拒否される</td><td><a href="#ghcr">1.3 の権限づけ</a>を実行 (= workflow が付いていない。標準ログイン直後や別 PC ではこの状態です)</td></tr>
         <tr><td>エンジンイメージの取得で 403</td><td><a href="#ghcr">1.3 の 2 コマンド</a>をやり直し (= read:packages が付いていない)</td></tr>
         <tr><td>エンジンの版が合わないと言われる</td><td>AI に起動を頼めば版の照合ごとやってくれます (手動なら案件の <code>docker-compose.yml</code> の版を案内された版に変更して起動し直し)</td></tr>
         <tr><td>案件の CLAUDE.md の nkuma 欄が古い</td><td><code>/nkuma:nk-init</code> を再実行 — 初期化は<b>何度実行しても安全</b> (既存の成果物は壊さず、設定・看板だけ最新化)</td></tr>
