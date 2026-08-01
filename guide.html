@@ -75,7 +75,7 @@
       <div class="note"><b>ツールを入れた直後は、ターミナルを一度閉じて開き直してください。</b>開きっぱなしのターミナルは新しく入れたツールを認識しないため、入れたのに <code>command not found</code> のままになります (Claude Code / git / gh / bun すべて共通)。</div>
 
       <h3>1.4 前提ツール (チェックリスト)</h3>
-      <p>次の 6 つを順に確認します。「確認方法」のコマンドをターミナルで実行して (<a href="#terminal">1.3 のやり方</a>)、版の数字が返れば OK。返らないものだけ「入れ方」で入れてください:</p>
+      <p>次の 6 つ (必須) を順に確認します。「確認方法」のコマンドをターミナルで実行して (<a href="#terminal">1.3 のやり方</a>)、版の数字が返れば OK。返らないものだけ「入れ方」で入れてください:</p>
       <table>
         <tr><th>ツール</th><th>確認方法</th><th>入れ方</th></tr>
         <tr><td><b>Claude Code</b> (サブスクリプション + インストール)</td><td><code>claude --version</code></td><td><a href="https://claude.com/claude-code">claude.com/claude-code</a> の手順どおり (公式インストーラ)</td></tr>
@@ -84,6 +84,7 @@
         <tr><td><b>Node.js</b> (LTS 版)</td><td><code>node --version</code></td><td><a href="https://nodejs.org/ja">nodejs.org</a> (LTS 推奨版のインストーラ)</td></tr>
         <tr><td><b>bun</b> (1.0 以上)</td><td><code>bun --version</code></td><td>下のコマンド 1 行 (<a href="#bun-install">この節のすぐ下</a>)</td></tr>
         <tr><td><b>Docker</b> (Desktop)</td><td><code>docker --version</code></td><td><a href="https://www.docker.com/products/docker-desktop/">docker.com</a></td></tr>
+        <tr><td><b>Azure CLI</b> (任意 — <b>AI 機能 ($ai) をローカルで使う案件のみ</b>)</td><td><code>az --version</code></td><td><a href="https://learn.microsoft.com/ja-jp/cli/azure/install-azure-cli">learn.microsoft.com (Azure CLI)</a>。入れたら <code>az login</code> で会社アカウントにログイン (API キーは使いません — <a href="#run">§4</a>)</td></tr>
       </table>
       <div class="note">
         <b>Node.js と bun は両方必要です。</b>アプリの実行環境は <b>bun</b> が担いますが、画面のブラウザ確認機能 (Playwright MCP) が Node.js 同梱の <code>npx</code> で起動するため、Node.js も入れてください (入れるだけで OK — 直接使う場面はありません)。<br>
@@ -149,6 +150,8 @@
       <h2>4. アプリを動かすとき (共通基盤エンジンの起動)</h2>
       <p>アプリの土台は、データ保存を担う<b>共通基盤エンジン</b> (Docker イメージ) と一緒に動きます。エンジンの起動は、案件で nkuma (AI) に頼めば<b>運転係</b>が行います — 起動前に最新エンジン版と照合し、差があれば「更新するか今のままか」を確認されるので、選ぶだけで大丈夫です。</p>
       <p class="muted">手で起動する場合は、案件フォルダで <code>bun run dataplane</code> (テンプレに同梱のコマンド)。イメージ取得で 403 が出る場合は <a href="#ghcr">1.6 の権限づけ</a>が未実施です。</p>
+      <h3>AI 機能 ($ai) を使う案件のみ: 追加の準備</h3>
+      <p>LLM (Azure OpenAI) はローカルに代替が無いため、開発中も開発用の実リソースを呼びます。準備は 2 つだけ — <b>① Azure CLI を入れて <code>az login</code></b> (いつもの会社アカウントでログイン。<b>API キーは一切使いません</b> — あなたのログインがそのまま通行証になります)、<b>② 開発用 AI リソースへのロール付与を環境管理者に依頼</b> (初回のみ。付与後の反映に数分かかることがあります)。設定場所は案件の <code>docker-compose.yml</code> のコメント欄です。オフラインや CI では <b>stub モード</b> (決め打ち応答) に切り替えられます。</p>
     </section>
 
     <section id="publish">
@@ -164,7 +167,7 @@
         <tr><td>⑥ 開通</td><td>ログインを確認して URL を共有する。<b>① で伝えたあなたのアカウントは初回の配備で自動的に管理者 (ADMIN) 登録済み</b> — 誰かに登録をお願いする作業はありません</td><td>あなた</td></tr>
       </table>
       <ul>
-        <li><b>あなたに Azure の権限も az コマンドも要りません</b> — 前提ツールは 1.2 のまま (使うのは gh だけ)。Azure 側の操作はすべて管理者と CI が行います</li>
+        <li><b>公開の手順にあなたの Azure 権限や az コマンドは要りません</b> — 使うのは gh だけで、Azure 側の操作はすべて管理者と CI が行います (AI 機能をローカル開発で使う場合の az login は<a href="#run">§4</a> の話で、公開手順とは別)</li>
         <li><b>2 回目以降は「deploy へマージするだけ」</b>で更新が公開されます</li>
         <li><b>データが消えうる変更は自動で止まります</b> (安全装置)。止まったら nkuma と一緒に内容を確認し、承認の操作は人が行います</li>
         <li>公開後、アプリの利用者管理 (メンバーの追加・権限変更) は<b>アプリの管理画面 (<code>/admin</code>)</b> で完結します — 利用したい人には URL を共有するだけ (ログインすると自動で登録されます)</li>
