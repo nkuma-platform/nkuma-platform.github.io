@@ -45,7 +45,7 @@
         <tr><td><b>plugin</b> (skill / subagent / hook)</td><td><code>sync-marketplace.sh &lt;版&gt;</code></td><td>vYYYYMMDD-連番</td><td>各案件で <code>/plugin update</code> — <b>メンバーへのアナウンスが必要</b> (自動では届かない)</td></tr>
         <tr><td><b>アプリテンプレ</b></td><td><code>sync-template.sh &lt;版&gt;</code></td><td>vYYYYMMDD-連番</td><td>新規案件の展開 (nk-poc-setup) から。<b>既存案件には反映されない</b> (スナップショット)</td></tr>
         <tr><td><b>エンジンイメージ</b></td><td>GitHub Actions <b>release-dataplane-image</b> を手動起動 (版名を入力)</td><td>vYYYYMMDD-連番</td><td>ローカル: 起動時に AI (運転係) が最新版と照合し、人が「更新するか」を選ぶ / 顧客環境: <b>4.2 の取り込み</b></td></tr>
-        <tr><td><b>SDK</b> (nkuma-sdk)</td><td><code>publish-sdk.sh &lt;semver&gt;</code> (npm login 済みで)</td><td>semver (例 0.1.0)</td><td>公開 npm — 案件の <code>bun update</code></td></tr>
+        <tr><td><b>SDK</b> (nkuma-sdk)</td><td><code>publish-sdk.sh &lt;semver&gt;</code> (npm login 済みで。publish 前に実例 examples の型検査ゲートあり — 赤なら実例か契約のどちらかがズレている)</td><td>semver (例 0.1.0)</td><td>公開 npm — 案件の <code>bun update</code></td></tr>
         <tr><td><b>サポートページ</b> (このサイト)</td><td><code>sync-support-site.sh</code> (版なし)</td><td>—</td><td>即時 (push 後 1〜2 分で配信)</td></tr>
       </table>
       <div class="note">
