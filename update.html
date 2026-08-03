@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>更新ガイド — nkuma サポート</title>
+<meta name="description" content="nkuma を最新にする手順。plugin (専門家 skill 群) とテンプレート (案件の仕組み部品) の 2 つを更新します。">
+<link rel="icon" type="image/png" href="./images/nkuma-face.png">
+<link rel="stylesheet" href="./site.css">
+<script src="./site.js" defer></script>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html"><img src="./images/nkuma-face.png" alt="">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./guide.html">利用者ガイド</a>
+      <a href="./update.html" class="current">更新ガイド</a>
+      <a href="./admin.html">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="kicker">UPDATE GUIDE</div>
+        <h1>nkuma を<em>最新にする</em>。</h1>
+        <p class="lead">nkuma の更新は自動では届きません。<br>管理者から「新しい版を配布しました」の案内が来たら、このページの手順で受け取ります。<br>やることは 2 つだけ、あわせて 5 分ほどです。</p>
+        <div class="badge">対象: nkuma を使っているすべての人 — 管理者からの案内が来た時に</div>
+      </div>
+      <img class="hero-bear" src="./images/nkuma02.png" alt="案内するクマのキャラクター">
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#what">1. 更新のきほん</a>
+    <a href="#plugin">2. plugin のアップデート</a>
+    <a href="#template">3. テンプレートのアップデート</a>
+    <a href="#trouble">4. 困った時</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <section id="what">
+      <span class="kicker">OVERVIEW</span>
+      <h2>1. 更新のきほん — <em>何を・どこで・何回</em></h2>
+      <p>更新するものは 2 つあります。<br class="s">役割と回数が違うので、先に全体を掴んでください:</p>
+      <table>
+        <tr><th>何を</th><th>中身</th><th>どこでやる</th><th>回数</th></tr>
+        <tr><td><b>plugin</b> (<a href="#plugin">§2</a>)</td><td>nkuma の専門家 skill 群 — 対話の頭脳</td><td><b>ターミナル</b></td><td><b>PC ごとに 1 回</b> (全案件に効く)</td></tr>
+        <tr><td><b>テンプレート</b> (<a href="#template">§3</a>)</td><td>案件リポジトリに同梱された仕組みの部品 (CI 設定・公開ガイドなど)</td><td><b>Claude アプリ</b> (案件を開いて)</td><td><b>案件ごとに 1 回</b></td></tr>
+      </table>
+      <div class="note"><b>エンジン (データ保存の土台) の更新はここに含まれません。</b><br class="s">エンジンはアプリを動かす時に AI が自動で版を照合し、「更新するか今のままか」を訊いてくれます — 選ぶだけで OK です。</div>
+    </section>
+
+    <section id="plugin">
+      <span class="kicker">STEP 1 — PLUGIN</span>
+      <h2>2. plugin のアップデート <em>(ターミナルで 2 コマンド)</em></h2>
+      <p>使っている PC で 1 回だけ実行します。<br class="s">どのフォルダにいても OK、Claude Code の画面を開く必要もありません。</p>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>ターミナルを開いて 2 コマンドを実行する</b><div class="fs-body">1 つずつ貼り付けて Enter (開き方を忘れたら<a href="./guide.html#terminal">利用者ガイド 2.3</a>):<pre>claude plugin marketplace update nkuma-marketplace</pre><pre>claude plugin update nkuma@nkuma-marketplace</pre></div></div></div>
+        <div class="flow-step"><i>2</i><div><b>新しい版になったか確認する</b><div class="fs-body"><pre>claude plugin list</pre><code>nkuma@nkuma-marketplace</code> の Version が、案内された版 (例: <code>v20260801-1</code>) になっていれば OK です。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>Claude アプリのセッションを開き直す</b><div class="fs-body">開きっぱなしのセッションは古い版のまま動きます。<br class="s">新しいセッションを始めれば、そこから新版です。</div></div></div>
+      </div>
+      <div class="note"><b>Claude アプリの中で <code>/plugin ...</code> と打っても動きません</b> (アプリの仕様)。<br class="s">plugin の操作は必ずターミナルで行います。</div>
+    </section>
+
+    <section id="template">
+      <span class="kicker">STEP 2 — TEMPLATE</span>
+      <h2>3. テンプレートのアップデート <em>(案件ごとに、アプリで頼む)</em></h2>
+      <p>テンプレートは、案件リポジトリに同梱されている「仕組みの部品」(CI 設定・公開ガイド <code>DEPLOY.md</code> など) です。<br class="s">こちらは案件の中身に関わるので、<b>案件ごとに</b> Claude アプリの中で更新します。</p>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>案件フォルダを Claude アプリで開く</b><div class="fs-body">いつもどおり、更新したい案件のフォルダでセッションを始めます。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>「テンプレートの更新を適用して」と頼む</b><div class="fs-body">チャット欄に <code>/nkuma:nk-template-update</code> と入力しても同じです。<br class="s">nkuma が最新版と照合して、変わる部分の差分を見せてくれます。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>差分を見て、適用を決める</b><div class="fs-body">適用するかはあなたの確認を経てからです。<br class="s">迷ったら nkuma に「この差分はどういう意味?」と聞けば説明してくれます。</div></div></div>
+      </div>
+      <div class="note"><b>あなたが作ったアプリのコードには触りません。</b><br class="s">対象は nkuma が同梱した仕組みの部品だけです。<br class="s">また、テンプレート更新の案内が無い版もあります — 管理者のアナウンスに「テンプレも更新してください」とある時だけで大丈夫です。</div>
+    </section>
+
+    <section id="trouble">
+      <span class="kicker">TROUBLESHOOTING</span>
+      <h2>4. 困った時</h2>
+      <table>
+        <tr><th>症状</th><th>対処</th></tr>
+        <tr><td>更新したのに skill の挙動が変わらない</td><td>Claude アプリの<b>セッションを開き直したか</b>確認 (<a href="#plugin">§2</a> の手順 3)。<br class="s">直らなければ <code>claude plugin uninstall nkuma@nkuma-marketplace</code> → <a href="./guide.html#install">利用者ガイド 2.7</a> で入れ直し (何度やっても安全)</td></tr>
+        <tr><td><code>claude plugin update</code> がエラーになる</td><td><code>gh auth status</code> でログイン確認 (<a href="./guide.html#gh-login">利用者ガイド 2.5</a>)。<br class="s">初回導入がまだなら<a href="./guide.html#install">利用者ガイド 2.7</a> へ</td></tr>
+        <tr><td>その他</td><td><a href="./guide.html#trouble">利用者ガイドの「困った時の手引き」</a>へ。<br class="s">解決しなければ管理者 (taiga) に聞いてください</td></tr>
+      </table>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>このページが nkuma の<b>更新手順の正本</b>です。</p>
+    <p><a href="./index.html">トップ</a> ・ <a href="./guide.html">利用者ガイド</a> ・ <a href="./admin.html">管理者ハンドブック</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>

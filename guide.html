@@ -16,6 +16,7 @@
     <a class="brand" href="./index.html"><img src="./images/nkuma-face.png" alt="">nkuma <span>Support</span></a>
     <nav>
       <a href="./guide.html" class="current">利用者ガイド</a>
+      <a href="./update.html">更新ガイド</a>
       <a href="./admin.html">管理者ハンドブック</a>
     </nav>
   </div>
@@ -60,7 +61,7 @@
         <div class="tool-card">
           <span class="em">⌨️</span>
           <b>ターミナル <i>初回セットアップだけ</i></b>
-          <span>黒い文字入力の画面。<a href="#prepare">§2</a> のコマンドを、コピーして貼り付けて Enter するだけです。<br class="s">プログラミングの知識は要りません。<br class="s">日常でここに戻るのは更新の時 (<a href="#update">§8</a>) くらい。</span>
+          <span>黒い文字入力の画面。<a href="#prepare">§2</a> のコマンドを、コピーして貼り付けて Enter するだけです。<br class="s">プログラミングの知識は要りません。<br class="s">日常でここに戻るのは更新の時 (<a href="./update.html">更新ガイド</a>) くらい。</span>
         </div>
         <div class="tool-card app">
           <span class="em">💬</span>
@@ -185,7 +186,7 @@
         <figcaption>claude plugin list の結果 — nkuma が enabled になっていれば受け取り完了</figcaption>
       </figure>
       <div class="note"><b>1 行目の URL は必ず <code>https://</code> 付き</b>で貼ってください。<br class="s">短縮形 (<code>nkuma-platform/nkuma-marketplace</code>) だと SSH という別方式の接続になり、SSH の鍵を設定していないパソコンでは失敗します。</div>
-      <div class="note"><b>plugin の操作はターミナル専用です。</b><br class="s">Claude アプリの中で <code>/plugin ...</code> と打っても動きません (アプリの仕様)。<br class="s">困った時 (<a href="#trouble">§7</a>) や更新 (<a href="#update">§8</a>) のコマンドも、すべてターミナルで実行します。</div>
+      <div class="note"><b>plugin の操作はターミナル専用です。</b><br class="s">Claude アプリの中で <code>/plugin ...</code> と打っても動きません (アプリの仕様)。<br class="s">困った時 (<a href="#trouble">§7</a>) や更新 (<a href="./update.html">更新ガイド</a>) のコマンドも、すべてターミナルで実行します。</div>
       <div class="note">skill の呼び出しは常に <b><code>/nkuma:</code> 付き</b> (例: <code>/nkuma:nk-init</code>)。<br class="s">名前空間なし (<code>/nk-init</code>) では起動しません。</div>
     </section>
 
@@ -277,8 +278,8 @@
       <h2>7. 困った時の手引き</h2>
       <table>
         <tr><th>症状</th><th>対処</th></tr>
-        <tr><td>Claude アプリで <code>/plugin ...</code> が動かない・反応しない</td><td>アプリの仕様です (故障ではありません)。<br class="s">plugin の導入・更新・入れ直しは、すべて<b>ターミナル</b>の <code>claude plugin ...</code> コマンドで行います (<a href="#install">2.7</a> / <a href="#update">§8</a>)</td></tr>
-        <tr><td><code>/nkuma:nk-XXX</code> が見つからない</td><td>ターミナルで <a href="#update">§8 の更新 2 コマンド</a> → Claude アプリのセッションを開き直す。<br class="s">直らなければ <code>claude plugin uninstall nkuma@nkuma-marketplace</code> → <a href="#install">2.7</a> で入れ直し (何度やっても安全)</td></tr>
+        <tr><td>Claude アプリで <code>/plugin ...</code> が動かない・反応しない</td><td>アプリの仕様です (故障ではありません)。<br class="s">plugin の導入・更新・入れ直しは、すべて<b>ターミナル</b>の <code>claude plugin ...</code> コマンドで行います (<a href="#install">2.7</a> / <a href="./update.html">更新ガイド</a>)</td></tr>
+        <tr><td><code>/nkuma:nk-XXX</code> が見つからない</td><td>ターミナルで<a href="./update.html#plugin">更新ガイドの 2 コマンド</a> → Claude アプリのセッションを開き直す。<br class="s">直らなければ <code>claude plugin uninstall nkuma@nkuma-marketplace</code> → <a href="#install">2.7</a> で入れ直し (何度やっても安全)</td></tr>
         <tr><td>skill が古い挙動をする</td><td>同上 (= 新しい版が配布されたのに更新していない可能性)</td></tr>
         <tr><td>2.7 の <code>marketplace add</code> が失敗する</td><td>順に確認: ① チーム招待 (<a href="#prepare">2.2</a>) を承諾済みか ② <code>gh auth status</code> でログイン済みか (<a href="#gh-login">2.5</a>) ③ <code>gh auth setup-git</code> を実行したか (<a href="#gh-login">2.5</a> の最後) ④ URL を <code>https://</code> 付きで貼ったか</td></tr>
         <tr><td>ツールを入れたのに「認識されません」/ <code>command not found</code> のまま</td><td>ターミナルを<b>一度閉じて開き直す</b> (開きっぱなしのターミナルは新しく入れたツールを認識しません)</td></tr>
@@ -294,13 +295,9 @@
     <section id="update">
       <span class="kicker">UPDATE</span>
       <h2>8. 更新の受け取り方 <em>(日々の運用)</em></h2>
-      <ul>
-        <li>更新は<b>自動では届きません</b>。<br class="s">管理者から「新しい版を配布しました」の案内が流れたら、<b>ターミナルで</b>次の 2 コマンドを実行してください (実行後、Claude アプリはセッションを開き直せば新版になります):
-          <pre>claude plugin marketplace update nkuma-marketplace</pre>
-          <pre>claude plugin update nkuma@nkuma-marketplace</pre></li>
-        <li>エンジンの版更新は<b>起動時に AI が自動で照合</b>します (最新版があれば「更新するか今のままか」を確認されるので、選ぶだけで届きます)</li>
-        <li>案件リポジトリに同梱されている仕組みの部品 (CI 設定・公開ガイドなど) の更新は、nkuma に<b>「テンプレートの更新を適用して」</b> (<code>/nkuma:nk-template-update</code>) と頼むと、最新版との差分を見せてくれます — 適用するかはあなたが確認してから</li>
-      </ul>
+      <p>nkuma の更新は<b>自動では届きません</b>。<br class="s">管理者から「新しい版を配布しました」の案内が流れたら、更新の操作をします。</p>
+      <p>手順の正本は専用ページ「<a href="./update.html"><b>更新ガイド</b></a>」です。<br class="s">やることは 2 つ — plugin のアップデート (ターミナル、PC ごとに 1 回) と、テンプレートのアップデート (Claude アプリ、案件ごとに 1 回)。</p>
+      <p class="muted">エンジンの版更新はここに含まれません — アプリを動かす時に AI が自動で照合し、「更新するか今のままか」を訊いてくれます (<a href="#run">§5</a>)。</p>
     </section>
 
     <section id="ask">
