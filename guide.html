@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>利用者ガイド — nkuma サポート</title>
-<meta name="description" content="nkuma を使い始めるための準備・セットアップ・困った時の手引き。">
+<meta name="description" content="nkuma を使い始めるための準備・セットアップ・困った時の手引き。Claude Code がはじめての人向け。">
+<link rel="icon" type="image/png" href="./images/nkuma-face.png">
 <link rel="stylesheet" href="./site.css">
 <script src="./site.js" defer></script>
 </head>
@@ -12,7 +13,7 @@
 
 <div class="site-header">
   <div class="wrap">
-    <a class="brand" href="./index.html">nkuma <span>Support</span></a>
+    <a class="brand" href="./index.html"><img src="./images/nkuma-face.png" alt="">nkuma <span>Support</span></a>
     <nav>
       <a href="./guide.html" class="current">利用者ガイド</a>
       <a href="./admin.html">管理者ハンドブック</a>
@@ -22,142 +23,239 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="kicker">USER GUIDE</div>
-    <h1>利用者ガイド — セットアップからサポートまで</h1>
-    <p class="lead">nkuma は、Claude Code の上で動く南国ソフトの AI 開発基盤です。専門家 skill たちと対話しながら、顧客理解 → 設計 → 実装 → 公開まで一本の道で進めます。このページは「最初に何を揃えるか」から「困った時」までの正本です。</p>
-    <div class="badge">対象: nkuma を使い始める人 (エンジニアでなくても大丈夫)</div>
+    <div class="hero-grid">
+      <div>
+        <div class="kicker">USER GUIDE</div>
+        <h1>nkuma の<em>はじめかた</em>と、<br>困った時の手引き。</h1>
+        <p class="lead">nkuma は、Claude Code の上で動く南国ソフトの AI 業務アプリ基盤です。<br>専門家 skill たちと対話しながら、顧客理解 → 設計 → 実装 → 公開まで一本の道で進めます。<br>このページの手順どおりに進めば、はじめてでも迷いません。</p>
+        <div class="badge">対象: nkuma を使い始める人 — Claude Code がはじめてでも、エンジニアでなくても大丈夫</div>
+      </div>
+      <img class="hero-bear" src="./images/nkuma02.png" alt="案内するクマのキャラクター">
+    </div>
   </div>
 </header>
 
 <nav class="toc">
   <div class="wrap">
-    <a href="#prepare">1. 使う前の準備</a>
-    <a href="#install">2. nkuma の受け取り方</a>
-    <a href="#first-step">3. 最初の一歩</a>
-    <a href="#run">4. アプリを動かす</a>
-    <a href="#publish">5. アプリを公開する</a>
-    <a href="#trouble">6. 困った時</a>
-    <a href="#update">7. 更新の受け取り方</a>
-    <a href="#ask">8. 質問するには</a>
+    <a href="#overview">1. 全体像</a>
+    <a href="#prepare">2. 初回セットアップ</a>
+    <a href="#workspace">3. 案件フォルダと Claude アプリ</a>
+    <a href="#first-step">4. 最初の一歩</a>
+    <a href="#run">5. アプリを動かす</a>
+    <a href="#publish">6. アプリを公開する</a>
+    <a href="#trouble">7. 困った時</a>
+    <a href="#update">8. 更新の受け取り方</a>
+    <a href="#ask">9. 質問するには</a>
   </div>
 </nav>
 
 <main>
   <div class="wrap">
 
-    <section id="prepare">
-      <h2>1. 使う前の準備</h2>
+    <section id="overview">
+      <span class="kicker">OVERVIEW</span>
+      <h2>1. 全体像 — 使う道具は <em>2 つだけ</em></h2>
+      <p>nkuma の利用は、次の 2 つの道具の使い分けで成り立ちます:</p>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <span class="em">⌨️</span>
+          <b>ターミナル <i>初回セットアップだけ</i></b>
+          <span>黒い文字入力の画面。<a href="#prepare">§2</a> のコマンドを、コピーして貼り付けて Enter するだけです。<br class="s">プログラミングの知識は要りません。<br class="s">日常でここに戻るのは更新の時 (<a href="#update">§8</a>) くらい。</span>
+        </div>
+        <div class="tool-card app">
+          <span class="em">💬</span>
+          <b>Claude アプリ <i>毎日の利用はこちら</i></b>
+          <span>デスクトップ版の Claude アプリ。<br class="s">案件フォルダを開いて、nkuma の専門家たちと日本語で対話しながらアプリを作っていきます。</span>
+        </div>
+      </div>
+      <p>もう 1 つ、最初に知っておくと迷わない考え方があります:</p>
+      <div class="card accent">
+        <p><b>「1 つの案件 (作りたいアプリ) = パソコンの中の 1 つのフォルダ」</b>です。<br class="s">nkuma との会話の記録も、できあがっていくアプリのコードも、ぜんぶその案件のフォルダの中に貯まっていきます。</p>
+        <p>新しい案件を始める = 空のフォルダを 1 つ作る。<br class="s">続きをやる = 前と同じフォルダを開く。<br class="s">それだけです (作り方・開き方は <a href="#workspace">§3</a>)。</p>
+      </div>
+      <p>このページの道のりは 4 歩です:</p>
+      <div class="journey">
+        <div class="journey-step once" data-no="1"><b>初回セットアップ</b><span>ツールを入れて nkuma を受け取る</span><small>ターミナル・1 回だけ</small></div>
+        <div class="journey-step" data-no="2"><b>案件フォルダを作る</b><span>空のフォルダを 1 つ。<br class="s">それが案件の器</span><small>案件ごとに 1 回</small></div>
+        <div class="journey-step" data-no="3"><b>nkuma と対話する</b><span>Claude アプリでフォルダを開いて話す</span><small>毎日ここ</small></div>
+        <div class="journey-step" data-no="4"><b>動かして、公開する</b><span>できたアプリを試し、チームへ届ける</span><small>nkuma が案内</small></div>
+      </div>
+    </section>
 
-      <h3>1.1 GitHub アカウントを用意する (最初に 1 回)</h3>
-      <p>nkuma の配布物はすべて GitHub 経由で届くので、最初に GitHub アカウントが必要です。まだ持っていない人は次の手順で作ります (無料プランで大丈夫です):</p>
+    <section id="prepare">
+      <span class="kicker">SETUP — STEP 1</span>
+      <h2>2. 初回セットアップ <em>(上から順に、1 回だけ)</em></h2>
+      <p>この章は<b>上から順に</b>進めてください。<br class="s">全部で 30〜60 分ほど、どの手順も 1 回きりです。</p>
+
+      <h3>2.1 GitHub アカウントを用意する</h3>
+      <p>nkuma の配布物はすべて GitHub 経由で届くので、最初に GitHub アカウントが必要です。<br class="s">まだ持っていない人は次の手順で作ります (無料プランで大丈夫です):</p>
       <ol class="steps">
         <li><a href="https://github.com/signup">github.com/signup</a> を開く</li>
-        <li><b>メールアドレス → パスワード → ユーザー名</b>の順に入力する。ユーザー名は半角英数 (とハイフン) で、これがあなたの<b>「GitHub アカウント名」</b>になります (後で管理者に伝える名前です)</li>
-        <li>届いた確認メールのコード (またはリンク) で認証したら完了。プラン選択の画面が出たら <b>Free</b> のままで OK です</li>
+        <li><b>メールアドレス → パスワード → ユーザー名</b>の順に入力する。<br class="s">ユーザー名は半角英数 (とハイフン) で、これがあなたの<b>「GitHub アカウント名」</b>になります (後で管理者に伝える名前です)</li>
+        <li>届いた確認メールのコード (またはリンク) で認証したら完了。<br class="s">プラン選択の画面が出たら <b>Free</b> のままで OK です</li>
       </ol>
 
-      <h3>1.2 管理者に伝えるもの (最初に 1 回)</h3>
+      <h3>2.2 管理者に伝えるもの</h3>
       <div class="card accent">
-        <p>管理者 (taiga) に <b>GitHub アカウント名</b> (1.1 で決めたユーザー名) を伝えて、以下を依頼してください:</p>
+        <p>管理者 (taiga) に <b>GitHub アカウント名</b> (2.1 で決めたユーザー名) を伝えて、以下を依頼してください:</p>
         <ul>
           <li>GitHub organization <b>nkuma-platform</b> のチーム招待 (= 配布物の取得権限が付きます)</li>
-          <li>クラウド版 Claude Code を使いたい場合は、その旨もあわせて伝える (管理者側の設定が必要です)</li>
         </ul>
+        <p class="muted">招待メールが届いたら、リンクを開いて <b>Join</b> (承諾) しておいてください。<br class="s">承諾しないと 2.7 の受け取りで失敗します。</p>
       </div>
 
-      <h3 id="terminal">1.3 コマンドの実行のしかた (ターミナルの開き方)</h3>
+      <h3 id="terminal">2.3 ターミナルの開き方 (コマンドの実行のしかた)</h3>
       <p>このページに出てくる「コマンド」は、すべて<b>ターミナル</b> (黒い文字入力の画面) に貼り付けて Enter を押すだけです:</p>
-      <ol class="steps">
-        <li><b>ターミナルを開く</b> — Windows はスタートメニューで「<b>Git Bash</b>」を検索して開く (git を入れると一緒に入ります。まだ git が無い段階では「PowerShell」でも OK)。Mac は Spotlight (⌘ + Space) で「<b>ターミナル</b>」を検索して開く</li>
-        <li><b>コマンドを貼り付ける</b> — このページのコマンド枠は右上の「コピー」ボタンでコピーできます。ターミナルに貼り付けて (Git Bash は右クリック → Paste、Mac は ⌘V) <b>Enter</b></li>
-        <li><b>結果を読む</b> — 例えば <code>git --version</code> と打って <code>git version 2.45.0</code> のように<b>版の数字が返れば「入っている」</b>、<code>command not found</code> (コマンドが見つかりません) と返れば<b>「まだ入っていない」</b>です</li>
-      </ol>
-      <div class="note"><b>ツールを入れた直後は、ターミナルを一度閉じて開き直してください。</b>開きっぱなしのターミナルは新しく入れたツールを認識しないため、入れたのに <code>command not found</code> のままになります (Claude Code / git / gh / bun すべて共通)。</div>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>ターミナルを開く</b><div class="fs-body">Windows はスタートメニューで「<b>ターミナル</b>」を検索して開く (見つからなければ「PowerShell」でも同じです)。<br class="s">Mac は Spotlight (⌘ + Space) で「<b>ターミナル</b>」を検索して開く。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>コマンドを貼り付けて Enter</b><div class="fs-body">このページのコマンド枠は右上の「コピー」ボタンでコピーできます。<br class="s">ターミナルに貼り付けて (Windows は Ctrl+V または右クリック、Mac は ⌘V) <b>Enter</b>。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>結果を読む</b><div class="fs-body">例えば <code>git --version</code> と打って <code>git version 2.45.0</code> のように<b>版の数字が返れば「入っている」</b>、「<b>認識されません</b>」(Mac は <code>command not found</code>) と返れば<b>「まだ入っていない」</b>です。</div></div></div>
+      </div>
+      <figure class="shot">
+        <div class="shot-frame"><img src="./images/shots/terminal-example.png" alt="ターミナルで git --version を実行した画面"></div>
+        <figcaption>ターミナルの見た目 — コマンドを打つと結果が文字で返ります</figcaption>
+      </figure>
+      <div class="note"><b>ツールを入れた直後は、ターミナルを一度閉じて開き直してください。</b><br class="s">開きっぱなしのターミナルは新しく入れたツールを認識しないため、入れたのに「認識されません」のままになります (Claude Code / git / gh / bun すべて共通)。</div>
 
-      <h3>1.4 前提ツール (チェックリスト)</h3>
-      <p>次の 6 つ (必須) を順に確認します。「確認方法」のコマンドをターミナルで実行して (<a href="#terminal">1.3 のやり方</a>)、版の数字が返れば OK。返らないものだけ「入れ方」で入れてください:</p>
+      <h3>2.4 ツールを入れる (チェックリスト)</h3>
+      <p>次の 7 つ (必須) を順に確認します。<br class="s">「確認方法」のコマンドをターミナルで実行して (<a href="#terminal">2.3 のやり方</a>)、版の数字が返れば OK。<br class="s">返らないものだけ「入れ方」で入れてください:</p>
       <table>
         <tr><th>ツール</th><th>確認方法</th><th>入れ方</th></tr>
-        <tr><td><b>Claude Code</b> (サブスクリプション + インストール)</td><td><code>claude --version</code></td><td><a href="https://claude.com/claude-code">claude.com/claude-code</a> の手順どおり (公式インストーラ)</td></tr>
-        <tr><td><b>git</b></td><td><code>git --version</code></td><td><a href="https://git-scm.com/">git-scm.com</a> (Windows はここで Git Bash も一緒に入ります)</td></tr>
-        <tr><td><b>gh CLI</b> (GitHub 公式コマンド)</td><td><code>gh --version</code></td><td><a href="https://cli.github.com/">cli.github.com</a>。入れたらログインへ → <a href="#gh-login">1.5</a></td></tr>
+        <tr><td><b>Claude アプリ</b> (デスクトップ版 — 日常利用の主役)</td><td>アプリを起動してログインできる</td><td><a href="https://claude.ai/download">claude.ai/download</a> からインストールして、会社で使っている Claude アカウントでログイン</td></tr>
+        <tr><td><b>Claude Code CLI</b> (ターミナル用 — セットアップと plugin 管理で使う)</td><td><code>claude --version</code></td><td><a href="https://claude.com/claude-code">claude.com/claude-code</a> の手順どおり (公式インストーラ)</td></tr>
+        <tr><td><b>git</b></td><td><code>git --version</code></td><td><a href="https://git-scm.com/">git-scm.com</a> (Windows 用インストーラは設定を全部そのまま Next で OK)</td></tr>
+        <tr><td><b>gh CLI</b> (GitHub 公式コマンド)</td><td><code>gh --version</code></td><td><a href="https://cli.github.com/">cli.github.com</a>。<br class="s">入れたらログインへ → <a href="#gh-login">2.5</a></td></tr>
         <tr><td><b>Node.js</b> (LTS 版)</td><td><code>node --version</code></td><td><a href="https://nodejs.org/ja">nodejs.org</a> (LTS 推奨版のインストーラ)</td></tr>
         <tr><td><b>bun</b> (1.0 以上)</td><td><code>bun --version</code></td><td>下のコマンド 1 行 (<a href="#bun-install">この節のすぐ下</a>)</td></tr>
         <tr><td><b>Docker</b> (Desktop)</td><td><code>docker --version</code></td><td><a href="https://www.docker.com/products/docker-desktop/">docker.com</a></td></tr>
-        <tr><td><b>Azure CLI</b> (任意 — <b>AI 機能 ($ai) をローカルで使う案件のみ</b>)</td><td><code>az --version</code></td><td><a href="https://learn.microsoft.com/ja-jp/cli/azure/install-azure-cli">learn.microsoft.com (Azure CLI)</a>。入れたら <code>az login</code> で会社アカウントにログイン (API キーは使いません — <a href="#run">§4</a>)</td></tr>
+        <tr><td><b>Azure CLI</b> (任意 — <b>AI 機能 ($ai) をローカルで使う案件のみ</b>)</td><td><code>az --version</code></td><td><a href="https://learn.microsoft.com/ja-jp/cli/azure/install-azure-cli">learn.microsoft.com (Azure CLI)</a>。<br class="s">入れたら <code>az login</code> で会社アカウントにログイン (API キーは使いません — <a href="#run">§5</a>)</td></tr>
       </table>
       <div class="note">
-        <b>Node.js と bun は両方必要です。</b>アプリの実行環境は <b>bun</b> が担いますが、画面のブラウザ確認機能 (Playwright MCP) が Node.js 同梱の <code>npx</code> で起動するため、Node.js も入れてください (入れるだけで OK — 直接使う場面はありません)。<br>
-        <b>OS の前提</b>: Windows は Git Bash 同梱の環境で使います (git のインストールで一緒に入ります)。Mac / Linux はそのままで OK。<br>
-        <b>ネットワークの前提</b>: 初回のブラウザ確認機能が自動でブラウザ実体 (約 150MB) をダウンロードします。外部ダウンロードが制限されている環境では管理者へ相談してください。
+        <ul>
+          <li><b>Claude アプリと Claude Code CLI は別物で、両方必要です。</b><br class="s">アプリが日常利用の画面、CLI がターミナルからのセットアップ・plugin 管理の担当です (アプリを入れてもターミナルの <code>claude</code> コマンドは付いてきません)。<br class="s">アカウントは同じものでログインします。</li>
+          <li><b>Node.js と bun も両方必要です。</b><br class="s">アプリの実行環境は bun が担いますが、画面のブラウザ確認機能が Node.js 同梱の <code>npx</code> で起動するためです。<br class="s">Node.js は入れるだけで OK — 直接使う場面はありません。</li>
+          <li><b>OS の前提</b>: Windows は標準の「ターミナル」で OK です (git のインストールだけは必須 — Claude Code が内部で使います)。<br class="s">Mac / Linux はそのままで OK。</li>
+          <li><b>ネットワークの前提</b>: 初回のブラウザ確認機能が自動でブラウザ実体 (約 150MB) をダウンロードします。<br class="s">外部ダウンロードが制限されている環境では管理者へ相談してください。</li>
+        </ul>
       </div>
 
       <h4 id="bun-install">bun の入れ方 (コマンド 1 行)</h4>
       <p>Mac / Linux はターミナルで:</p>
       <pre>curl -fsSL https://bun.sh/install | bash</pre>
-      <p>Windows は PowerShell (または Git Bash) で:</p>
+      <p>Windows はターミナルで:</p>
       <pre>powershell -c "irm bun.sh/install.ps1 | iex"</pre>
       <p class="muted">入れたらターミナルを<b>閉じて開き直して</b> <code>bun --version</code> — 版の数字が返れば完了です。</p>
 
-      <h3 id="gh-login">1.5 gh のログイン (最初に 1 回)</h3>
+      <h3 id="gh-login">2.5 gh のログイン</h3>
       <p>gh CLI を入れたら、GitHub アカウントと結びつけるログインを 1 回だけ行います:</p>
-      <ol class="steps">
-        <li>ターミナルで次を実行:
-          <pre>gh auth login --web</pre></li>
-        <li>いくつか質問が出ますが、<b>すべてそのまま Enter</b> (既定の選択) で大丈夫です (GitHub.com / HTTPS / Yes)</li>
-        <li><b>ワンタイムコード</b> (例: <code>A1B2-C3D4</code>) が表示されるので控えて、Enter を押すとブラウザが開きます</li>
-        <li>ブラウザで GitHub にログイン → 控えたコードを入力 → <b>Authorize github</b> を押す</li>
-        <li>ターミナルに戻って完了表示が出たら、確認:
-          <pre>gh auth status</pre>
-          アカウント名と <code>Logged in</code> が表示されれば OK です</li>
-      </ol>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>ログインを開始する</b><div class="fs-body">ターミナルで次を実行:<pre>gh auth login --web</pre>いくつか質問が出ますが、<b>すべてそのまま Enter</b> (既定の選択) で大丈夫です (GitHub.com / HTTPS / Yes)。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>ワンタイムコードで認証する</b><div class="fs-body"><b>ワンタイムコード</b> (例: <code>A1B2-C3D4</code>) が表示されるので控えて、Enter を押すとブラウザが開きます。<br class="s">ブラウザで GitHub にログイン → 控えたコードを入力 → <b>Authorize github</b> を押す。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>確認する</b><div class="fs-body"><pre>gh auth status</pre>アカウント名と <code>Logged in</code> が表示されれば OK です。</div></div></div>
+        <div class="flow-step"><i>4</i><div><b>git にもこのログインを使わせる</b><div class="fs-body"><pre>gh auth setup-git</pre>画面には何も出ませんが、それで正常です (2.7 の受け取りと案件リポジトリの操作に必要です)。</div></div></div>
+      </div>
+      <figure class="shot">
+        <div class="shot-frame"><img src="./images/shots/gh-auth-login.png" alt="gh auth login のワンタイムコードが表示された画面"></div>
+        <figcaption>gh auth login のワンタイムコード表示 — このコードをブラウザに入力します</figcaption>
+      </figure>
 
-      <h3 id="ghcr">1.6 gh の権限づけ (最初に 1 回、チーム招待が済んでから)</h3>
+      <h3 id="ghcr">2.6 gh の権限づけ (チーム招待が済んでから)</h3>
       <p>gh の標準ログインでは足りない権限が 2 つあるので、まとめて 1 回で足しておきます:</p>
       <ul>
         <li><b>workflow</b> — 案件リポジトリには CI 設定 (ワークフローファイル) が含まれ、この権限がないと GitHub が push を拒否します</li>
         <li><b>read:packages</b> — アプリのデータ保存を担う<b>共通基盤エンジン</b>が private 置き場 (ghcr.io) の Docker イメージで届くため、その取得に必要です</li>
       </ul>
       <pre>gh auth refresh -h github.com -s repo,workflow,read:packages</pre>
-      <p class="muted">ブラウザが開くので、表示されたコードを入力して承認します。承認画面に organization の一覧が出ますが、これは gh が既に持っているアクセス範囲の確認表示で、この操作で新たに加わるのは「ワークフローファイルの更新」と「パッケージの読み取り」だけです。</p>
+      <p class="muted">ブラウザが開くので、表示されたコードを入力して承認します。</p>
+      <p class="muted">承認画面に organization の一覧が出ますが、これは gh が既に持っているアクセス範囲の確認表示です。<br class="s">この操作で新たに加わるのは「ワークフローファイルの更新」と「パッケージの読み取り」の 2 つだけです。</p>
       <p>続けて、エンジンを取得できるように docker をログインさせておきます:</p>
       <pre>gh auth token | docker login ghcr.io -u $(gh api user -q .login) --password-stdin</pre>
-      <div class="note"><b>この手順は期限切れがなく、マシンごとに 1 回だけ</b>です (同じ GitHub アカウントでも、PC が変われば再度必要です)。やり忘れても、必要になった場面で AI が同じ手順を案内してくれます (workflow は nk-init の環境チェック、read:packages はエンジン取得時の運転係)。</div>
+      <div class="note"><b>この手順は期限切れがなく、マシンごとに 1 回だけ</b>です (同じ GitHub アカウントでも、PC が変われば再度必要です)。<br class="s">やり忘れても、必要になった場面で AI が同じ手順を案内してくれます (workflow は nk-init の環境チェック、read:packages はエンジン取得時の運転係)。</div>
+
+      <h3 id="install">2.7 nkuma を受け取る (plugin の導入)</h3>
+      <p>ここまでの準備ができたら、nkuma 本体 (plugin) を受け取ります。<b>ターミナルで</b>次の 2 コマンドを<b>1 つずつ</b>実行してください (どのフォルダにいても OK。<br class="s">Claude Code の画面を開く必要はありません):</p>
+      <pre>claude plugin marketplace add https://github.com/nkuma-platform/nkuma-marketplace</pre>
+      <pre>claude plugin install nkuma@nkuma-marketplace</pre>
+      <p>導入できたかの確認:</p>
+      <pre>claude plugin list</pre>
+      <p><code>nkuma@nkuma-marketplace</code> が <code>enabled</code> と表示されれば完了です。</p>
+      <p>ターミナルで入れた plugin は、Claude アプリにもそのまま反映されます (設定が共有されています)。</p>
+      <figure class="shot">
+        <div class="shot-frame"><img src="./images/shots/plugin-list.png" alt="claude plugin list で nkuma が enabled と表示された画面"></div>
+        <figcaption>claude plugin list の結果 — nkuma が enabled になっていれば受け取り完了</figcaption>
+      </figure>
+      <div class="note"><b>1 行目の URL は必ず <code>https://</code> 付き</b>で貼ってください。<br class="s">短縮形 (<code>nkuma-platform/nkuma-marketplace</code>) だと SSH という別方式の接続になり、SSH の鍵を設定していないパソコンでは失敗します。</div>
+      <div class="note"><b>plugin の操作はターミナル専用です。</b><br class="s">Claude アプリの中で <code>/plugin ...</code> と打っても動きません (アプリの仕様)。<br class="s">困った時 (<a href="#trouble">§7</a>) や更新 (<a href="#update">§8</a>) のコマンドも、すべてターミナルで実行します。</div>
+      <div class="note">skill の呼び出しは常に <b><code>/nkuma:</code> 付き</b> (例: <code>/nkuma:nk-init</code>)。<br class="s">名前空間なし (<code>/nk-init</code>) では起動しません。</div>
     </section>
 
-    <section id="install">
-      <h2>2. nkuma の受け取り方 (plugin の導入)</h2>
-      <p>案件フォルダ (どこでも OK) でターミナルから <code>claude</code> と打って Claude Code を開き、次の 2 コマンドを<b>1 つずつ</b>実行します (gh 認証済みの資格で取得されます):</p>
-      <pre>/plugin marketplace add nkuma-platform/nkuma-marketplace</pre>
-      <pre>/plugin install nkuma@nkuma-marketplace</pre>
-      <p>導入できたかの確認: Claude Code を<b>再起動</b>して <code>/nkuma:nk-master</code> と打ち、skill が起動すれば OK です。</p>
-      <div class="note">skill の呼び出しは常に <b><code>/nkuma:</code> 付き</b> (例: <code>/nkuma:nk-init</code>)。名前空間なし (<code>/nk-init</code>) では起動しません。</div>
+    <section id="workspace">
+      <span class="kicker">WORKSPACE — STEP 2 &amp; 3</span>
+      <h2>3. 案件フォルダを作って、<em>Claude アプリで開く</em></h2>
+      <p>初回セットアップが済んだら、ここからが日常の入口です。<a href="#overview">§1</a> のとおり「1 案件 = 1 フォルダ」— まず器になるフォルダを作り、それを Claude アプリで開きます。</p>
+
+      <h3>3.1 案件フォルダを作る (新しい案件を始める時に 1 回)</h3>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>置き場所を開く</b><div class="fs-body">Windows は<b>エクスプローラー</b>、Mac は <b>Finder</b> を開き、「ドキュメント」など自分の分かりやすい場所へ移動する。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>空のフォルダを 1 つ作る</b><div class="fs-body">右クリック → <b>新規作成 → フォルダー</b> (Mac は右クリック → 新規フォルダ)。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>名前を付ける</b><div class="fs-body">フォルダ名は<b>半角英数とハイフン</b>で (例: <code>kintai-app</code>、<code>uriage-kanri</code>)。<br class="s">日本語やスペース入りの名前は思わぬ不具合の元なので避けてください。</div></div></div>
+      </div>
+      <figure class="shot">
+        <div class="shot-frame"><img src="./images/shots/explorer-new-folder.png" alt="エクスプローラーで新規フォルダを作成する画面"></div>
+        <figcaption>エクスプローラーで案件フォルダを作る — 名前は半角英数で</figcaption>
+      </figure>
+      <div class="note"><b>1 案件 1 フォルダを守ってください。</b><br class="s">同じフォルダで別のアプリを作り始めると、nkuma が 2 つの案件を混ぜて理解してしまいます。<br class="s">続きの作業はいつも同じフォルダ、新しい案件は新しいフォルダです。</div>
+
+      <h3>3.2 Claude アプリでフォルダを開く (毎回の入口)</h3>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>Claude アプリを起動する</b><div class="fs-body"><b>Code</b> の画面から新しいセッションを開始する。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>実行環境は Local を選ぶ</b><div class="fs-body">自分のパソコンの上で動かす、という意味です。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>案件フォルダを選ぶ</b><div class="fs-body"><b>フォルダ選択 (Select folder)</b> で、3.1 で作った案件フォルダを選ぶ。</div></div></div>
+      </div>
+      <figure class="shot">
+        <div class="shot-frame"><img src="./images/shots/app-new-session.png" alt="Claude アプリの新しいセッション開始画面 — Local とフォルダ選択"></div>
+        <figcaption>Claude アプリの新しいセッション — Local を選んで案件フォルダを開きます</figcaption>
+      </figure>
+      <p class="muted">これで nkuma と話す準備が整いました。<br class="s">2 回目以降も同じ — アプリを開いて、同じ案件フォルダで新しいセッションを始めるだけです。</p>
     </section>
 
     <section id="first-step">
-      <h2>3. 最初の一歩 (新しい案件の始め方)</h2>
+      <span class="kicker">FIRST STEP</span>
+      <h2>4. 最初の一歩 <em>(新しい案件の始め方)</em></h2>
       <ol class="steps">
-        <li>案件用の<b>空のフォルダ</b>を作り、そこで Claude Code を開く</li>
-        <li><code>/nkuma:nk-init</code> を実行 — キックオフの専門家が、環境チェック → 案件リポジトリの初期化 → 顧客理解のインタビューまで対話で導きます</li>
+        <li>案件フォルダを Claude アプリで開いた状態で (<a href="#workspace">§3</a>)、チャット欄に <code>/nkuma:nk-init</code> と入力して実行 — キックオフの専門家が、環境チェック → 案件リポジトリの初期化 → 顧客理解のインタビューまで対話で導きます</li>
         <li>以降は迷ったら <code>/nkuma:nk-master</code> — チームリーダー役が現在地を把握して、次に話すべき専門家 (設計対話 / 実装 / QA など) へ案内します</li>
       </ol>
+      <figure class="shot">
+        <div class="shot-frame"><img src="./images/shots/app-nk-init.png" alt="Claude アプリのチャット欄に /nkuma:nk-init と入力した画面"></div>
+        <figcaption>チャット欄に /nkuma:nk-init — ここから nkuma との旅が始まります</figcaption>
+      </figure>
       <p class="muted">旅の全体像 (各 skill が案内するので暗記は不要です):</p>
       <pre><code>nk-init (キックオフ) → nk-domain-talk (顧客理解・設計) → nk-sprint-talk (何を作るか決める)
 → nk-poc-setup (動く土台を展開) → nk-dev-worker (実装) → nk-qa (テスト) → nk-ship (公開)</code></pre>
     </section>
 
     <section id="run">
-      <h2>4. アプリを動かすとき (共通基盤エンジンの起動)</h2>
-      <p>アプリの土台は、データ保存を担う<b>共通基盤エンジン</b> (Docker イメージ) と一緒に動きます。エンジンの起動は、案件で nkuma (AI) に頼めば<b>運転係</b>が行います — 起動前に最新エンジン版と照合し、差があれば「更新するか今のままか」を確認されるので、選ぶだけで大丈夫です。</p>
-      <p class="muted">手で起動する場合は、案件フォルダで <code>bun run dataplane</code> (テンプレに同梱のコマンド)。イメージ取得で 403 が出る場合は <a href="#ghcr">1.6 の権限づけ</a>が未実施です。</p>
+      <span class="kicker">RUN</span>
+      <h2>5. アプリを動かすとき <em>(共通基盤エンジンの起動)</em></h2>
+      <p>アプリの土台は、データ保存を担う<b>共通基盤エンジン</b> (Docker イメージ) と一緒に動きます。</p>
+      <p>エンジンの起動は、案件で nkuma (AI) に「動かして」と頼むだけです。<br class="s">起動前に最新エンジン版との照合があり、差があれば「更新するか今のままか」を訊かれるので、選ぶだけで大丈夫です。</p>
+      <p class="muted">手で起動する場合は、案件フォルダで <code>bun run dataplane</code> (テンプレに同梱のコマンド)。<br class="s">イメージ取得で 403 が出る場合は <a href="#ghcr">2.6 の権限づけ</a>が未実施です。</p>
       <h3>AI 機能 ($ai) を使う案件のみ: 追加の準備</h3>
-      <p>LLM (Azure OpenAI) はローカルに代替が無いため、開発中も開発用の実リソースを呼びます。準備は 2 つだけ — <b>① Azure CLI を入れて <code>az login</code></b> (いつもの会社アカウントでログイン。<b>API キーは一切使いません</b> — あなたのログインがそのまま通行証になります)、<b>② 開発用 AI リソースへのロール付与を環境管理者に依頼</b> (初回のみ。付与後の反映に数分かかることがあります)。設定場所は案件の <code>docker-compose.yml</code> のコメント欄です。オフラインや CI では <b>stub モード</b> (決め打ち応答) に切り替えられます。</p>
+      <p>LLM (Azure OpenAI) はローカルに代替が無いため、開発中も開発用の実リソースを呼びます。<br class="s">準備は 2 つだけです:</p>
+      <ol class="steps">
+        <li><b>Azure CLI を入れて <code>az login</code></b> — いつもの会社アカウントでログインします。<b>API キーは一切使いません</b> (あなたのログインがそのまま通行証になります)</li>
+        <li><b>開発用 AI リソースへのロール付与を環境管理者に依頼</b> — 初回のみ。<br class="s">付与後の反映に数分かかることがあります</li>
+      </ol>
+      <p class="muted">設定場所は案件の <code>docker-compose.yml</code> のコメント欄です。<br class="s">オフラインや CI では <b>stub モード</b> (決め打ち応答) に切り替えられます。</p>
     </section>
 
     <section id="publish">
-      <h2>5. アプリを公開するとき (人に共有できるようにする)</h2>
-      <p>できたアプリを Azure に公開してログイン付きで共有するには、nkuma に<b>「公開したい」</b>と言ってください (<code>/nkuma:nk-ship</code>)。手順の正本は<b>案件リポジトリに同梱されている公開ガイド <code>DEPLOY.md</code></b> — nkuma が現在地を見て「いまどの段か・次に何をするか」を案内するので、ここでは全体像だけ掴めば十分です。</p>
-      <table>
+      <span class="kicker">SHIP</span>
+      <h2>6. アプリを公開するとき <em>(人に共有できるようにする)</em></h2>
+      <p>できたアプリを Azure に公開してログイン付きで共有するには、nkuma に<b>「公開したい」</b>と言ってください (<code>/nkuma:nk-ship</code>)。</p>
+      <p>手順の正本は、案件リポジトリに同梱されている公開ガイド <code>DEPLOY.md</code> です。<br class="s">nkuma が現在地を見て「いまどの段か・次に何をするか」を案内するので、ここでは全体像だけ掴めば十分です。</p>
+      <table class="phase-table">
         <tr><th>段</th><th>やること</th><th>誰のターン</th></tr>
         <tr><td>① 依頼</td><td>リポジトリ名・アプリ名・顧客名・<b>初期 ADMIN (あなたのメールアドレス)</b> の 4 点を環境管理者へ送る (雛形は nkuma が作ります)</td><td>あなた</td></tr>
         <tr><td>② 待ち</td><td>管理者が受け入れ作業 (Azure 側の配線) を行う</td><td>管理者</td></tr>
@@ -167,41 +265,48 @@
         <tr><td>⑥ 開通</td><td>ログインを確認して URL を共有する。<b>① で伝えたあなたのアカウントは初回の配備で自動的に管理者 (ADMIN) 登録済み</b> — 誰かに登録をお願いする作業はありません</td><td>あなた</td></tr>
       </table>
       <ul>
-        <li><b>公開の手順にあなたの Azure 権限や az コマンドは要りません</b> — 使うのは gh だけで、Azure 側の操作はすべて管理者と CI が行います (AI 機能をローカル開発で使う場合の az login は<a href="#run">§4</a> の話で、公開手順とは別)</li>
+        <li><b>公開の手順にあなたの Azure 権限や az コマンドは要りません</b> — 使うのは gh だけで、Azure 側の操作はすべて管理者と CI が行います (AI 機能をローカル開発で使う場合の az login は<a href="#run">§5</a> の話で、公開手順とは別)</li>
         <li><b>2 回目以降は「deploy へマージするだけ」</b>で更新が公開されます</li>
-        <li><b>データが消えうる変更は自動で止まります</b> (安全装置)。止まったら nkuma と一緒に内容を確認し、承認の操作は人が行います</li>
+        <li><b>データが消えうる変更は自動で止まります</b> (安全装置)。<br class="s">止まったら nkuma と一緒に内容を確認し、承認の操作は人が行います</li>
         <li>公開後、アプリの利用者管理 (メンバーの追加・権限変更) は<b>アプリの管理画面 (<code>/admin</code>)</b> で完結します — 利用したい人には URL を共有するだけ (ログインすると自動で登録されます)</li>
       </ul>
     </section>
 
     <section id="trouble">
-      <h2>6. 困った時の手引き</h2>
+      <span class="kicker">TROUBLESHOOTING</span>
+      <h2>7. 困った時の手引き</h2>
       <table>
         <tr><th>症状</th><th>対処</th></tr>
-        <tr><td><code>/nkuma:nk-XXX</code> が見つからない</td><td><code>/plugin update</code> → Claude Code 再起動。直らなければ <code>/plugin uninstall nkuma@nkuma-marketplace</code> → install し直し (何度やっても安全)</td></tr>
-        <tr><td>skill が古い挙動をする</td><td>同上 (= 新しい版が配布されたのに update していない可能性)</td></tr>
-        <tr><td>ツールを入れたのに <code>command not found</code> のまま</td><td>ターミナルを<b>一度閉じて開き直す</b> (開きっぱなしのターミナルは新しく入れたツールを認識しません)</td></tr>
-        <tr><td><code>gh</code> 関連のエラーで止まる</td><td><code>gh auth status</code> を確認 → 未認証なら <a href="#gh-login">1.5 のログイン</a> (<code>gh auth login --web</code>)</td></tr>
-        <tr><td>nk-init が「スコープ不足」で止まる / push が拒否される</td><td><a href="#ghcr">1.6 の権限づけ</a>を実行 (= workflow が付いていない。標準ログイン直後や別 PC ではこの状態です)</td></tr>
-        <tr><td>エンジンイメージの取得で 403</td><td><a href="#ghcr">1.6 の 2 コマンド</a>をやり直し (= read:packages が付いていない)</td></tr>
+        <tr><td>Claude アプリで <code>/plugin ...</code> が動かない・反応しない</td><td>アプリの仕様です (故障ではありません)。<br class="s">plugin の導入・更新・入れ直しは、すべて<b>ターミナル</b>の <code>claude plugin ...</code> コマンドで行います (<a href="#install">2.7</a> / <a href="#update">§8</a>)</td></tr>
+        <tr><td><code>/nkuma:nk-XXX</code> が見つからない</td><td>ターミナルで <a href="#update">§8 の更新 2 コマンド</a> → Claude アプリのセッションを開き直す。<br class="s">直らなければ <code>claude plugin uninstall nkuma@nkuma-marketplace</code> → <a href="#install">2.7</a> で入れ直し (何度やっても安全)</td></tr>
+        <tr><td>skill が古い挙動をする</td><td>同上 (= 新しい版が配布されたのに更新していない可能性)</td></tr>
+        <tr><td>2.7 の <code>marketplace add</code> が失敗する</td><td>順に確認: ① チーム招待 (<a href="#prepare">2.2</a>) を承諾済みか ② <code>gh auth status</code> でログイン済みか (<a href="#gh-login">2.5</a>) ③ <code>gh auth setup-git</code> を実行したか (<a href="#gh-login">2.5</a> の最後) ④ URL を <code>https://</code> 付きで貼ったか</td></tr>
+        <tr><td>ツールを入れたのに「認識されません」/ <code>command not found</code> のまま</td><td>ターミナルを<b>一度閉じて開き直す</b> (開きっぱなしのターミナルは新しく入れたツールを認識しません)</td></tr>
+        <tr><td><code>gh</code> 関連のエラーで止まる</td><td><code>gh auth status</code> を確認 → 未認証なら <a href="#gh-login">2.5 のログイン</a> (<code>gh auth login --web</code>)</td></tr>
+        <tr><td>nk-init が「スコープ不足」で止まる / push が拒否される</td><td><a href="#ghcr">2.6 の権限づけ</a>を実行 (= workflow が付いていない。<br class="s">標準ログイン直後や別 PC ではこの状態です)</td></tr>
+        <tr><td>エンジンイメージの取得で 403</td><td><a href="#ghcr">2.6 の 2 コマンド</a>をやり直し (= read:packages が付いていない)</td></tr>
         <tr><td>エンジンの版が合わないと言われる</td><td>AI に起動を頼めば版の照合ごとやってくれます (手動なら案件の <code>docker-compose.yml</code> の版を案内された版に変更して起動し直し)</td></tr>
         <tr><td>案件の CLAUDE.md の nkuma 欄が古い</td><td><code>/nkuma:nk-init</code> を再実行 — 初期化は<b>何度実行しても安全</b> (既存の成果物は壊さず、設定・看板だけ最新化)</td></tr>
       </table>
-      <div class="note"><b>原則: nkuma の配布物 (skill / 設定 / エンジン) は「入れ直せば直る」ように作られています。</b>手で直そうとする前に、update / 再実行を試してください。</div>
+      <div class="note"><b>原則: nkuma の配布物 (skill / 設定 / エンジン) は「入れ直せば直る」ように作られています。</b><br class="s">手で直そうとする前に、更新 / 再実行を試してください。</div>
     </section>
 
     <section id="update">
-      <h2>7. 更新の受け取り方 (日々の運用)</h2>
+      <span class="kicker">UPDATE</span>
+      <h2>8. 更新の受け取り方 <em>(日々の運用)</em></h2>
       <ul>
-        <li>更新は<b>自動では届きません</b>。管理者が新しい版を配布した時だけ <code>/plugin update</code> で届きます (更新の案内は管理者から流れます)</li>
+        <li>更新は<b>自動では届きません</b>。<br class="s">管理者から「新しい版を配布しました」の案内が流れたら、<b>ターミナルで</b>次の 2 コマンドを実行してください (実行後、Claude アプリはセッションを開き直せば新版になります):
+          <pre>claude plugin marketplace update nkuma-marketplace</pre>
+          <pre>claude plugin update nkuma@nkuma-marketplace</pre></li>
         <li>エンジンの版更新は<b>起動時に AI が自動で照合</b>します (最新版があれば「更新するか今のままか」を確認されるので、選ぶだけで届きます)</li>
         <li>案件リポジトリに同梱されている仕組みの部品 (CI 設定・公開ガイドなど) の更新は、nkuma に<b>「テンプレートの更新を適用して」</b> (<code>/nkuma:nk-template-update</code>) と頼むと、最新版との差分を見せてくれます — 適用するかはあなたが確認してから</li>
       </ul>
     </section>
 
     <section id="ask">
-      <h2>8. 質問するには</h2>
-      <p>分からないところは管理者 (taiga) に聞いてください — 全部を独力で突破する必要はありません。よくある質問はこのページに順次追記していきます。</p>
+      <span class="kicker">ASK</span>
+      <h2>9. 質問するには</h2>
+      <p>分からないところは管理者 (taiga) に聞いてください — 全部を独力で突破する必要はありません。<br class="s">よくある質問はこのページに順次追記していきます。</p>
     </section>
 
   </div>

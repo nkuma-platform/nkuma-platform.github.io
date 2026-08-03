@@ -1,5 +1,7 @@
 /* nkuma サポートサイト共通スクリプト
- * コマンド枠 (pre) に「コピー」ボタンを付ける (#485) */
+ * 1) コマンド枠 (pre) に「コピー」ボタンを付ける (#485)
+ * 2) スクリーンショット差し込み枠 (figure.shot) — 画像が未配置の間は枠ごと非表示にする
+ *    (images/shots/ に決められたファイル名で置くと自動で現れる) */
 document.querySelectorAll("pre").forEach(function (pre) {
   var wrap = document.createElement("div");
   wrap.className = "pre-wrap";
@@ -27,4 +29,16 @@ document.querySelectorAll("pre").forEach(function (pre) {
     }
   });
   wrap.appendChild(btn);
+});
+
+document.querySelectorAll("figure.shot img").forEach(function (img) {
+  function hide() {
+    var fig = img.closest("figure.shot");
+    if (fig) fig.style.display = "none";
+  }
+  if (img.complete && img.naturalWidth === 0) {
+    hide();
+  } else {
+    img.addEventListener("error", hide);
+  }
 });
