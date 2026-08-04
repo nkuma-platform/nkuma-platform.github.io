@@ -168,7 +168,18 @@ ul li::marker { color: var(--orange); }
 .tool-card b { font: 700 15.5px var(--display); align-self: end; }
 .tool-card b i { font-style: normal; margin-left: 8px; padding: 2px 10px; border-radius: 999px; font: 600 10.5px var(--mono); background: rgba(217,119,22,.12); color: var(--orange-deep); vertical-align: 2px; }
 .tool-card.app b i { background: rgba(39,106,145,.1); color: var(--sky-deep); }
+.tool-card.ai .em { border-color: var(--green); }
 .tool-card span { color: var(--soft); font-size: 13px; line-height: 1.75; align-self: start; }
+/* 3 つ以上並べる時 (勉強会「作れるものの型」) — 幅に応じて 3 列 → 1 列。
+   丸 + 見出しを 1 行目、説明を 2 行目の全幅へ組み替える
+   (2 列版のまま丸を 2 行にまたがらせると、文量差でカードごとに見出しの高さがずれる) */
+.tool-grid.three { grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); }
+.tool-grid.three .tool-card { grid-template-columns: 46px 1fr; gap: 12px 14px; align-items: center; }
+.tool-grid.three .tool-card .em { grid-row: auto; width: 46px; height: 46px; font-size: 22px; }
+.tool-grid.three .tool-card b { align-self: center; }
+.tool-grid.three .tool-card span:not(.em) { grid-column: 1 / -1; }
+/* カード内の補足行 (例: …) */
+.tool-card span em { display: block; margin-top: 6px; color: var(--muted); font-size: 12.5px; font-style: normal; }
 
 /* ---------- 道のりパイプライン (LP pipeline 移植) ---------- */
 .journey { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 0 10px; padding-top: 56px; }
@@ -191,11 +202,15 @@ ul li::marker { color: var(--orange); }
 
 /* ---------- 番号付き縦タイムライン (LP draft-steps 移植) ---------- */
 .flow-steps { display: grid; gap: 14px; margin: 16px 0; }
-.flow-step { position: relative; display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: start; }
-.flow-step i {
+/* 2 列目は minmax(0,1fr) — 既定の min-width:auto だと中の pre の最小幅で列が広がり、狭い画面で横スクロールになる */
+.flow-step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 14px; align-items: start; }
+/* 直下の i だけが番号玉 (本文中の i を巻き込まないよう子セレクタで狭く書く) */
+.flow-step > i {
   z-index: 1; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
   background: var(--orange-deep); color: var(--white); font: 600 13px var(--mono); font-style: normal;
 }
+/* 見出しに添える小さな目印 */
+.flow-step .tag { display: inline-block; white-space: nowrap; margin-left: 8px; padding: 2px 10px; border-radius: 999px; font: 600 10.5px var(--mono); background: rgba(217,119,22,.12); color: var(--orange-deep); vertical-align: 2px; }
 .flow-step::before { content: ""; position: absolute; top: 30px; bottom: -14px; left: 14px; width: 2px; background: var(--line); }
 .flow-step:last-child::before { display: none; }
 .flow-step > div > b { display: block; font: 700 15px var(--display); }
@@ -227,6 +242,9 @@ figure.shot figcaption { margin-top: 8px; color: var(--muted); font-size: 12.5px
   transition: transform .2s ease, box-shadow .2s ease;
 }
 .entry-card.admin { border-top-color: var(--sky-deep); }
+/* 全幅の目立つ入口 (トップの勉強会カード) */
+.entry-card.wide { grid-column: 1 / -1; border-top-color: var(--green); }
+.entry-card.wide .go { color: var(--green); }
 .entry-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
 .entry-card b { font: 700 18px var(--display); }
 .entry-card p { color: var(--soft); font-size: 13.5px; margin-top: 8px; }

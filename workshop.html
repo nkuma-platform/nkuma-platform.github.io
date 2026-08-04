@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>勉強会 — nkuma サポート</title>
+<meta name="description" content="nkuma の勉強会で「はじめての一本」を作るためのページ。何が作れるのか、当日までの準備、当日の道のり、会話の書き出しのお願い。">
+<link rel="icon" type="image/png" href="./images/nkuma-face.png">
+<link rel="stylesheet" href="./site.css">
+<script src="./site.js" defer></script>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./index.html"><img src="./images/nkuma-face.png" alt="">nkuma <span>Support</span></a>
+    <nav>
+      <a href="./workshop.html" class="current">勉強会</a>
+      <a href="./guide.html">利用者ガイド</a>
+      <a href="./update.html">更新ガイド</a>
+      <a href="./admin.html">管理者ハンドブック</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="kicker">WORKSHOP</div>
+        <h1>nkuma で<em>はじめての一本</em>を作る。</h1>
+        <p class="lead">勉強会で一緒に進む道のりのページです。<br>まず「何が作れるのか」を掴んで、自分の仕事から題材を 1 つ持ち込み、その日のうちに動くところまで作ります。<br>プログラミングの知識は要りません — 作るのは対話です。</p>
+        <div class="badge">対象: 勉強会に参加する人 — エンジニアでなくても大丈夫</div>
+      </div>
+      <img class="hero-bear" src="./images/nkuma01.png" alt="座っているクマのキャラクター">
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#what">1. 何が作れるのか</a>
+    <a href="#prepare">2. 当日までの準備</a>
+    <a href="#theme">3. 何を作るか</a>
+    <a href="#journey">4. 当日の道のり</a>
+    <a href="#export">5. お願い</a>
+    <a href="#trouble">6. 困った時</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <section id="what">
+      <span class="kicker">WHAT YOU CAN BUILD</span>
+      <h2>1. nkuma で<em>何が作れるのか</em></h2>
+      <p>最初にここを掴んでください。<br class="s">当日いちばん時間がかかるのは、作ることではなく「何を作るか」を思いつくところだからです。</p>
+      <p>nkuma で作れるものは、大きく次の 3 つの型でできています。<br class="s">1 つだけでもアプリになりますし、組み合わせても構いません:</p>
+
+      <div class="tool-grid three">
+        <div class="tool-card">
+          <span class="em">📋</span>
+          <b>貯める</b>
+          <span>入力したものがちゃんと残って、みんなが同じものを見られる。<em>例: 備品の貸出台帳 / 設備の点検記録 / 案件の進捗表</em></span>
+        </div>
+        <div class="tool-card app">
+          <span class="em">🔑</span>
+          <b>人によって変わる</b>
+          <span>ログインした人が誰かで、見えるもの・できることが変わる。<em>例: 自分が出した申請だけ見える / 承認できるのは上長だけ</em></span>
+        </div>
+        <div class="tool-card ai">
+          <span class="em">🤖</span>
+          <b>AI が読む・書く</b>
+          <span>写真や PDF を読み取って項目に起こす、文章を要約・分類する。<em>例: 領収書を撮ると金額と日付が入る / 問い合わせ文を担当部署に仕分ける</em></span>
+        </div>
+      </div>
+
+      <h3>自分で作らなくても、最初から付いてくるもの</h3>
+      <p>次のものは、どのアプリにも共通で必要になるので nkuma 側が用意しています。<br class="s">「これも作らなきゃ」と数えなくて大丈夫です:</p>
+      <div class="chips">
+        <span class="chip">ログイン</span>
+        <span class="chip">利用者の管理画面</span>
+        <span class="chip">権限の出し分け</span>
+        <span class="chip">誰がいつ何をしたかの記録</span>
+        <span class="chip">ファイルの添付</span>
+        <span class="chip">一覧表とグラフ</span>
+        <span class="chip">読み込み中の表示</span>
+        <span class="chip">バックアップ</span>
+        <span class="chip">Azure への公開</span>
+      </div>
+
+      <h3>今はまだできないこと</h3>
+      <p>先に正直にお伝えしておきます。<br class="s">次のものは、今の nkuma にはまだ届いていません:</p>
+      <div class="note">
+        <ul>
+          <li><b>リアルタイム通信</b> — 画面がひとりでに更新される仕組み。<br class="s">チャットの即時反映や、お知らせの通知</li>
+          <li><b>ログイン無しで誰でも見られる公開ページ</b> — アプリは全体がログイン必須です</li>
+          <li><b>AI まわりの一部</b> — 応答が 1 文字ずつ流れる表示、社内文書を検索して答える仕組み、画像の生成</li>
+          <li><b>基幹システムや SaaS との常時連携</b> — 別のシステムと自動でつながり続ける仕組み</li>
+        </ul>
+      </div>
+      <p class="muted">これらは順に増えていきます。<br class="s">当日「これをやりたい」が出たら、その場で教えてください — 次に何を足すかを決める材料になります。</p>
+    </section>
+
+    <section id="prepare">
+      <span class="kicker">BEFORE THE DAY</span>
+      <h2>2. 当日までの準備 <em>(30〜60 分、1 回きり)</em></h2>
+      <p>当日は<b>セットアップが終わった状態</b>から始めます。<br class="s">手順の正本は利用者ガイドなので、そちらを上から順に進めてください:</p>
+      <div class="card accent">
+        <p><b><a href="./guide.html#prepare">利用者ガイド 2. 初回セットアップ →</a></b></p>
+        <p>GitHub アカウントを作る → 管理者に伝える → ツールを 7 つ入れる → gh にログインする → nkuma を受け取る。<br class="s">この順で 1 本道です。</p>
+      </div>
+      <p>終わったかどうかは、ターミナルでこの 1 つを実行すれば確かめられます:</p>
+      <pre>claude plugin list</pre>
+      <p><code>nkuma@nkuma-marketplace</code> が <code>enabled</code> と表示されれば、準備は完了です。</p>
+      <div class="note"><b>管理者への依頼 (<a href="./guide.html#prepare">利用者ガイド 2.2</a>) だけは早めに済ませてください。</b><br class="s">これは返事とチーム招待を待つ手順なので、当日ぎりぎりだと間に合いません。<br class="s">他の手順は自分のペースで大丈夫です。</div>
+      <div class="note"><b>途中で止まっても大丈夫です。</b><br class="s">当日いちばんに解決しますので、<b>どこで止まったか</b>だけメモしておいてください。<br class="s">「入れたのに認識されません」の多くは、ターミナルを一度閉じて開き直せば直ります。</div>
+    </section>
+
+    <section id="theme">
+      <span class="kicker">YOUR IDEA</span>
+      <h2>3. 何を作るか — <em>自分の仕事から 1 つ</em></h2>
+      <p>当日作るものは、<b>自分で持ち込んでください</b>。<br class="s">自分の仕事のものだから、できたときに嬉しいし、良し悪しの判断も自分でつきます。</p>
+      <p>探し方のコツは、次のどれかに当てはまる作業を思い出すことです:</p>
+      <ul>
+        <li>毎回 <b>Excel で同じことをやっている</b></li>
+        <li><b>紙とハンコ</b>で回している、あるいはメールで依頼が飛び交っている</li>
+        <li><b>人に聞かないと分からない</b> (どこにあるか、今どうなっているか)</li>
+      </ul>
+      <p>思い浮かんだら、メモ 1 行で十分です。<br class="s">細かいことは当日 nkuma と話しながら決めます。</p>
+
+      <h3>思いつかない人向けのお題: SVG アイコンストア</h3>
+      <div class="card accent">
+        <p><b>業務で何度も使うアイコン (SVG) を 1 か所に集めて、探せるようにするアプリ</b>です。<br class="s">「いつも誰かの PC の中にあって、探すのに時間がかかる」を解きます。</p>
+        <ul>
+          <li>アイコンを<b>名前とタグを付けて登録</b>する</li>
+          <li>一覧から<b>探して、その場でダウンロード</b>する</li>
+          <li>名前の直しや削除など<b>整理ができるのは管理者だけ</b></li>
+          <li>誰がいつ何を足したかは<b>自動で記録が残る</b></li>
+        </ul>
+        <p class="muted">上の 3 つの型のうち「貯める」と「人によって変わる」を素直に通るお題です。<br class="s">時間が余ったら「『会議で使うやつ』みたいな曖昧な言葉から、登録済みのタグの候補を AI に出してもらう」まで足せます。</p>
+      </div>
+    </section>
+
+    <section id="journey">
+      <span class="kicker">THE DAY</span>
+      <h2>4. 当日の道のり — <em>対話しながら進む</em></h2>
+      <p>ここからは Claude アプリの中の話です。<br class="s"><b>コマンドを覚える必要はありません</b> — 迷ったら <code>/nkuma:nk-master</code> が、いま何をすべきかを教えてくれます。</p>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>案件フォルダを作って、Claude アプリで開く</b><div class="fs-body">「1 つの案件 = パソコンの中の 1 つのフォルダ」です。<br class="s">作り方と開き方は<a href="./guide.html#workspace">利用者ガイド 3</a> に画面つきで書いてあります。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b><code>/nkuma:nk-init</code> — 何を作りたいのかを話す</b><div class="fs-body">キックオフ役が、環境を確認し、GitHub にあなたの案件リポジトリを作り、「誰の・どんな困りごとを・どう解くのか」を聞いていきます。<br class="s">ここでたくさん話すほど、後の工程が楽になります。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>リポジトリの名前を管理者に伝える <span class="tag">忘れずに</span></b><div class="fs-body">リポジトリができたら、その時点で管理者 (taiga) に伝えてください。<br class="s">公開に必要な Azure 側の受け入れ作業を、<b>あなたが作っている間に並行して</b>進めてもらえます (ここを後回しにすると、公開のところで待ち時間になります)。<br class="s">nkuma に「公開の依頼文を作って」と頼めば、必要な 4 点 — リポジトリ名 / アプリ名 / 顧客 (基盤) 名 / 初期管理者にする人のメールアドレス — を確認して文面を作ってくれます。</div></div></div>
+        <div class="flow-step"><i>4</i><div><b><code>/nkuma:nk-master</code> — いま何をすべきかを聞く</b><div class="fs-body">チームリーダー役です。<br class="s">やることの一覧を見て、次に話す相手を教えてくれます。<br class="s">道に迷ったら、いつでもここに戻ってきてください。</div></div></div>
+        <div class="flow-step"><i>5</i><div><b><code>/nkuma:nk-sprint-talk</code> — 今日どこまで作るかを決める</b><div class="fs-body">「今日ここまで動けば嬉しい」を一緒に決めて、作れる大きさに割ります。<br class="s">欲張らず、1 つの画面が動くところを目標にするのがおすすめです。</div></div></div>
+        <div class="flow-step"><i>6</i><div><b>動く土台を展開する</b><div class="fs-body">画面もログインもデータの置き場も入った土台が、<code>/nkuma:nk-poc-setup</code> で展開されます。<br class="s">呼ぶ場所は nkuma が教えてくれるので、覚えなくて大丈夫です。<br class="s">ここから先は「動くものを育てる」作業になります。</div></div></div>
+        <div class="flow-step"><i>7</i><div><b><code>/nkuma:nk-dev-worker</code> — 作って、動かして、見る</b><div class="fs-body">実装役です。<br class="s">書いたら実際に画面を動かして自分の目で確認してから「できました」と言います。<br class="s">出てきた画面を見て、違うと思ったらそのまま言葉で伝えてください — それが次の一手になります。</div></div></div>
+        <div class="flow-step"><i>8</i><div><b><code>/nkuma:nk-ship</code> — 公開する</b><div class="fs-body">形になったら Azure に公開して、ログイン付きの URL で人に共有できます。<br class="s">手順 3 の受け入れが済んでいれば、あなたがやるのは案内どおりの数コマンドだけです。<br class="s">Azure の権限も知識も要りません (くわしくは<a href="./guide.html#publish">利用者ガイド 6</a>)。</div></div></div>
+      </div>
+      <div class="note"><b>順番どおりに進まなくても大丈夫です。</b><br class="s">行ったり来たりするのが普通ですし、話の流れで別の専門家に案内されることもあります。<br class="s">迷子になったら <code>/nkuma:nk-master</code> に「いまどこ?」と聞けば、現在地から教えてくれます。</div>
+    </section>
+
+    <section id="export">
+      <span class="kicker">PLEASE</span>
+      <h2>5. お願い — <em>その日の会話を書き出す</em></h2>
+      <p>差し支えなければ、当日の会話を書き出して管理者に渡してください。</p>
+      <p>nkuma は「<b>人がどう話しかけたら、AI がどう動いたか</b>」を見て良くしていきます。<br class="s">うまくいった会話も、噛み合わなかった会話も、同じくらい役に立ちます — むしろ噛み合わなかった方が改善の材料になります。</p>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>セッションの終わりに、チャット欄で <code>/export</code> と打つ</b><div class="fs-body">ファイル名を決めたいときは <code>/export 20260810-taro.txt</code> のように続けて書きます。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>保存先を選ぶ</b><div class="fs-body">ファイル名を付けずに実行すると、<b>クリップボードにコピー</b>するか<b>ファイルに保存</b>するかを選ぶ画面が出ます。<br class="s">どちらでも構いません。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>できたものを管理者に渡す</b><div class="fs-body">中身はただの文章です。<br class="s">その場で渡せなくても、後日で大丈夫です。</div></div></div>
+      </div>
+      <figure class="shot">
+        <div class="shot-frame"><img src="./images/shots/export-dialog.png" alt="/export を実行して保存先を選ぶ画面"></div>
+        <figcaption>/export の保存先を選ぶ画面 — クリップボードかファイルかを選びます</figcaption>
+      </figure>
+      <div class="note"><b>出せる分だけで十分助かります。</b><br class="s">顧客の実名や社外に出せない情報が会話に含まれている場合は、その部分を消してから渡してください。<br class="s">無理に出す必要はありません。</div>
+    </section>
+
+    <section id="trouble">
+      <span class="kicker">TROUBLESHOOTING</span>
+      <h2>6. 困った時</h2>
+      <p>当日は隣に管理者がいます。<br class="s">詰まったらすぐ声をかけてください — 全部を独力で突破する必要はありません。</p>
+      <table>
+        <tr><th>症状</th><th>対処</th></tr>
+        <tr><td><code>/nkuma:nk-init</code> と打っても反応しない</td><td>先頭の <code>/nkuma:</code> が抜けていないか確認 (<code>/nk-init</code> では起動しません)。<br class="s">それでも駄目なら<a href="./update.html#plugin">更新ガイドの 2 コマンド</a>を実行して、セッションを開き直す</td></tr>
+        <tr><td>会話が長くなって、話が噛み合わなくなってきた</td><td>新しいセッションを<b>同じ案件フォルダ</b>で始めて <code>/nkuma:nk-master</code>。<br class="s">フォルダの中身とやることの一覧から現在地を読み直してくれます</td></tr>
+        <tr><td>作りたい機能が「できない」と言われた</td><td><a href="#what">§1 の「今はまだできないこと」</a>に当たっている可能性があります。<br class="s">その場で教えてください — 別のやり方を一緒に探します</td></tr>
+        <tr><td>その他 (セットアップ・更新・エラー)</td><td><a href="./guide.html#trouble">利用者ガイドの「困った時の手引き」</a>に一覧があります</td></tr>
+      </table>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>このページが<b>勉強会の進め方の正本</b>です (セットアップ手順は<a href="./guide.html">利用者ガイド</a>、更新は<a href="./update.html">更新ガイド</a>が正本)。</p>
+    <p><a href="./index.html">トップ</a> ・ <a href="./guide.html">利用者ガイド</a> ・ <a href="./update.html">更新ガイド</a> ・ <a href="./admin.html">管理者ハンドブック</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+  </div>
+</footer>
+
+</body>
+</html>
