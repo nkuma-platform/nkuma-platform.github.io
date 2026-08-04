@@ -66,7 +66,7 @@
 
     <section id="rollback">
       <h2>リリースを戻したいとき (ロールバック)</h2>
-      <p>1 つ前の版のイメージへ差し戻します — 版は <b>git タグ / Container Registry のタグ / 配備台帳 (registry.json)</b> の 3 点に残っているので、迷子になりません。案件リポジトリ同梱のロールバック用ワークフロー (版タグを人が入力) か、<code>az containerapp update</code> で戻します。</p>
+      <p>1 つ前の版のイメージへ差し戻します — 版は <b>git タグ / Container Registry のタグ / 配備台帳 (registry.json)</b> の 3 点に残っているので、迷子になりません。<br class="s">戻し方は<b>案件リポジトリ同梱のロールバック用ワークフロー</b> (Actions → rollback を版名を入力して起動) の一本です — 手動の <code>az containerapp update</code> はイメージ名しか変わらず器の構成が揃わないため使いません。</p>
     </section>
 
     <section id="emergency">
@@ -77,7 +77,7 @@
 
     <section id="test-env">
       <h2>テスト面を建てて壊す</h2>
-      <p>常設のテスト環境は持ちません。必要になったら記入用紙に <code>environment = 'test'</code> を指定して<b>同じ IaC で別 RG に建て</b> (構成差はスペックのみ、分離・鍵レス・認証の規律は本番と同一)、済んだら RG ごと削除します。</p>
+      <p>常設のテスト環境は持ちません。<br class="s">必要になったらテスト面用の記入用紙 (<code>&lt;顧客&gt;.test.bicepparam</code> — 記入用紙は環境ごとに 1 枚です) を用意して<b>同じ IaC で別 RG に建て</b> (構成差はスペックのみ、分離・鍵レス・認証の規律は本番と同一)、済んだら RG ごと削除します。<br class="s">紙の <code>environment</code> も <code>test</code> にし、<code>-Environment test</code> を付けて実行してください (コマンドは <a href="./admin-environment.html#bicep">1 章の手順</a>を参照。付け忘れると既存の公開面の紙が掴まれます)。</p>
     </section>
 
     <section id="members">
@@ -95,7 +95,7 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ <a href="./update.html">更新ガイド</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
   </div>
 </footer>
 

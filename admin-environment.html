@@ -74,17 +74,17 @@
       <div class="note"><b>管理者の定型は「記入用紙を編集する → <code>deploy-foundation.ps1</code> を実行する」の 2 手だけ</b>です。宛先の照合・Entra 登録の確保・what-if・エンジン取り込み・DB 名簿登録・完了チェックは script が面倒を見ます (人に残る判断は confirm だけ)。道具一式は <a href="https://github.com/nkuma-platform/nkuma-infra">nkuma-infra リポジトリ</a> (管理者専用・private) から clone して使います。</div>
       <ol class="steps">
         <li><b>権限の確認</b> — 実行者は対象 RG への <b>Owner 相当</b> (ロール割り当て権限込み) が必要。<b>純 Contributor では不可</b>: リソースは建つのにロール割り当てで失敗する「半建ち」になります。無ければ建て始めずに情シスへ依頼 (「RG を作成し Owner を付与してほしい」)</li>
-        <li><b>記入用紙を書く</b> — <code>params/sample.bicepparam</code> を <code>&lt;顧客&gt;.bicepparam</code> の名前でコピーして記入 (下の表)。実物 (台帳) は gitignore 済みで手元にだけ残ります</li>
+        <li><b>記入用紙を書く</b> — <code>params/sample.bicepparam</code> をコピーして記入 (下の表)。<br class="s">記入用紙は<b>環境ごとに 1 枚</b>です — 公開面は <code>&lt;顧客&gt;.bicepparam</code>、テスト面は <code>&lt;顧客&gt;.test.bicepparam</code> の名前にします。<br class="s">実物 (台帳) は gitignore 済みで手元にだけ残ります</li>
         <li><b>実行する</b> — <code>.\deploy-foundation.ps1 -Customer &lt;顧客&gt;</code>。宛先ガード (記入用紙の subscriptionId × az セッション現在地の照合 — 不一致は停止、切替は人) → <b>Entra アプリ登録 2 本 (ログイン用・エンジン用) の確保</b> (規約名で検索し、無ければ confirm で作成して ID を記入用紙へ自動で書き戻す) → what-if の差分提示 → <b>読んで y</b> → 適用 → 初回は「プレースホルダ → エンジン取り込み → 実イメージ」の二段を自動実行 → PG 名簿登録 (pg-bootstrap) → 完了チェック表示、まで一気に進みます</li>
       </ol>
 
       <h3>記入用紙 (bicepparam) の意味</h3>
-      <p>bicep 本体 = 全顧客共通の設計図。bicepparam = <b>その顧客の固有値を書く記入用紙</b>で、顧客ごとに 1 枚持ちます。この紙は「その顧客環境の今あるべき姿」を表す台帳になり、後日の再実行 (名簿追加・版更新) もこの紙を書き換えて行います。</p>
+      <p>bicep 本体 = 全顧客共通の設計図。<br class="s">bicepparam = <b>その環境の固有値を書く記入用紙</b>で、<b>環境ごとに 1 枚</b>持ちます (公開面とテスト面ではログイン設定の値が違うため、1 枚を使い回すと取り違えが起きます — スクリプトが照合して止めます)。<br class="s">この紙は「その環境の今あるべき姿」を表す台帳になり、後日の再実行 (名簿追加・版更新) もこの紙を書き換えて行います。</p>
       <table>
         <tr><th>パラメータ</th><th>必須</th><th>何を書くか</th><th>後で変える場面</th></tr>
         <tr><td><code>customer</code></td><td>✅</td><td>顧客 slug (小文字英数ハイフン 3〜12 字)。全リソース名の種</td><td><b>変えない</b> (変える = 別環境)</td></tr>
         <tr><td><code>subscriptionId</code></td><td>✅</td><td><b>宛先サブスクリプション</b> — script が az セッションの現在地と照合し、不一致なら実行前に停止する (取り違え防止)</td><td>変えない</td></tr>
-        <tr><td><code>environment</code></td><td>—</td><td><code>prod</code> (既定) / <code>test</code></td><td>テスト面を建てる時だけ</td></tr>
+        <tr><td><code>environment</code></td><td>—</td><td><code>prod</code> (既定) / <code>test</code></td><td>テスト面は専用の紙 (<code>&lt;顧客&gt;.test.bicepparam</code>) に書く</td></tr>
         <tr><td><code>location</code></td><td>—</td><td>リージョン (標準 = Japan East)</td><td>変えない</td></tr>
         <tr><td><code>pgEntraAdminObjectId</code> / <code>...PrincipalName</code></td><td>✅</td><td>PostgreSQL の管理者 = <b>自分</b> (<code>az ad signed-in-user show</code> で取得)</td><td>管理者交代時</td></tr>
         <tr><td><code>pgEntraAdminPrincipalType</code></td><td>—</td><td><code>User</code> (既定)</td><td>ほぼ変えない</td></tr>
@@ -110,7 +110,7 @@
         <tr><td>リポジトリ登録の顧客初回 (<a href="./admin-repository.html">3 章</a>)</td><td><code>opsOperatorOids</code> に CI の身元を追記</td></tr>
         <tr><td>公開前</td><td>(なし — ログイン設定は script が確保済み)</td></tr>
         <tr><td>エンジン版更新 (<a href="./admin-update.html">4 章</a>)</td><td><code>engineVersion</code> を新しい版に</td></tr>
-        <tr><td>テスト面 (<a href="./admin-operations.html">5 章</a>)</td><td><code>environment = 'test'</code> (別 RG へ)</td></tr>
+        <tr><td>テスト面 (<a href="./admin-operations.html">5 章</a>)</td><td>テスト面用の紙 (<code>&lt;顧客&gt;.test.bicepparam</code>) を用意して <code>-Environment test</code> で実行 (別 RG へ)</td></tr>
       </table>
       <div class="note"><b>不安になったら what-if</b> — 適用前に「何が変わるか」の差分が見えます。読んで想定どおりなら create。コマンドの正本は開発リポジトリの infra/README。</div>
     </section>
@@ -283,7 +283,7 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
+    <p><a href="./admin.html">管理者ハンドブック目次</a> ・ <a href="./index.html">トップ</a> ・ <a href="./update.html">更新ガイド</a> ・ © 南国ソフト — nkuma (個人 × AI の開発基盤)</p>
   </div>
 </footer>
 
