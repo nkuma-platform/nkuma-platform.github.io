@@ -97,14 +97,15 @@
         <li>届いた確認メールのコード (またはリンク) で認証したら完了。<br class="s">プラン選択の画面が出たら <b>Free</b> のままで OK です</li>
       </ol>
 
-      <h3>2.2 管理者に伝えるもの</h3>
-      <div class="card accent">
-        <p>管理者 (taiga) に <b>GitHub アカウント名</b> (2.1 で決めたユーザー名) を伝えて、以下を依頼してください:</p>
-        <ul>
-          <li>GitHub organization <b>nkuma-platform</b> のチーム招待 (= 配布物の取得権限が付きます)</li>
-        </ul>
-        <p class="muted">招待メールが届いたら、リンクを開いて <b>Join</b> (承諾) しておいてください。<br class="s">承諾しないと 2.7 の受け取りで失敗します。</p>
+      <h3 id="invite">2.2 管理者に依頼して、<em>届いた招待に参加する</em></h3>
+      <p>nkuma の配布物は <b>GitHub organization「nkuma-platform」</b>の中に置いてあります。<br class="s">ここに参加していないと置き場そのものが見えないので、<b>この節は 4 歩あります</b> — 依頼して終わりではなく、<b>届いた招待に参加するところまで</b>です。</p>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>管理者に依頼する</b><div class="fs-body">管理者 (taiga) に <b>GitHub アカウント名</b> (2.1 で決めたユーザー名) を伝えて、<b>organization「nkuma-platform」のチーム招待</b>を依頼してください。<br class="s">これで配布物の取得権限が付きます。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>招待メールが届くのを待つ</b><div class="fs-body">GitHub から<b>「Invitation to join the nkuma-platform organization」</b>のような件名のメールが届きます。<br class="s">宛先は 2.1 で GitHub に登録したメールアドレスです。<br class="s">見当たらない時は<b>迷惑メールフォルダ</b>も確認してください。</div></div></div>
+        <div class="flow-step"><i>3</i><div><b>メールの中の「Join」を押して参加する</b><div class="fs-body">メールのボタン (<b>Join @nkuma-platform</b>) を押すとブラウザが開くので、GitHub にログインした状態で<b>参加を確定</b>します。<br class="s"><b>ここまでやらないと参加は成立しません</b> — メールが届いただけでは権限は付きません。<br class="s">メールを消してしまった場合は <a href="https://github.com/nkuma-platform">github.com/nkuma-platform</a> を開けば、未承諾の招待からその場で参加できます。</div></div></div>
+        <div class="flow-step"><i>4</i><div><b>参加できたか確かめる</b><div class="fs-body">GitHub にログインした状態で <a href="https://github.com/nkuma-platform">github.com/nkuma-platform</a> を開いてください。<br class="s"><b>組織のページ (リポジトリの一覧) が見えれば参加済み</b>です。<br class="s">「招待が届いています」の表示が残っていれば、まだ 3 が終わっていません。<br class="s">ページが見つからない (404) 場合は、招待そのものがまだなので管理者に確認してください。</div></div></div>
       </div>
+      <div class="note"><b>この 4 歩が済んでいないと、<a href="#ghcr">2.6</a> と <a href="#install">2.7</a> は必ず失敗します。</b><br class="s">置き場が見えないためで、コマンドやパソコンの問題ではありません。<br class="s">依頼と返事を待つ手順なので、<b>初回セットアップの中でいちばん先に済ませておく</b>のがおすすめです (他の手順は待っている間に進められます)。</div>
 
       <h3 id="terminal">2.3 ターミナルの開き方 (コマンドの実行のしかた)</h3>
       <p>このページに出てくる「コマンド」は、すべて<b>ターミナル</b> (黒い文字入力の画面) に貼り付けて Enter を押すだけです:</p>
@@ -129,7 +130,7 @@
         <tr><td><b>gh CLI</b> (GitHub 公式コマンド)</td><td><code>gh --version</code></td><td><a href="https://cli.github.com/">cli.github.com</a>。<br class="s">入れたらログインへ → <a href="#gh-login">2.5</a></td></tr>
         <tr><td><b>Node.js</b> (LTS 版)</td><td><code>node --version</code></td><td><a href="https://nodejs.org/ja">nodejs.org</a> (LTS 推奨版のインストーラ)</td></tr>
         <tr><td><b>bun</b> (1.0 以上)</td><td><code>bun --version</code></td><td>下のコマンド 1 行 (<a href="#bun-install">この節のすぐ下</a>)</td></tr>
-        <tr><td><b>Docker</b> (Desktop)</td><td><code>docker --version</code></td><td><a href="https://www.docker.com/products/docker-desktop/">docker.com</a></td></tr>
+        <tr><td><b>Docker</b> (Desktop)</td><td><code>docker --version</code></td><td><a href="https://www.docker.com/products/docker-desktop/">docker.com</a>。<br class="s">入れたら<b>起動もしておく</b> → <a href="#ghcr">2.6</a> (版の数字が返っても「起動している」とは限りません)</td></tr>
         <tr><td><b>Azure CLI</b> (任意 — <b>AI 機能 ($ai) をローカルで使う案件のみ</b>)</td><td><code>az --version</code></td><td><a href="https://learn.microsoft.com/ja-jp/cli/azure/install-azure-cli">learn.microsoft.com (Azure CLI)</a>。<br class="s">入れたら <code>az login</code> で会社アカウントにログイン (API キーは使いません — <a href="#run">§5</a>)</td></tr>
       </table>
       <div class="note">
@@ -148,6 +149,15 @@
       <pre>powershell -c "irm bun.sh/install.ps1 | iex"</pre>
       <p class="muted">入れたらターミナルを<b>閉じて開き直して</b> <code>bun --version</code> — 版の数字が返れば完了です。</p>
 
+      <h4 id="mac-notes">Mac の人への補足 <em>(2 つだけ)</em></h4>
+      <p>Mac では次の 2 つでつまずくことがあります。<br class="s">当てはまらなければ読み飛ばして構いません:</p>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>bun を入れたのに <code>command not found</code> のまま</b><div class="fs-body">bun のインストーラは、最後に<b>設定ファイルへの追記コマンド</b>を画面に表示します。<br class="s">これを実行しないと、ターミナルは bun の置き場所を覚えません (開き直しても直りません)。<br class="s">表示を見逃した場合は、次の 2 行を実行してから<b>ターミナルを開き直して</b>ください:<pre>echo 'export BUN_INSTALL="$HOME/.bun"' &gt;&gt; ~/.zshrc
+echo 'export PATH="$BUN_INSTALL/bin:$PATH"' &gt;&gt; ~/.zshrc</pre>これは Mac 標準のターミナル (zsh) の場合です。<br class="s"><code>bun --version</code> で版の数字が返れば完了です。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>Azure CLI (<code>az</code>) を入れるなら Homebrew があると楽</b><div class="fs-body">Homebrew は Mac でソフトを入れるための道具です。<br class="s">入っていれば Azure CLI は 1 行で入ります:<pre>brew install azure-cli</pre>Homebrew 自体が無ければ <a href="https://brew.sh/ja/">brew.sh</a> のコマンドを実行してください。<br class="s"><b>インストールの最後に「次を実行してください」と 3 行ほど表示されます</b> — <b>その 3 行もコピーして実行</b>しないと、<code>brew</code> コマンドが見つからないままになります (bun と同じ理由です)。<br class="s">途中で分からなくなったら、画面つきで手順を追える記事があります → <a href="https://zenn.dev/cscloud_blog/articles/homebrew-install">【備忘録】Homebrew のインストール方法 (Zenn)</a></div></div></div>
+      </div>
+      <p class="muted">Azure CLI は<b>「AI 機能 ($ai) をローカルで使う案件」だけ</b>必要です (<a href="#run">§5</a>)。<br class="s">使わない案件なら Homebrew ごと不要です。</p>
+
       <h3 id="gh-login">2.5 gh のログイン</h3>
       <p>gh CLI を入れたら、GitHub アカウントと結びつけるログインを 1 回だけ行います:</p>
       <div class="flow-steps">
@@ -161,7 +171,7 @@
         <figcaption>gh auth login のワンタイムコード表示 — このコードをブラウザに入力します</figcaption>
       </figure>
 
-      <h3 id="ghcr">2.6 gh の権限づけ (チーム招待が済んでから)</h3>
+      <h3 id="ghcr">2.6 gh の権限づけ <em>(<a href="#invite">2.2 の参加</a>が済んでから)</em></h3>
       <p>gh の標準ログインでは足りない権限が 2 つあるので、まとめて 1 回で足しておきます:</p>
       <ul>
         <li><b>workflow</b> — 案件リポジトリには CI 設定 (ワークフローファイル) が含まれ、この権限がないと GitHub が push を拒否します</li>
@@ -170,12 +180,14 @@
       <pre>gh auth refresh -h github.com -s repo,workflow,read:packages</pre>
       <p class="muted">ブラウザが開くので、表示されたコードを入力して承認します。</p>
       <p class="muted">承認画面に organization の一覧が出ますが、これは gh が既に持っているアクセス範囲の確認表示です。<br class="s">この操作で新たに加わるのは「ワークフローファイルの更新」と「パッケージの読み取り」の 2 つだけです。</p>
-      <p>続けて、エンジンを取得できるように docker をログインさせておきます:</p>
+      <p>続けて、エンジンを取得できるように docker をログインさせておきます。<br class="s">その前に <b>Docker Desktop を起動してください</b> — アプリを開いて、クジラのアイコンが動き出す (起動完了の表示になる) まで待ちます。<br class="s">起動していないとこのコマンドは必ず失敗します。</p>
       <pre>gh auth token | docker login ghcr.io -u $(gh api user -q .login) --password-stdin</pre>
+      <div class="note"><b><code>failed to get console mode for stdin: The handle is invalid.</code> という行が出ますが、これは無視して構いません。</b><br class="s">成功した時にも必ず出る行です。<br class="s"><b>最後の行が <code>Login Succeeded</code> になっていれば完了</b>です。<br class="s">Docker Desktop が起動していない時は、代わりに <code>error during connect: ... the docker daemon is not running</code> が出ます。<br class="s">その場合は起動してからもう一度実行してください。</div>
       <div class="note"><b>この手順は期限切れがなく、マシンごとに 1 回だけ</b>です (同じ GitHub アカウントでも、PC が変われば再度必要です)。<br class="s">やり忘れても、必要になった場面で AI が同じ手順を案内してくれます (workflow は nk-init の環境チェック、read:packages はエンジン取得時の運転係)。</div>
 
       <h3 id="install">2.7 nkuma を受け取る (plugin の導入)</h3>
-      <p>ここまでの準備ができたら、nkuma 本体 (plugin) を受け取ります。<b>ターミナルで</b>次の 2 コマンドを<b>1 つずつ</b>実行してください (どのフォルダにいても OK。<br class="s">Claude Code の画面を開く必要はありません):</p>
+      <div class="note"><b>その前に 1 つだけ確認 — <a href="#invite">2.2</a> の招待に参加しましたか?</b><br class="s">依頼しただけ・メールが届いただけでは足りません。<br class="s"><b>参加が済んでいないと、下の 1 行目は必ず失敗します</b> (受け取り先が見えないため)。<br class="s">確かめ方は <a href="#invite">2.2 の 4</a> — <a href="https://github.com/nkuma-platform">github.com/nkuma-platform</a> を開いて組織のページが見えれば参加済みです。</div>
+      <p>承諾できていたら、nkuma 本体 (plugin) を受け取ります。<b>ターミナルで</b>次の 2 コマンドを<b>1 つずつ</b>実行してください (どのフォルダにいても OK。<br class="s">Claude Code の画面を開く必要はありません):</p>
       <pre>claude plugin marketplace add https://github.com/nkuma-platform/nkuma-marketplace</pre>
       <pre>claude plugin install nkuma@nkuma-marketplace</pre>
       <p>導入できたかの確認:</p>
@@ -246,7 +258,7 @@
       <h3>AI 機能 ($ai) を使う案件のみ: 追加の準備</h3>
       <p>LLM (Azure OpenAI) はローカルに代替が無いため、開発中も開発用の実リソースを呼びます。<br class="s">準備は 2 つだけです:</p>
       <ol class="steps">
-        <li><b>Azure CLI を入れて <code>az login</code></b> — いつもの会社アカウントでログインします。<b>API キーは一切使いません</b> (あなたのログインがそのまま通行証になります)</li>
+        <li><b>Azure CLI を入れて <code>az login</code></b> — いつもの会社アカウントでログインします。<b>API キーは一切使いません</b> (あなたのログインがそのまま通行証になります)。<br class="s">ログイン後に<b>「サブスクリプションを選んでください」と番号付きの一覧が出ることがあります</b>が、<b>そのまま Enter で大丈夫</b>です (「既定のまま変更しない」という意味の選択肢です)</li>
         <li><b>開発用 AI リソースへのロール付与を環境管理者に依頼</b> — 初回のみ。<br class="s">付与後の反映に数分かかることがあります</li>
       </ol>
       <p class="muted">設定場所は案件の <code>docker-compose.yml</code> のコメント欄です。<br class="s">オフラインや CI では <b>stub モード</b> (決め打ち応答) に切り替えられます。</p>
@@ -259,7 +271,7 @@
       <p>手順の正本は、案件リポジトリに同梱されている公開ガイド <code>DEPLOY.md</code> です。<br class="s">nkuma が現在地を見て「いまどの段か・次に何をするか」を案内するので、ここでは全体像だけ掴めば十分です。</p>
       <table class="phase-table">
         <tr><th>段</th><th>やること</th><th>誰のターン</th></tr>
-        <tr><td>① 依頼</td><td>リポジトリ名・アプリ名・顧客名・<b>初期 ADMIN (あなたのメールアドレス)</b> の 4 点を環境管理者へ送る (雛形は nkuma が作ります)</td><td>あなた</td></tr>
+        <tr><td>① 依頼</td><td>リポジトリの情報・アプリ名・顧客名・<b>初期 ADMIN (あなたのメールアドレス)</b> を環境管理者へ送る (雛形は nkuma が作ります — リポジトリの情報は自動で埋まるので、あなたが決めるのは残り 3 つです)</td><td>あなた</td></tr>
         <tr><td>② 待ち</td><td>管理者が受け入れ作業 (Azure 側の配線) を行う</td><td>管理者</td></tr>
         <tr><td>③ 配線</td><td>管理者の返信にあるコマンド一式をそのまま実行する (すべて非秘密の識別子)</td><td>あなた</td></tr>
         <tr><td>④ リリース</td><td>deploy ブランチへマージする — これがリリースの引き金</td><td>あなた</td></tr>
@@ -282,7 +294,10 @@
         <tr><td>Claude アプリで <code>/plugin ...</code> が動かない・反応しない</td><td>アプリの仕様です (故障ではありません)。<br class="s">plugin の導入・更新・入れ直しは、すべて<b>ターミナル</b>の <code>claude plugin ...</code> コマンドで行います (<a href="#install">2.7</a> / <a href="./update.html">更新ガイド</a>)</td></tr>
         <tr><td><code>/nkuma:nk-XXX</code> が見つからない</td><td>ターミナルで<a href="./update.html#plugin">更新ガイドの 2 コマンド</a> → Claude アプリのセッションを開き直す。<br class="s">直らなければ <code>claude plugin uninstall nkuma@nkuma-marketplace</code> → <a href="#install">2.7</a> で入れ直し (何度やっても安全)</td></tr>
         <tr><td>skill が古い挙動をする</td><td>同上 (= 新しい版が配布されたのに更新していない可能性)</td></tr>
-        <tr><td>2.7 の <code>marketplace add</code> が失敗する</td><td>順に確認: ① チーム招待 (<a href="#prepare">2.2</a>) を承諾済みか ② <code>gh auth status</code> でログイン済みか (<a href="#gh-login">2.5</a>) ③ <code>gh auth setup-git</code> を実行したか (<a href="#gh-login">2.5</a> の最後) ④ URL を <code>https://</code> 付きで貼ったか</td></tr>
+        <tr><td>2.7 の <code>marketplace add</code> が失敗する</td><td>順に確認: ① <a href="#invite">2.2 の招待に参加済み</a>か — <b>いちばん多い原因です</b> (<a href="https://github.com/nkuma-platform">github.com/nkuma-platform</a> を開いて組織のページが見えれば参加済み。招待の表示が残っていれば、その場から参加できます) ② <code>gh auth status</code> でログイン済みか (<a href="#gh-login">2.5</a>) ③ <code>gh auth setup-git</code> を実行したか (<a href="#gh-login">2.5</a> の最後) ④ URL を <code>https://</code> 付きで貼ったか</td></tr>
+        <tr><td>2.6 の <code>docker login</code> が <code>the docker daemon is not running</code> で失敗する</td><td><b>Docker Desktop が起動していません</b>。<br class="s">アプリを開いて起動しきってから、同じコマンドをもう一度実行してください (<a href="#ghcr">2.6</a>)。<br class="s"><code>docker --version</code> は起動していなくても版の数字を返すので、これだけでは判断できません</td></tr>
+        <tr><td><code>failed to get console mode for stdin</code> と出る</td><td><b>正常です</b> (成功時にも必ず出る行)。<br class="s">最後の行が <code>Login Succeeded</code> なら完了しています (<a href="#ghcr">2.6</a>)</td></tr>
+        <tr><td>Mac で bun を入れたのに <code>command not found</code> のまま</td><td>設定ファイルへの追記が済んでいません — <a href="#mac-notes">Mac の人への補足</a>の 2 行を実行してターミナルを開き直してください</td></tr>
         <tr><td>ツールを入れたのに「認識されません」/ <code>command not found</code> のまま</td><td>ターミナルを<b>一度閉じて開き直す</b> (開きっぱなしのターミナルは新しく入れたツールを認識しません)</td></tr>
         <tr><td><code>gh</code> 関連のエラーで止まる</td><td><code>gh auth status</code> を確認 → 未認証なら <a href="#gh-login">2.5 のログイン</a> (<code>gh auth login --web</code>)</td></tr>
         <tr><td>nk-init が「スコープ不足」で止まる / push が拒否される</td><td><a href="#ghcr">2.6 の権限づけ</a>を実行 (= workflow が付いていない。<br class="s">標準ログイン直後や別 PC ではこの状態です)</td></tr>

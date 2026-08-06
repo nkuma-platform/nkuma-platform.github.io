@@ -7,6 +7,7 @@
 <meta name="description" content="案件リポジトリを Nkuma 環境へ受け入れる管理者の手順 (フェデレーション認証の登録から Variables の返信まで)。">
 <link rel="icon" type="image/png" href="./images/nkuma-face.png">
 <link rel="stylesheet" href="./site.css">
+<script src="./site.js" defer></script>
 </head>
 <body class="admin-page">
 
@@ -58,7 +59,7 @@
 
     <section id="steps">
       <h2>手順</h2>
-      <p><b>入力</b>: ドライバーからの依頼に <b>リポジトリ名 / アプリ名 / 顧客名 / 初期 ADMIN にする人の UPN</b> が含まれます (案件側のガイドが雛形を出します)。UPN は ① の <code>-InitialAdminUpn</code> にそのまま渡します。</p>
+      <p><b>入力</b>: ドライバーからの依頼に <b>リポジトリ名 / リポジトリ ID・所有者 ID / アプリ名 / 顧客名 / 初期 ADMIN にする人の UPN</b> が含まれます (案件側のガイドが雛形を出します)。UPN は ① の <code>-InitialAdminUpn</code> に、ID 2 つは <code>-RepoId</code> / <code>-OwnerId</code> にそのまま渡します。<br class="s">ID 2 つを依頼に添えてもらうのは、案件リポジトリが private だと<b>管理者からは取得できない</b>値だからです (引ける側から渡してもらうのが確実)。</p>
       <ol class="steps">
         <li><b><code>oidc-setup.ps1</code> を実行</b> — CI 用登録の作成 (初回のみ) + 案件リポジトリの FIC 追加 + ロール付与 + ログイン用登録への戻り先 URL 追記 + <b>初期 ADMIN の UPN 解決</b> (依頼の UPN を ID に引き当て、初回配備の CI が自動で ADMIN 登録できるようにする) + <b>Variables 設定コマンド一式の出力</b>、まで一括 (冪等)</li>
         <li><b><code>tokenstore-setup.ps1</code> を実行</b> — このアプリ用のログイントークン置き場づくり。<b>Storage アカウントは増えません</b> — 顧客共通のトークンストア用 Storage (<a href="./admin-environment.html#manual">1 章 手順 5</a> で作成済みの金庫室) の中に、このアプリ専用のコンテナ (部屋) <code>easyauth-&lt;アプリ名&gt;</code> を 1 つ切り、<b>その部屋だけ開く鍵 (SAS、期限 1 年)</b> を発行して Key Vault へ格納します (値は画面にもログにも表示されない。部屋を分けるのは、鍵が漏れても他アプリのトークンに届かないようにする分離)。これが無いと公開時のログイン構成が組めません。再実行すると SAS が上書きされる = <b>鍵のローテーションも同じスクリプト</b></li>
@@ -66,6 +67,7 @@
         <li><b>(顧客初回のみ) 運用者名簿に CI を載せる</b> — 記入用紙 (<a href="./admin-environment.html#bicep">1.2</a>) の <code>opsOperatorOids</code> に ① が表示した CI 身元の objectId を追記して <code>deploy-foundation.ps1</code> を再実行。これで CI がスキーマの宣言登録を行えるようになります</li>
       </ol>
       <div class="note"><b>受付向け設定は自動化済み</b> — ログイン用登録への「API の公開」3 点セット (宛先の正式名称 / 委任スコープ / Azure CLI の事前承認) は、<b>oidc-setup が毎回冪等に確保します</b>。順序を間違えると拒否される Graph 操作の罠ごと script が吸収しているので、手作業はありません。</div>
+      <div class="note"><b>① が「未完了」で終わったときだけ、ドライバーに 1 つ聞いてください。</b><br class="s">依頼に ID 2 つが無い場合、① は <code>gh api</code> で自動取得を試みますが、<b>private のリポジトリは管理者から読めません</b> (この一意 ID 形式の FIC が無いと初回配備が失敗します)。<br class="s">その場合 ① は末尾に未完了の案内を出して終わるので、<b>返信する前に</b>次をドライバーに実行してもらい:<br class="s"><code>gh api repos/&lt;owner&gt;/&lt;リポジトリ&gt; --jq "{id: .id, ownerId: .owner.id}"</code><br class="s">返ってきた 2 値を <code>-RepoId</code> / <code>-OwnerId</code> に付けて ① を再実行してください (冪等)。</div>
       <div class="note"><b>Entra への書き込みは管理者側に残しています</b> — CI に Graph 権限を渡すと権限も判子も増えるため、戻り先 URL の追記などはこの受け入れ作業のついでに管理者が済ませる設計です。コマンドの正本は開発リポジトリの infra/README「アプリの受け入れ」。</div>
     </section>
 

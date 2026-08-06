@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>勉強会 — nkuma サポート</title>
-<meta name="description" content="nkuma の勉強会で「はじめての一本」を作るためのページ。何が作れるのか、当日までの準備、当日の道のり、会話の書き出しのお願い。">
+<meta name="description" content="nkuma の勉強会で「はじめての一本」を作るためのページ。何が作れるのか、当日までにできること、当日の道のり、会話の書き出しのお願い。セットアップは会場で一緒に行います。">
 <link rel="icon" type="image/png" href="./images/nkuma-face.png">
 <link rel="stylesheet" href="./site.css">
 <script src="./site.js" defer></script>
@@ -40,7 +40,7 @@
 <nav class="toc">
   <div class="wrap">
     <a href="#what">1. 何が作れるのか</a>
-    <a href="#prepare">2. 当日までの準備</a>
+    <a href="#prepare">2. 当日までにできること</a>
     <a href="#theme">3. 何を作るか</a>
     <a href="#journey">4. 当日の道のり</a>
     <a href="#export">5. お願い</a>
@@ -104,16 +104,22 @@
 
     <section id="prepare">
       <span class="kicker">BEFORE THE DAY</span>
-      <h2>2. 当日までの準備 <em>(30〜60 分、1 回きり)</em></h2>
-      <p>当日は<b>セットアップが終わった状態</b>から始めます。<br class="s">手順の正本は利用者ガイドなので、そちらを上から順に進めてください:</p>
+      <h2>2. 当日までにできること <em>(やってこなくても大丈夫)</em></h2>
+      <p><b>セットアップは当日、会場で一緒にやります。</b><br class="s">何も準備できていない状態で来てもらって構いません。<br class="s">この章は「先にやっておくと当日が楽になること」の案内です。</p>
       <div class="card accent">
-        <p><b><a href="./guide.html#prepare">利用者ガイド 2. 初回セットアップ →</a></b></p>
-        <p>GitHub アカウントを作る → 管理者に伝える → ツールを 7 つ入れる → gh にログインする → nkuma を受け取る。<br class="s">この順で 1 本道です。</p>
+        <p><b>先にやっておいてもらえると助かるのは、この 2 つだけです:</b></p>
+        <ul>
+          <li><b>GitHub アカウントを作る</b> (<a href="./guide.html#prepare">利用者ガイド 2.1</a>) — 無料プランで大丈夫です</li>
+          <li><b>GitHub の道具を入れる</b> (<a href="./guide.html#prepare">利用者ガイド 2.4</a> の git / gh CLI) — インストーラを実行するだけです</li>
+        </ul>
+        <p class="muted">どちらも当日その場でできます。<br class="s">できていなくても進行に支障はありません。</p>
       </div>
-      <p>終わったかどうかは、ターミナルでこの 1 つを実行すれば確かめられます:</p>
-      <pre>claude plugin list</pre>
-      <p><code>nkuma@nkuma-marketplace</code> が <code>enabled</code> と表示されれば、準備は完了です。</p>
-      <div class="note"><b>管理者への依頼 (<a href="./guide.html#prepare">利用者ガイド 2.2</a>) だけは早めに済ませてください。</b><br class="s">これは返事とチーム招待を待つ手順なので、当日ぎりぎりだと間に合いません。<br class="s">他の手順は自分のペースで大丈夫です。</div>
+      <p>時間に余裕がある人は、利用者ガイドの初回セットアップを先に進めてもらっても構いません:</p>
+      <div class="card">
+        <p><b><a href="./guide.html#prepare">利用者ガイド 2. 初回セットアップ →</a></b></p>
+        <p>GitHub アカウントを作る → organization に参加する → ツールを入れる → gh にログインする → nkuma を受け取る。<br class="s">この順で 1 本道です。</p>
+      </div>
+      <div class="note"><b>organization への参加 (<a href="./guide.html#invite">利用者ガイド 2.2</a>) は会場で行います。</b><br class="s">招待を出すのも、参加を確認するのも、当日その場で一緒にやります。<br class="s">事前に招待が届いていた人は、先に参加まで済ませておいてもらっても構いません。</div>
       <div class="note"><b>途中で止まっても大丈夫です。</b><br class="s">当日いちばんに解決しますので、<b>どこで止まったか</b>だけメモしておいてください。<br class="s">「入れたのに認識されません」の多くは、ターミナルを一度閉じて開き直せば直ります。</div>
     </section>
 
@@ -145,7 +151,8 @@
     <section id="journey">
       <span class="kicker">THE DAY</span>
       <h2>4. 当日の道のり — <em>対話しながら進む</em></h2>
-      <p>ここからは Claude アプリの中の話です。<br class="s"><b>コマンドを覚える必要はありません</b> — 迷ったら <code>/nkuma:nk-master</code> が、いま何をすべきかを教えてくれます。</p>
+      <p>当日はまず、<b>セットアップの仕上げを全員で一緒に</b>やります (organization への参加 → 道具の確認 → nkuma の受け取り)。<br class="s">ここは<a href="./guide.html#prepare">利用者ガイドの 2</a> をその場で一緒に進めるだけなので、事前に何もできていなくて大丈夫です。</p>
+      <p>その先が下の道のり — <b>ここからは Claude アプリの中の話</b>です。<br class="s"><b>コマンドを覚える必要はありません</b> — 迷ったら <code>/nkuma:nk-master</code> が、いま何をすべきかを教えてくれます。</p>
       <div class="flow-steps">
         <div class="flow-step"><i>1</i><div><b>案件フォルダを作って、Claude アプリで開く</b><div class="fs-body">「1 つの案件 = パソコンの中の 1 つのフォルダ」です。<br class="s">作り方と開き方は<a href="./guide.html#workspace">利用者ガイド 3</a> に画面つきで書いてあります。</div></div></div>
         <div class="flow-step"><i>2</i><div><b><code>/nkuma:nk-init</code> — 何を作りたいのかを話す</b><div class="fs-body">キックオフ役が、環境を確認し、GitHub にあなたの案件リポジトリを作り、「誰の・どんな困りごとを・どう解くのか」を聞いていきます。<br class="s">ここでたくさん話すほど、後の工程が楽になります。</div></div></div>

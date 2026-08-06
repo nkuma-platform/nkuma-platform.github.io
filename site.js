@@ -1,7 +1,8 @@
 /* nkuma サポートサイト共通スクリプト
  * 1) コマンド枠 (pre) に「コピー」ボタンを付ける (#485)
  * 2) スクリーンショット差し込み枠 (figure.shot) — 画像が未配置の間は枠ごと非表示にする
- *    (images/shots/ に決められたファイル名で置くと自動で現れる) */
+ *    (images/shots/ に決められたファイル名で置くと自動で現れる)
+ * 3) 外部サイトへのリンクは別タブで開く (#607) */
 document.querySelectorAll("pre").forEach(function (pre) {
   var wrap = document.createElement("div");
   wrap.className = "pre-wrap";
@@ -41,4 +42,14 @@ document.querySelectorAll("figure.shot img").forEach(function (img) {
   } else {
     img.addEventListener("error", hide);
   }
+});
+
+/* 外部サイトへのリンクだけ別タブで開く。読んでいる手順のページを見失わせないため。
+ * ページ内アンカー (#...) とサイト内リンク (./guide.html 等) は同じタブのまま。
+ * 個別に target を書くとページを増やすたび取り残しが出るので、ここで一括して付ける */
+document.querySelectorAll("a[href]").forEach(function (a) {
+  if (!/^https?:\/\//i.test(a.getAttribute("href"))) return;  // 相対リンク・#・mailto は対象外
+  if (a.host === location.host) return;                       // 自サイトの絶対 URL も対象外
+  a.target = "_blank";
+  a.rel = "noopener";
 });
