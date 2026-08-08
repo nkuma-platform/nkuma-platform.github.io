@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>5. 困ったとき・その他の作業 — 管理者ハンドブック</title>
-<meta name="description" content="秘密の投入、破壊的マイグレーションの承認、ロールバック、非常口、テスト面の建て壊し。">
+<meta name="description" content="秘密の投入、破壊的マイグレーションの承認、ロールバック、アプリの撤収、非常口、テスト面の建て壊し。">
 <link rel="icon" type="image/png" href="./images/nkuma-face.png">
 <link rel="stylesheet" href="./site.css">
 <script src="./site.js" defer></script>
@@ -36,6 +36,7 @@
     <a href="#secrets">秘密の投入</a>
     <a href="#confirm">破壊的マイグレーションの承認</a>
     <a href="#rollback">ロールバック</a>
+    <a href="#teardown">アプリの撤収</a>
     <a href="#emergency">非常口</a>
     <a href="#test-env">テスト面</a>
     <a href="#members">メンバーの環境トラブル</a>
@@ -69,6 +70,17 @@
     <section id="rollback">
       <h2>リリースを戻したいとき (ロールバック)</h2>
       <p>1 つ前の版のイメージへ差し戻します — 版は <b>git タグ / Container Registry のタグ / 配備台帳 (registry.json)</b> の 3 点に残っているので、迷子になりません。<br class="s">戻し方は<b>案件リポジトリ同梱のロールバック用ワークフロー</b> (Actions → rollback を版名を入力して起動) の一本です — 手動の <code>az containerapp update</code> はイメージ名しか変わらず器の構成が揃わないため使いません。</p>
+    </section>
+
+    <section id="teardown">
+      <h2>アプリの公開をやめるとき (撤収)</h2>
+      <p>公開をやめるアプリは、道具箱の撤収スクリプト (<code>05_登録した生成アプリを撤収する/teardown-app.ps1</code>) で畳みます。<br class="s">器・権限・秘密・イメージを<b>対で</b>消す一本道で、実行前に対象一覧を見て confirm するだけです (手作業で器だけ消すと、権限の残骸が幽霊として残ります)。</p>
+      <ol class="steps">
+        <li>撤収スクリプトを実行する — 消える対象の一覧が表示されるので、確認して y を打つ</li>
+        <li><b>データは消えません</b> — DB の区画・ファイル・台帳は残り、再受け入れすればアプリごと復活できます。完全な廃棄は保持期間・顧客合意を踏まえた別判断です</li>
+        <li>締めに<b>幽霊掃除</b>が自動で走ります — 宛先の身元がもう存在しない権限の残骸が見つかれば、確認の上で削除できます (掃除だけしたいときは <code>-SweepOnly</code>)</li>
+      </ol>
+      <div class="note"><b>幽霊とは</b>: 器をポータルなどから直接消したときに残る、宛先不明のロール割り当てです。<br class="s">動作は壊しませんが、溜まるとサブスクリプションの割り当て上限を圧迫します — 撤収のたびに自動点検されるので、意識して覚えておく必要はありません。</div>
     </section>
 
     <section id="emergency">
