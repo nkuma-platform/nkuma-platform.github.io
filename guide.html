@@ -231,6 +231,14 @@ echo 'export PATH="$BUN_INSTALL/bin:$PATH"' &gt;&gt; ~/.zshrc</pre>これは Mac
         <figcaption>Claude アプリの新しいセッション — Local を選んで案件フォルダを開きます</figcaption>
       </figure>
       <p class="muted">これで nkuma と話す準備が整いました。<br class="s">2 回目以降も同じ — アプリを開いて、同じ案件フォルダで新しいセッションを始めるだけです。</p>
+
+      <h3 id="model">3.3 使うモデルを確認する <em>(推奨: Claude Opus 5 以上)</em></h3>
+      <p>Claude には性能の違う何種類かの<b>モデル</b> (AI の頭脳) があり、セッションごとに切り替えられます。<br class="s">nkuma の専門家 skill たちは <b>Claude Opus 5 以上</b>のモデルで使う前提に調整されているため、それより軽いモデルや古いモデルで使うと、案内や生成物の質が下がることがあります。</p>
+      <div class="flow-steps">
+        <div class="flow-step"><i>1</i><div><b>いまのモデルを確認する</b><div class="fs-body">案件フォルダを開いたセッションのチャット欄に <code>/model</code> と入力して実行します。<br class="s">いま使っているモデルと、選べるモデルの一覧が表示されます。</div></div></div>
+        <div class="flow-step"><i>2</i><div><b>Opus 5 以上になっていれば OK</b><div class="fs-body"><b>Opus 5</b> (またはそれより高性能なモデル) が選ばれていればそのままで大丈夫。<br class="s">違うモデルになっていたら、一覧から選んで切り替えます。</div></div></div>
+      </div>
+      <p class="muted">新しい案件フォルダで最初のセッションを始めた時に、一度確認しておくのがおすすめです。<br class="s">「専門家の案内がいつもより雑だな」と感じた時も、まずここを見直してください。</p>
     </section>
 
     <section id="first-step">
