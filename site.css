@@ -27,7 +27,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-[id] { scroll-margin-top: 118px; }
+/* --header-h / --toc-h は site.js が .site-header / nav.toc の実高を入れる (どちらも狭幅で折り返して高くなる — 固定値に戻さない) */
+[id] { scroll-margin-top: calc(var(--header-h, 55px) + var(--toc-h, 63px) + 14px); }
 body {
   background: var(--paper); color: var(--ink);
   font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
@@ -77,7 +78,7 @@ header.hero {
 .hero-bear { width: min(180px, 26vw); filter: drop-shadow(0 18px 18px rgba(56,44,25,.16)); }
 
 /* ---------- ページ内目次 (sticky ヘッダの下) ---------- */
-nav.toc { position: sticky; top: 55px; z-index: 10; background: rgba(255,251,242,.95); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+nav.toc { position: sticky; top: var(--header-h, 55px); z-index: 10; background: rgba(255,251,242,.95); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
 nav.toc .wrap { display: flex; gap: 4px 16px; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
 nav.toc a { font: 700 12.5px var(--display); color: var(--muted); text-decoration: none; }
 nav.toc a:hover { color: var(--orange-deep); }
@@ -242,6 +243,8 @@ figure.shot figcaption { margin-top: 8px; color: var(--muted); font-size: 12.5px
   transition: transform .2s ease, box-shadow .2s ease;
 }
 .entry-card.admin { border-top-color: var(--sky-deep); }
+/* 全幅の入口 (トップの「Nkumaとは？」カード — 色は既定の橙のまま) */
+.entry-card.about { grid-column: 1 / -1; }
 /* 全幅の目立つ入口 (トップの勉強会カード) */
 .entry-card.wide { grid-column: 1 / -1; border-top-color: var(--green); }
 .entry-card.wide .go { color: var(--green); }

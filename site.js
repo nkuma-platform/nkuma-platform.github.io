@@ -2,7 +2,21 @@
  * 1) コマンド枠 (pre) に「コピー」ボタンを付ける (#485)
  * 2) スクリーンショット差し込み枠 (figure.shot) — 画像が未配置の間は枠ごと非表示にする
  *    (images/shots/ に決められたファイル名で置くと自動で現れる)
- * 3) 外部サイトへのリンクは別タブで開く (#607) */
+ * 3) 外部サイトへのリンクは別タブで開く (#607)
+ * 4) sticky ヘッダとページ内目次バーの実高を --header-h / --toc-h に入れる (狭幅で折り返して高くなっても、目次バーとアンカーが裏に隠れないように) */
+(function () {
+  var header = document.querySelector(".site-header"), toc = document.querySelector("nav.toc");
+  if (!header) return;
+  function measure() {
+    var root = document.documentElement.style;
+    root.setProperty("--header-h", header.offsetHeight + "px");
+    if (toc) root.setProperty("--toc-h", toc.offsetHeight + "px");
+  }
+  measure();
+  if (window.ResizeObserver) { var ro = new ResizeObserver(measure); ro.observe(header); if (toc) ro.observe(toc); } else window.addEventListener("resize", measure);
+  window.addEventListener("load", measure);
+})();
+
 document.querySelectorAll("pre").forEach(function (pre) {
   var wrap = document.createElement("div");
   wrap.className = "pre-wrap";

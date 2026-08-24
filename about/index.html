@@ -1,0 +1,1470 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Nkuma — 作る人のフレームワーク。Claude Code は作れる。Nkuma は作り切れる。">
+  <title>Nkuma | Claude Code は作れる。Nkuma は作り切れる。</title>
+  <link rel="icon" type="image/png" href="images/nkuma-face.png">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+    :root {
+      --paper: #fffbf2; --cream: #f8f1e3; --ink: #232a38; --ink-2: #3f4654; --muted: #5b6472;
+      --orange: #f29d38; --orange-deep: #d97716;
+      --sky: #83c9ee; --sky-deep: #276a91; --sky-ink: #1f5a7d; --sky-pale: #eaf6fc;
+      --line: #e3dcce; --soft: #a9afb8; --gray-fill: #edeae2; --no: #b23b2e;
+      --night: #1a2130; --white: #fff;
+      --terminal: #151922; --term-text: #d8dee9; --term-red: #e8998a; --term-prompt: #8fb6d9; --frame-dot: #c9c2b3;
+      --shadow: 0 20px 50px rgba(56, 44, 25, .12);
+      --display: "Noto Sans JP", sans-serif;
+      --mono: "IBM Plex Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: "Noto Sans JP", sans-serif; line-height: 1.85; overflow: hidden; font-feature-settings: "palt"; letter-spacing: -0.01em; }
+    a { color: inherit; }
+
+    /* ---------- deck (コマ送り) ---------- */
+    .deck { height: 100dvh; overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; outline: none; }
+    .slide { position: relative; display: grid; align-content: center; justify-items: center; min-height: 100dvh; padding: clamp(56px, 7vh, 80px) clamp(20px, 5vw, 64px) clamp(32px, 4vh, 56px); scroll-snap-align: start; scroll-snap-stop: always; overflow: hidden; }
+    .slide-inner { width: min(1000px, 100%); }
+
+    /* ---------- 現在地 (章ナビ + ページ + 目次) ---------- */
+    .chapnav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    .chapnav-inner { max-width: 1200px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .chapnav .brand { display: flex; align-items: center; gap: 8px; font: 700 14px var(--display); margin-right: 14px; text-decoration: none; }
+    .chapnav .brand img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(35,42,56,.85); background: var(--white); }
+    .chapnav a.ch.support { margin-left: auto; margin-right: 96px; color: var(--sky-ink); border-color: var(--line); }
+    @media (max-width: 720px) { .chapnav-inner { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .chapnav-inner::-webkit-scrollbar { display: none; } .chapnav a.ch { white-space: nowrap; } } /* 狭幅は 1 行に保ち横スクロール (折り返すとコマ上端が隠れる) */
+    .chapnav a.ch { font: 500 12.5px var(--mono); color: var(--muted); text-decoration: none; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; }
+    .chapnav a.ch.active { color: var(--sky-deep); border-color: var(--sky-deep); background: var(--sky-pale); }
+    .pager { position: fixed; bottom: 18px; right: 22px; z-index: 50; color: var(--muted); font: 500 12.5px var(--mono); letter-spacing: .12em; }
+    .toc-btn { position: fixed; top: 9px; right: 16px; z-index: 60; font: 700 13px var(--display); color: var(--ink); background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; box-shadow: 0 6px 18px rgba(56,44,25,.10); }
+    .toc-btn:hover, .toc-btn[aria-expanded="true"] { border-color: var(--sky-deep); color: var(--sky-deep); }
+    .toc { position: fixed; top: 0; right: 0; bottom: 0; z-index: 55; width: min(380px, 90vw); background: var(--white); border-left: 1px solid var(--line); box-shadow: -12px 0 40px rgba(56,44,25,.14); transform: translateX(100%); transition: transform .3s ease; overflow-y: auto; padding: 56px 18px 28px; }
+    .toc.open { transform: none; }
+    @media (prefers-reduced-motion: reduce) { .deck { scroll-behavior: auto; } .toc { transition: none; } } /* 表現規約 C-15: 利用者操作起因の遷移だけなので reduce では落とすのみ */
+    .toc h2 { font: 700 13px var(--mono); letter-spacing: .14em; color: var(--orange-deep); margin: 0 0 10px; }
+    .toc .toc-ch { font: 700 14px var(--display); color: var(--sky-deep); margin: 14px 0 4px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+    .toc ol { list-style: none; margin: 0; padding: 0; }
+    .toc li a { display: block; font-size: 13px; line-height: 1.5; padding: 5px 8px; border-radius: 8px; color: var(--ink-2); text-decoration: none; }
+    .toc li a:hover { background: var(--cream); }
+    .toc li.cur a { background: var(--sky-pale); color: var(--sky-ink); font-weight: 700; }
+
+    /* ---------- コマの部品 ---------- */
+    .kicker { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; color: var(--orange-deep); font: 600 12.5px var(--mono); letter-spacing: .1em; }
+    .kicker .n { background: var(--orange); color: var(--white); border-radius: 999px; padding: 1px 10px; font-weight: 700; letter-spacing: 0; }
+    .kicker .q { background: var(--sky-pale); color: var(--sky-ink); border: 1px solid var(--sky-deep); border-radius: 999px; padding: 0 10px; font-weight: 700; letter-spacing: 0; }
+    h1 { margin: 0 0 14px; font: 900 clamp(30px, 5vw, 48px)/1.35 var(--display); letter-spacing: -0.02em; }
+    h2 { margin: 0 0 14px; font: 700 clamp(22px, 3.4vw, 31px)/1.5 var(--display); letter-spacing: -0.02em; }
+    h2 em, h1 em { font-style: normal; color: var(--sky-deep); }
+    .lead { margin: 0 0 18px; font-size: clamp(15px, 1.6vw, 17.5px); color: var(--ink-2); max-width: 50em; }
+    .note { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); }
+    /* 畳んだ補足 (規約 A-1): 図の理由や限界を、読む人だけが開く */
+    .more { margin: 6px 0 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.7; }
+    .more summary { cursor: pointer; color: var(--sky-ink); font-weight: 700; list-style: none; }
+    .more summary::before { content: "▸ "; }
+    .more[open] summary::before { content: "▾ "; }
+    .more ul { margin: 4px 0 0; padding-left: 1.4em; }
+    .more li { margin: 0; }
+    .slide:has(.more[open]) { overflow-y: auto; } /* 開いた補足が画面に収まらないときだけ、そのコマの中でスクロールできる */
+
+    /* 章の区切り */
+    .divider { background: var(--cream); }
+    .divider .slide-inner { border-left: 6px solid var(--orange); padding-left: 28px; }
+    .ch-num { margin: 0 0 8px; font: 700 14px var(--mono); letter-spacing: .14em; color: var(--orange-deep); }
+    .ch-title { margin: 0 0 18px; font: 900 clamp(34px, 5vw, 54px)/1.3 var(--display); letter-spacing: -0.02em; }
+    .ch-title.long { font-size: clamp(26px, 3.6vw, 40px); }
+    .ch-q, .ch-a { margin: 0 0 8px; font-size: clamp(16px, 1.8vw, 19px); color: var(--ink-2); }
+    .ch-q b, .ch-a b { display: inline-block; min-width: 4.5em; color: var(--sky-ink); font-family: var(--display); }
+    .qmap { list-style: none; margin: 26px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .qmap li { padding: 12px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--white); color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .qmap li.on { border-color: var(--sky-deep); background: var(--sky-pale); color: var(--sky-ink); font-weight: 700; }
+    .qmap li.done { color: var(--ink-2); }
+    .qmap.list li { color: var(--ink-2); border-color: var(--muted); background: var(--white); }
+    .ch-lead { margin: 0; font-size: clamp(16px, 1.8vw, 19px); color: var(--ink-2); max-width: 46em; }
+    .agenda { background: var(--cream); }
+    .agenda .slide-inner { border-left: 6px solid var(--orange); padding-left: 28px; }
+    .agenda .ch-title { font-size: clamp(28px, 4vw, 42px); }
+    .agenda-list { list-style: none; margin: 26px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+    .agenda-list a { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: baseline; padding: 12px 16px; background: var(--white); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: var(--ink); }
+    .agenda-list a:hover { border-color: var(--orange); }
+    .agenda-list .num { grid-row: 1 / 3; font: 700 12.5px var(--mono); letter-spacing: .1em; color: var(--orange-deep); white-space: nowrap; }
+    .agenda-list .ttl { font: 900 clamp(15px, 1.7vw, 18px)/1.4 var(--display); letter-spacing: -0.01em; }
+    .agenda-list .sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    @media (max-width: 720px) { .agenda-list { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) { .agenda-list { gap: 8px; margin-top: 16px; } .agenda-list a { padding: 9px 12px; grid-template-rows: auto; } .agenda-list .num { grid-row: auto; } .agenda-list .sub { display: none; } .agenda .ch-lead { font-size: 14px; } } /* 狭幅は章名だけにして 1 画面に収める (コマは overflow: hidden) */
+
+    /* 画の枠 */
+    .fig { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 12px; overflow-x: auto; }
+    .fig svg { display: block; width: 100%; height: auto; min-width: 700px; max-height: 66dvh; }
+    /* 高さのクランプを外す図 (構成図) — 縮むと図中の文字が 12px を割るため。コマが 1 画面に収まることは bun run heights で担保する */
+    .fig.tall svg { max-height: none; }
+    .fig img { display: block; width: 100%; height: auto; border-radius: 6px; }
+    /* 実画面 (スクショ) を同じ大きさの窓で並べる — 縦横比を揃え、左上を基準に切る */
+    .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .shots img { aspect-ratio: 16 / 10; object-fit: cover; object-position: left top; border: 1px solid var(--line); }
+    .shots .shot-t { display: block; margin: 0 0 6px; font: 700 13px var(--display); color: var(--ink); }
+    figure { margin: 0; }
+    figcaption { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; padding: 8px 6px 0; }
+    figcaption b { color: var(--ink); font-weight: 700; }
+
+    /* 凡例 (キャプション内) */
+    .lg { display: block; margin-top: 4px; color: var(--muted); }
+    .lg i.sw { display: inline-block; width: 18px; height: 0; border-top: 3px solid; border-radius: 2px; vertical-align: middle; margin: 0 5px 0 12px; }
+    .lg i.sw.b { border-color: var(--sky-deep); } .lg i.sw.o { border-color: var(--orange-deep); } .lg i.sw.r { border-color: var(--no); } .lg i.sw.k { border-color: var(--ink); }
+    .lg i.sw.g { border-color: var(--muted); } .lg i.sw.d { border-top-style: dashed; }
+    .lg i.fl { display: inline-block; width: 16px; height: 11px; border: 2px solid; border-radius: 3px; vertical-align: middle; margin: 0 5px 0 12px; background: var(--white); }
+    .lg i.fl.b { background: var(--sky-pale); border-color: var(--sky-deep); } .lg i.fl.o { background: #fdeeda; border-color: var(--orange-deep); }
+    .lg i.fl.g { background: var(--gray-fill); border-color: var(--muted); } .lg i.fl.m { border-color: var(--soft); } .lg i.fl.d { border-style: dashed; border-color: var(--muted); } .lg i.fl.k { border-color: var(--ink); } .lg i.fl.c { background: var(--cream); border-color: var(--line); }
+
+    /* ---------- SVG 共通 (規約 C 群: 同一テンプレ・色は述語・本文色 = 線色) ---------- */
+    svg text { font-family: "Noto Sans JP", sans-serif; fill: var(--ink); font-feature-settings: "palt"; letter-spacing: -0.01em; }
+    svg .t-title { font-size: 16px; font-weight: 700; }
+    svg .t-mono { font-family: var(--mono); font-size: 12.5px; }
+    svg .t-sub { font-size: 12.5px; fill: var(--ink-2); }
+    svg .t-tech { font-family: var(--mono); font-size: 12.5px; fill: var(--sky-ink); }
+    svg .t-edge { font-size: 12.5px; fill: var(--ink-2); }
+    svg .t-bound { font-size: 13px; font-weight: 700; fill: var(--muted); letter-spacing: .06em; }
+    svg .t-person { font-size: 14px; font-weight: 700; }
+    svg .t-badge { font-size: 12.5px; font-weight: 700; }
+    svg .t-no { font-size: 12.5px; fill: var(--no); font-weight: 700; }
+    svg .t-auto { font-size: 12.5px; fill: var(--sky-ink); font-weight: 700; }
+    svg .box { fill: var(--white); stroke: var(--ink); stroke-width: 2; }
+    svg .box-ghost { fill: var(--white); stroke: var(--muted); stroke-width: 2; stroke-dasharray: 6 5; }
+    svg .box-more { fill: var(--white); stroke: var(--soft); stroke-width: 2; }
+    svg .box-gray { fill: var(--gray-fill); stroke: var(--muted); stroke-width: 2; }
+    svg .box-hand { fill: #fdeeda; stroke: var(--orange-deep); stroke-width: 2; }
+    svg .box-auto { fill: var(--sky-pale); stroke: var(--sky-deep); stroke-width: 2; }
+    svg .bound { fill: var(--cream); stroke: var(--line); stroke-width: 2; }
+    svg .bound-in { fill: var(--sky-pale); stroke: var(--line); stroke-width: 2; }
+    svg .edge { stroke: var(--ink); stroke-width: 2; fill: none; }
+    svg .edge-auto { stroke: var(--sky-deep); stroke-width: 3; fill: none; }
+    svg .edge-hand { stroke: var(--orange-deep); stroke-width: 3; fill: none; }
+    svg .edge-idle { stroke: var(--muted); stroke-width: 2; fill: none; }
+    svg .edge-no { stroke: var(--no); stroke-width: 2; fill: none; stroke-dasharray: 6 5; }
+    svg .head { fill: var(--ink); }
+    svg .head-auto { fill: var(--sky-deep); }
+    svg .head-hand { fill: var(--orange-deep); }
+    svg .num-k { fill: var(--ink); }
+    svg .num-b { fill: var(--sky-deep); }
+    svg .num-o { fill: var(--orange-deep); }
+    svg .num-t { font-size: 13px; font-weight: 700; fill: var(--white); }
+    svg .no-mark { stroke: var(--no); stroke-width: 3; }
+    /* 以下は図テンプレ (presentations/assets/figure-template.css) の複製 — 表現技法カタログの形で使う部品 */
+    svg .t-big { font-size: 44px; font-weight: 900; }
+    svg .t-hand { font-size: 12.5px; fill: var(--orange-deep); font-weight: 700; }
+    svg .wall { fill: var(--ink); }
+    svg .dim { opacity: .28; }
+    svg .chev { fill: var(--white); stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+    svg .chev-auto { fill: var(--sky-pale); stroke: var(--sky-deep); stroke-width: 2; stroke-linejoin: round; }
+    svg .chev-hand { fill: #fdeeda; stroke: var(--orange-deep); stroke-width: 2; stroke-linejoin: round; }
+
+
+    /* ---------- ターミナル (実出力) ---------- */
+    .term { background: var(--terminal); color: var(--term-text); border-radius: 14px; overflow: hidden; }
+    .term-bar { display: flex; align-items: center; gap: 7px; padding: 9px 14px; background: rgba(255,255,255,.06); }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,.22); }
+    .term-bar span { margin-left: 8px; font: 500 11.5px var(--mono); color: rgba(255,255,255,.6); letter-spacing: .06em; }
+    .term-body { padding: 14px 18px 18px; overflow-x: auto; }
+    .term-body pre { margin: 0; font: 400 12.5px/1.7 var(--mono); white-space: pre-wrap; word-break: break-all; }
+    .term .p { color: var(--term-prompt); } .term .err { color: var(--term-red); } .term .dim { color: rgba(255,255,255,.55); }
+    .fig + .term, figure .term { margin-top: 10px; }
+
+    /* 低い画面 (高さ 820px 未満): 1 コマが 1 画面に収まるよう余白と図の高さを詰める */
+    @media (max-height: 820px) {
+      .slide { padding-top: 52px; padding-bottom: 28px; }
+      h2 { font-size: clamp(20px, 2.9vw, 26px); margin-bottom: 8px; }
+      .lead { font-size: 14.5px; line-height: 1.7; margin-bottom: 10px; }
+      .kicker { margin-bottom: 6px; }
+      .fig { padding: 8px; }
+      .fig svg { max-height: 54dvh; }
+      figcaption { font-size: 11.5px; line-height: 1.6; padding-top: 5px; }
+      .term-body { padding: 8px 12px 10px; }
+      .term-body pre { font-size: 12px; line-height: 1.5; }
+      .fig + .term, figure .term { margin-top: 6px; }
+    }
+
+    /* 表紙・締め */
+    .hero .slide-inner { display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center; }
+    .hero img { width: min(340px, 100%); display: block; }
+    .hero .logo { width: min(400px, 100%); margin: 0 0 18px; }
+    #end .slide-inner { grid-template-columns: 1fr; text-align: center; }
+    #end .logo { margin: 0 auto 18px; }
+    #end .lead, #end .tagline { max-width: none; }
+    @media (max-width: 720px) { .hero .slide-inner { grid-template-columns: 1fr; } }
+    .tagline { font: 700 clamp(16px, 2vw, 19px)/1.7 var(--display); color: var(--sky-deep); margin: 0 0 12px; }
+  </style>
+</head>
+<body>
+
+<nav class="chapnav" aria-label="章">
+  <div class="chapnav-inner">
+    <a class="brand" href="#top"><img src="images/nkuma-face.png" alt=""><span>Nkuma</span></a>
+    <a class="ch" href="#d-position" data-ch="position">立ち位置</a>
+    <a class="ch" href="#d-ddd" data-ch="ddd">DDD を決め切る</a>
+    <a class="ch" href="#d-safety" data-ch="safety">安全</a>
+    <a class="ch" href="#d-release" data-ch="release">公開</a>
+    <a class="ch" href="#d-loops" data-ch="loops">展開のメリット</a>
+    <a class="ch" href="#d-delivery" data-ch="delivery">提供方法</a>
+    <a class="ch support" href="https://nkuma-platform.github.io/">サポートサイト ↗</a>
+  </div>
+</nav>
+<button class="toc-btn" id="toc-btn" aria-controls="toc" aria-expanded="false">☰ 目次</button>
+<aside class="toc" id="toc" aria-label="目次">
+  <h2>目次 — 今どこを読んでいるか</h2>
+  <div id="toc-list"></div>
+</aside>
+<div class="pager" id="pager"></div>
+
+<main class="deck" id="deck" tabindex="0">
+
+  <!-- 表紙 -->
+  <section class="slide hero" id="top" data-ch="" data-group="表紙">
+    <div class="slide-inner">
+      <div>
+        <p class="tagline">作る人のフレームワーク</p>
+        <h1>Claude Code は作れる。<br>Nkuma は<em>作り切れる</em>。</h1>
+        <p class="lead">現場のドメイン・ビジネスロジックに即したアプリケーションを作り、安全かつ透明性のあるクオリティでリリースまでできる — 作る人 × AI の開発基盤。</p>
+      </div>
+      <img src="images/nkuma01.png" alt="Nkuma のマスコット、クマ君">
+    </div>
+  </section>
+
+  <!-- 目次 -->
+  <section class="slide agenda" id="agenda" data-ch="" data-group="目次">
+    <div class="slide-inner">
+      <p class="ch-num">目次</p>
+      <h2 class="ch-title">この資料の流れ</h2>
+      <p class="ch-lead">現場の 3 つの問題に、3 つの答え (第 2〜4 章)。その先に生まれるメリットと、届け方。</p>
+      <ol class="agenda-list">
+        <li><a href="#d-position"><span class="num">第 1 章</span><span class="ttl">立ち位置</span><span class="sub">Nkuma は何のフレームワークか。Claude Code と何が違うのか</span></a></li>
+        <li><a href="#d-ddd"><span class="num">第 2 章</span><span class="ttl">DDD を決め切る</span><span class="sub">問い ① 何のために作ったのか、分からない → ドメインに即して作る</span></a></li>
+        <li><a href="#d-safety"><span class="num">第 3 章</span><span class="ttl">安全</span><span class="sub">問い ② 安全に動いているのか、分からない → 事故が起こせない構造</span></a></li>
+        <li><a href="#d-release"><span class="num">第 4 章</span><span class="ttl">公開</span><span class="sub">問い ③ 作った本人しか、使えない → 合図ひとつで公開</span></a></li>
+        <li><a href="#d-loops"><span class="num">第 5 章</span><span class="ttl">ドメインの上にアプリが展開されるメリット</span><span class="sub">使う Agent にもなる / 業務の変更に追いつく / AI から使われる口も付く</span></a></li>
+        <li><a href="#d-delivery"><span class="num">第 6 章</span><span class="ttl">提供方法</span><span class="sub">どう売り、どう届き、どう動くか</span></a></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== 第 1 章 立ち位置 ===== -->
+  <section class="slide divider" id="d-position" data-ch="position">
+    <div class="slide-inner">
+      <p class="ch-num">第 1 章</p>
+      <h2 class="ch-title">立ち位置</h2>
+      <p class="ch-lead">Nkuma は何のフレームワークか。Claude Code と何が違うのか。</p>
+    </div>
+  </section>
+
+  <section class="slide" id="s-subject" data-ch="position">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">立ち位置</span>主語</span>
+      <h2>Nkuma は、<em>作る人を囲む</em>フレームワークです。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 330" role="img" aria-label="同じ大きさのクリーム色の枠が 2 つ並ぶ。左の枠「アプリを囲む」は中心にアプリの箱があり、その上下左右に画面の部品・データ読み書き・認証の部品・通信という 4 つの青い箱が並ぶ。右の枠「作る人を囲む」には Nkuma のロゴがあり、中心の白い箱に作る人と AI のアイコンが並び、その上下左右に決めた作り方・構造で安全・レビュー許可・合図で公開という 4 つの青い箱が並ぶ。枠の大きさも箱の形も左右で同じで、線と矢印は無い">
+            <defs>
+              <g id="i3-user" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="5" vector-effect="non-scaling-stroke"/>
+                <path d="M20 21a8 8 0 0 0-16 0" vector-effect="non-scaling-stroke"/>
+              </g>
+              <g id="i3-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+                <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+                <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+                <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+              </g>
+            </defs>
+          
+            <rect class="bound" x="14" y="22" width="466" height="286" rx="14"/>
+            <text class="t-bound" x="40" y="52">アプリを囲む</text>
+            <rect class="box-auto" x="185" y="78" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="247" y="105" text-anchor="middle">画面の部品</text>
+            <rect class="box-auto" x="32" y="162" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="94" y="189" text-anchor="middle">データ読み書き</text>
+            <rect class="box-auto" x="338" y="162" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="400" y="189" text-anchor="middle">認証の部品</text>
+            <rect class="box-auto" x="185" y="246" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="247" y="273" text-anchor="middle">通信</text>
+            <rect class="box" x="166" y="138" width="162" height="96" rx="12"/>
+            <text class="t-title" x="247" y="190" text-anchor="middle">アプリ</text>
+          
+            <rect class="bound" x="520" y="22" width="466" height="286" rx="14"/>
+            <text class="t-bound" x="546" y="52">作る人を囲む</text>
+            <image href="images/nkuma-main-logo.png" x="822" y="30" width="138" height="54" preserveAspectRatio="xMaxYMid meet"/>
+            <rect class="box-auto" x="691" y="78" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="753" y="105" text-anchor="middle">決めた作り方</text>
+            <rect class="box-auto" x="538" y="162" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="600" y="189" text-anchor="middle">構造で安全</text>
+            <rect class="box-auto" x="844" y="162" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="906" y="189" text-anchor="middle">レビュー許可</text>
+            <rect class="box-auto" x="691" y="246" width="124" height="44" rx="12"/>
+            <text class="t-badge" x="753" y="273" text-anchor="middle">合図で公開</text>
+            <rect class="box" x="672" y="138" width="162" height="96" rx="12"/>
+            <use href="#i3-user" transform="translate(685,146) scale(2.6)"/>
+            <use href="#i3-bot" transform="translate(759,146) scale(2.6)"/>
+            <text class="t-title" x="753" y="228" text-anchor="middle">作る人と AI</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 1.</b> フレームワークは、囲む相手で 2 種類に分かれる — アプリを中心に部品を備える型と、作る人と AI を中心に作り方・安全・公開を備える型。Nkuma は後者。<span class="lg">凡例:<i class="fl c"></i>クリームの枠 = 面倒を見る範囲<i class="fl b"></i>青 = 枠組みが備えるもの<i class="fl k"></i>白 = 囲まれている中心</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-scope" data-ch="position">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">立ち位置</span>違い</span>
+      <h2>Claude Code は作れる。Nkuma は<em>作り切れる</em>。</h2>
+      <p class="lead">Claude Code は「動くものを素早く書く」道具。Nkuma はその上で、業務に即したアプリを作り、安全に、公開まで届ける — 作り切る。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 445" role="img" aria-label="机に向かう人物とノート型の画面から右へ線が伸びる行程が上下 2 段に並び、上段 (Claude Code) は画面の停留点 1 つで途切れ、下段 (Nkuma) は同じ起点から画面・書類・盾・上向き矢印の 4 つの停留点を経て、大きな画面を囲む 3 人の人物まで続いている">
+          <rect x="0" y="0" width="1000" height="445" style="fill:#fdfaf4"/>
+          <image href="images/scope.png" x="0" y="40" width="1000" height="405"/>
+          <text class="t-title" x="49" y="34" style="font-size:28px">Claude Code</text>
+          <text class="t-title" x="49" y="250" style="font-size:28px">Nkuma</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 2.</b> 同じところから始まって、どこまで届けるかが違う。<span class="lg">凡例:<i class="fl o"></i>橙 = 人と、人が決めること<i class="fl b"></i>青 = 作られるもの<i class="sw k"></i>線 = 行程</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-problems" data-ch="position">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">立ち位置</span>3 つの問題</span>
+      <h2>AI でアプリが作れるようになった現場には、<em>3 つの問題</em>が残る。</h2>
+      <p class="lead">作れはした。けれど、使われていない。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 399" role="img" aria-label="細い縦線で仕切られた 3 つの場面。左 (① 何のために作ったのか、分からない) はスタンドに載った画面の脇で 2 人が手を上げたり肩をすくめたりし、中央 (② 安全に動いているのか、分からない) は中の見えない水色の箱を 1 人が手をかざして覗き込みもう 1 人が腕を組み、右 (③ 作った本人しか、使えない) は机で画面を使う 1 人と、間の地面が途切れた先で手を伸ばす 2 人が離れて立っている">
+          <image href="images/problems.png" x="0" y="0" width="1000" height="399"/>
+          <text class="t-title" x="173" y="330" text-anchor="middle">① 何のために作ったのか、分からない</text>
+          <text class="t-title" x="496" y="330" text-anchor="middle">② 安全に動いているのか、分からない</text>
+          <text class="t-title" x="823" y="330" text-anchor="middle">③ 作った本人しか、使えない</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 3.</b> 作れたあとに、3 つとも起きる。<span class="lg">凡例:<i class="fl o"></i>橙 = 作った人<i class="fl g"></i>灰 = 分からない人・使えない人<i class="fl b"></i>青 = 作られたもの</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-three" data-ch="position">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">立ち位置</span>3 つの答え</span>
+      <h2>作り切れる = 現場の 3 つの問題に、<em>構造で答える</em>こと。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 300" role="img" aria-label="左に現場の 3 つの問題、右に 3 つの答えと、それに答える章">
+          <rect class="box" x="20" y="24" width="400" height="64" rx="12"/>
+          <circle class="num-k" cx="48" cy="56" r="11"/><text class="num-t" x="48" y="61" text-anchor="middle">1</text>
+          <text class="t-badge" x="70" y="61">何のために作ったのか、分からない</text>
+          <rect class="box" x="20" y="118" width="400" height="64" rx="12"/>
+          <circle class="num-k" cx="48" cy="150" r="11"/><text class="num-t" x="48" y="155" text-anchor="middle">2</text>
+          <text class="t-badge" x="70" y="155">安全に動いているのか、分からない</text>
+          <rect class="box" x="20" y="212" width="400" height="64" rx="12"/>
+          <circle class="num-k" cx="48" cy="244" r="11"/><text class="num-t" x="48" y="249" text-anchor="middle">3</text>
+          <text class="t-badge" x="70" y="249">作った本人しか、使えない</text>
+
+            <path class="edge-auto" d="M420 56 H548"/><polygon class="head-auto" points="548,49 560,56 548,63"/>
+            <path class="edge-auto" d="M420 150 H548"/><polygon class="head-auto" points="548,143 560,150 548,157"/>
+            <path class="edge-auto" d="M420 244 H548"/><polygon class="head-auto" points="548,237 560,244 548,251"/>
+            <rect class="box-auto" x="560" y="24" width="420" height="64" rx="12"/>
+            <text class="t-badge" x="580" y="52">ドメインに即して作る</text>
+            <text class="t-sub" x="580" y="74">第 2 章 DDD を決め切る</text>
+            <rect class="box-auto" x="560" y="118" width="420" height="64" rx="12"/>
+            <text class="t-badge" x="580" y="146">構造で安全にする</text>
+            <text class="t-sub" x="580" y="168">第 3 章 安全</text>
+            <rect class="box-auto" x="560" y="212" width="420" height="64" rx="12"/>
+            <text class="t-badge" x="580" y="240">透明性のあるクオリティでリリースまで届ける</text>
+            <text class="t-sub" x="580" y="262">第 4 章 公開</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 4.</b> 問題 1 つに、答え 1 つ。<span class="lg">凡例:<i class="sw b"></i>構造で答える<i class="fl b"></i>青の塗り = 答え (章)</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ===== 第 2 章 DDD を決め切る ===== -->
+  <section class="slide divider" id="d-ddd" data-ch="ddd">
+    <div class="slide-inner">
+      <p class="ch-num">第 2 章</p>
+      <h2 class="ch-title">DDD を決め切る</h2>
+      <p class="ch-q"><b>問い ①</b>「何のために作ったのか、分からない」</p>
+      <p class="ch-a"><b>答え</b>ドメインに即して作る — 作るものを明確にし、仕様にして作り上げる</p>
+      <ol class="qmap"><li class="on">① 何のために作ったのか、分からない</li><li>② 安全に動いているのか、分からない</li><li>③ 作った本人しか、使えない</li></ol>
+    </div>
+  </section>
+
+  <section class="slide" id="s-ddd-frame" data-ch="ddd">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">DDD</span><span class="q">問い ①</span>まとめる</span>
+      <h2>「何のために作ったのか、分からない」— 問いは数え切れない。それを <em>DDD の手法でまとめる</em>。</h2>
+      <p class="lead">業界は何か、どの業務が要か、何と何が関わるか、誰が使うか、言葉は何を指すか — 問いは尽きない。1 つずつ答えるのではなく、決まった型でまとめて答える — DDD (ドメイン駆動設計)。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 390" role="img" aria-label="上から下へ。問い ①「何のために作ったのか、分からない」の 1 つの箱から、業界は? 重要度は? 関係は? もの・出来事は? 誰が使う? 言葉の意味は? 境目は? と多くの問いが 2 段に散らばって分かれ (末尾に … で続く)、それらが下でひとつに集まって、一番大きい青い箱 DDD になる">
+            <rect class="box" x="400" y="10" width="200" height="56" rx="12"/>
+            <text class="t-title" x="500" y="44" text-anchor="middle">問い ①</text>
+
+            <path class="edge-auto" d="M500 66 V82"/>
+            <path class="edge-idle" d="M130 82 H870"/>
+            <path class="edge-auto" d="M130 82 V94"/><polygon class="head-auto" points="123,94 130,106 137,94"/>
+            <path class="edge-auto" d="M375 82 V94"/><polygon class="head-auto" points="368,94 375,106 382,94"/>
+            <path class="edge-auto" d="M625 82 V94"/><polygon class="head-auto" points="618,94 625,106 632,94"/>
+            <path class="edge-auto" d="M870 82 V94"/><polygon class="head-auto" points="863,94 870,106 877,94"/>
+            <path class="edge-auto" d="M252 82 V168"/><polygon class="head-auto" points="245,168 252,180 259,168"/>
+            <path class="edge-auto" d="M500 82 V168"/><polygon class="head-auto" points="493,168 500,180 507,168"/>
+            <path class="edge-auto" d="M747 82 V168"/><polygon class="head-auto" points="740,168 747,180 754,168"/>
+
+            <rect class="box" x="30" y="106" width="200" height="56" rx="12"/>
+            <text class="t-title" x="130" y="140" text-anchor="middle">業界は?</text>
+            <rect class="box" x="275" y="106" width="200" height="56" rx="12"/>
+            <text class="t-title" x="375" y="140" text-anchor="middle">重要度は?</text>
+            <rect class="box" x="525" y="106" width="200" height="56" rx="12"/>
+            <text class="t-title" x="625" y="140" text-anchor="middle">関係は?</text>
+            <rect class="box" x="770" y="106" width="200" height="56" rx="12"/>
+            <text class="t-title" x="870" y="140" text-anchor="middle">もの・出来事は?</text>
+
+            <rect class="box" x="152" y="180" width="200" height="56" rx="12"/>
+            <text class="t-title" x="252" y="214" text-anchor="middle">誰が使う?</text>
+            <rect class="box" x="400" y="180" width="200" height="56" rx="12"/>
+            <text class="t-title" x="500" y="214" text-anchor="middle">言葉の意味は?</text>
+            <rect class="box" x="647" y="180" width="200" height="56" rx="12"/>
+            <text class="t-title" x="747" y="214" text-anchor="middle">境目は?</text>
+            <text class="t-title" x="910" y="216" text-anchor="middle">…</text>
+
+            <path class="edge-auto" d="M130 162 V256"/>
+            <path class="edge-auto" d="M375 162 V256"/>
+            <path class="edge-auto" d="M625 162 V256"/>
+            <path class="edge-auto" d="M870 162 V256"/>
+            <path class="edge-auto" d="M252 236 V256"/>
+            <path class="edge-auto" d="M500 236 V256"/>
+            <path class="edge-auto" d="M747 236 V256"/>
+            <path class="edge-idle" d="M130 256 H870"/>
+            <path class="edge-auto" d="M500 256 V268"/><polygon class="head-auto" points="493,268 500,280 507,268"/>
+
+            <rect class="box-auto" x="290" y="280" width="420" height="90" rx="12"/>
+            <text class="t-big" x="500" y="340" text-anchor="middle">DDD</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 5.</b> 問いはどれも業務の問い — だから、業務を中心に据える型で、まとめて答えられる。<span class="lg">凡例:<i class="sw b"></i>問いが分かれ、型でまとまる<i class="fl b"></i>青の塗り = 型 (DDD)<i class="sw g"></i>矢印の無い灰線 = 振り分け・集約</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-ddd-why" data-ch="ddd">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">DDD</span><span class="q">問い ①</span>なぜ DDD か</span>
+      <h2>設計の作法は、<em>自作しない</em> — Agent が学習済みの DDD なら、教え込まずに、作法どおりに動く。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 250" role="img" aria-label="左の枠では、作る人から橙の矢印 3 本「教え込む」が Agent へ注ぎ、その Agent の中に橙の箱「独自の作法」と「教えないと知らない」がある。右の枠では、同じ位置に立つ作る人と Agent の間に線が 1 本も無く、Agent の中に青の箱「DDD」と「教えなくても知っている」がある">
+            <defs>
+              <!-- Lucide user-round / bot (ISC, (c) Lucide Icons and Contributors) — assets/icons/icons-defs.html より -->
+              <g id="i9-user" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="5" vector-effect="non-scaling-stroke"/>
+                <path d="M20 21a8 8 0 0 0-16 0" vector-effect="non-scaling-stroke"/>
+              </g>
+              <g id="i9-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+                <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+                <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+                <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+              </g>
+            </defs>
+          
+            <rect class="bound" x="20" y="14" width="460" height="220" rx="14"/>
+            <rect class="bound" x="520" y="14" width="460" height="220" rx="14"/>
+          
+            <use href="#i9-user" transform="translate(46,97.2) scale(2.4)"/>
+            <text class="t-hand" x="141" y="92" text-anchor="middle">教え込む</text>
+            <path class="edge-hand" d="M114 106 H156"/><polygon class="head-hand" points="156,99 168,106 156,113"/>
+            <path class="edge-hand" d="M114 126 H156"/><polygon class="head-hand" points="156,119 168,126 156,133"/>
+            <path class="edge-hand" d="M114 146 H156"/><polygon class="head-hand" points="156,139 168,146 156,153"/>
+          
+            <rect class="box" x="180" y="36" width="280" height="176" rx="14"/>
+            <use href="#i9-bot" transform="translate(298.4,48) scale(1.8)"/>
+            <rect class="box-hand" x="210" y="98" width="220" height="56" rx="12"/>
+            <text class="t-title" x="320" y="132" text-anchor="middle">独自の作法</text>
+            <text class="t-title" x="320" y="186" text-anchor="middle">教えないと知らない</text>
+          
+            <use href="#i9-user" transform="translate(546,97.2) scale(2.4)"/>
+          
+            <rect class="box" x="680" y="36" width="280" height="176" rx="14"/>
+            <use href="#i9-bot" transform="translate(798.4,48) scale(1.8)"/>
+            <rect class="box-auto" x="710" y="98" width="220" height="56" rx="12"/>
+            <text class="t-big" x="820" y="142" text-anchor="middle">DDD</text>
+            <text class="t-title" x="820" y="186" text-anchor="middle">教えなくても知っている</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 6.</b> 自作の作法は、Agent に教え込むところから始まり、その定義を作業のたびに読ませ続ける — DDD は世の中の作法で、Agent は学習済み。Nkuma はその要点を装備させ、問いの立て方と整理の手順を足す。人が覚えるものも、教えるものも無い。<span class="lg">凡例:<i class="fl c"></i>クリームの枠 = 2 つの場合<i class="sw o"></i>橙の線 = 人が教え込む手間<i class="fl o"></i>橙の塗り = 自作の作法<i class="fl b"></i>青の塗り = 世の中で決まっている作法<i class="fl k"></i>白 = 登場人物</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-ddd-flow" data-ch="ddd">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">DDD</span><span class="q">問い ①</span>人の役目</span>
+      <h2>人は自分の業務を話すだけ。Agent が DDD の専門家として<em>ヒアリングし、文書にする</em>。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 200" role="img" aria-label="左から右へ、人のアイコンが付いた橙の山形「話す」、Agent のアイコンが付いた黒の山形「訊く」「書く」が連なり、その先の短い黒矢印が白い箱「業務の文書」へ届く">
+            <defs>
+              <g id="i10-user" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="5" vector-effect="non-scaling-stroke"/>
+                <path d="M20 21a8 8 0 0 0-16 0" vector-effect="non-scaling-stroke"/>
+              </g>
+              <g id="i10-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+                <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+                <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+                <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+              </g>
+            </defs>
+          
+            <polygon class="chev-hand" points="20,60 220,60 244,100 220,140 20,140"/>
+            <use href="#i10-user" transform="translate(88,83) scale(1.4)"/>
+            <text class="t-title" x="132" y="106">話す</text>
+          
+            <polygon class="chev" points="254,60 454,60 478,100 454,140 254,140 278,100"/>
+            <use href="#i10-bot" transform="translate(340,83) scale(1.4)"/>
+            <text class="t-title" x="384" y="106">訊く</text>
+          
+            <polygon class="chev" points="488,60 688,60 712,100 688,140 488,140 512,100"/>
+            <use href="#i10-bot" transform="translate(574,83) scale(1.4)"/>
+            <text class="t-title" x="618" y="106">書く</text>
+          
+            <path class="edge" d="M724 100 H772"/><polygon class="head" points="772,93 784,100 772,107"/>
+          
+            <rect class="box" x="796" y="65" width="184" height="70" rx="12"/>
+            <text class="t-title" x="888" y="106" text-anchor="middle">業務の文書</text>
+          
+            <text class="t-sub" x="126" y="170" text-anchor="middle">人はここだけ</text>
+            <text class="t-sub" x="483" y="170" text-anchor="middle">あとは Agent</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 7.</b> 3 手のうち、人の手は最初の 1 手。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 人の 1 手<i class="sw k"></i>AI の操作<i class="fl k"></i>白 = 起こる結果</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-ddd-layers" data-ch="ddd">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">DDD</span><span class="q">問い ①</span>決め切る</span>
+      <h2>ドメインだけではない — 決めておくべきことは多い。Nkuma はそれを <em>6 つの層</em>に振り分ける。</h2>
+      <p class="lead">中心は domain — 業務の語彙と構造。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 350" role="img" aria-label="左に 6 つの層、その右に 1 本の括り線が全段をまとめ、横長の帯が上から下へ 6 段積まれている。上から customer は顧客と担当者、dialogue は会議と要望、vision はなぜ作るか、domain は語彙と構造、work は進行の記録、build はコードと規約">
+            <text class="t-big" x="80" y="191">6</text><text class="t-title" x="112" y="191">つの層</text>
+            <path class="edge-idle" d="M256 30 H240 V322 H256"/>
+          
+            <rect class="box-auto" x="280" y="30" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="57">customer</text><text class="t-title" x="440" y="57">顧客と担当者</text>
+            <rect class="box-auto" x="280" y="80" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="107">dialogue</text><text class="t-title" x="440" y="107">会議と要望</text>
+            <rect class="box-auto" x="280" y="130" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="157">vision</text><text class="t-title" x="440" y="157">なぜ作るか</text>
+            <rect class="box-auto" x="280" y="180" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="207">domain</text><text class="t-title" x="440" y="207">語彙と構造</text>
+            <rect class="box-auto" x="280" y="230" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="257">work</text><text class="t-title" x="440" y="257">進行の記録</text>
+            <rect class="box-auto" x="280" y="280" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="307">build</text><text class="t-title" x="440" y="307">コードと規約</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 8.</b> 置き場が決まっているから、後から同じ場所を見れば照合できる。<span class="lg">凡例:<i class="fl b"></i>青の塗り = 層 (置き場) — どこに何を書くかが決まっている</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ===== 第 3 章 安全 ===== -->
+  <section class="slide divider" id="d-safety" data-ch="safety">
+    <div class="slide-inner">
+      <p class="ch-num">第 3 章</p>
+      <h2 class="ch-title">安全</h2>
+      <p class="ch-q"><b>問い ②</b>「安全に動いているのか、分からない」</p>
+      <p class="ch-a"><b>答え</b>構造で安全にする — 事故が「起こせない」構造</p>
+      <ol class="qmap"><li class="done">① 何のために作ったのか、分からない</li><li class="on">② 安全に動いているのか、分からない</li><li>③ 作った本人しか、使えない</li></ol>
+    </div>
+  </section>
+
+  <section class="slide" id="s-safety-def" data-ch="safety">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>定義</span>
+      <h2>安全とは — 事故が「<em>起こせない</em>」構造のこと。</h2>
+      <p class="lead">注意深さに頼らないのは、AI が書いたコードの品質が揺れるから。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 350" role="img" aria-label="左に AI が書いたコードの箱。中央に黒い壁が立ち、下寄りに門が 1 つだけ開いている。壁の向こう側は上下 2 つに分かれ、上は灰色の守るもの (鍵・記録・他社のデータ)、下は白い触ってよいもの (自分のアプリのデータ)。守るものへ向かう赤い破線の事故は壁の面で ✕ に止まり、門を通る青い線だけが触ってよいものへ届く">
+            <rect class="box" x="40" y="50" width="260" height="264" rx="12"/>
+            <text class="t-title" x="170" y="188" text-anchor="middle">AI が書いたコード</text>
+          
+            <text class="t-title" x="467" y="26" text-anchor="middle">起こせない</text>
+            <rect class="wall" x="460" y="38" width="14" height="212" rx="4"/>
+            <rect class="wall" x="460" y="294" width="14" height="44" rx="4"/>
+          
+            <path class="edge-no" d="M300 134 H430"/>
+            <line class="no-mark" x1="436" y1="125" x2="452" y2="143"/><line class="no-mark" x1="452" y1="125" x2="436" y2="143"/>
+            <text class="t-no" x="365" y="128" text-anchor="middle">事故</text>
+          
+            <path class="edge-auto" d="M300 272 H608"/><polygon class="head-auto" points="608,265 620,272 608,279"/>
+          
+            <rect class="box-gray" x="620" y="50" width="320" height="170" rx="12"/>
+            <text class="t-title" x="780" y="126" text-anchor="middle">守るもの</text>
+            <text class="t-sub" x="780" y="152" text-anchor="middle">鍵・記録・他社のデータ</text>
+          
+            <rect class="box" x="620" y="230" width="320" height="84" rx="12"/>
+            <text class="t-title" x="780" y="266" text-anchor="middle">触ってよいもの</text>
+            <text class="t-sub" x="780" y="290" text-anchor="middle">自分のアプリのデータ</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 9.</b> 品質が揺れても、被害は壁を越えない — 届くのは、触ってよいものだけ。<span class="lg">凡例:<i class="sw r d"></i>止まる (否定)<i class="sw b"></i>門を通る操作<i class="fl g"></i>灰 = AI のコードから直接は触れないもの</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-safety-seven" data-ch="safety">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>起きないこと</span>
+      <h2>Nkuma で作ったアプリでは、<em>こんな事故が起きない</em>。</h2>
+      <p class="lead">起こせない理由は 1 つ — 鍵・権限・記録・ファイルを持つのは共通基盤 (Nkuma が用意する全アプリ共通の土台) で、アプリは持たない。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 350" role="img" aria-label="左に作ったアプリの箱。そこから右へ向かう赤い破線 7 本 (鍵の漏れ、他社・他アプリ、全削除、戻せない、記録なし、ファイル流出、ログインの穴) が、中央の黒い壁の面ですべて ✕ で止まる。7 本の先にあるのは灰色の守るもの。壁の下寄りに開いた門を通る青い線 1 本だけが、白い触ってよいもの (自分のアプリのデータ) へ届く">
+            <rect class="box" x="40" y="50" width="260" height="264" rx="12"/>
+            <text class="t-title" x="170" y="188" text-anchor="middle">作ったアプリ</text>
+          
+            <text class="t-title" x="467" y="26" text-anchor="middle">起こせない</text>
+            <rect class="wall" x="460" y="38" width="14" height="212" rx="4"/>
+            <rect class="wall" x="460" y="294" width="14" height="44" rx="4"/>
+          
+            <path class="edge-no" d="M300 62 H430"/>
+            <line class="no-mark" x1="436" y1="53" x2="452" y2="71"/><line class="no-mark" x1="452" y1="53" x2="436" y2="71"/>
+            <text class="t-no" x="365" y="56" text-anchor="middle">鍵の漏れ</text>
+          
+            <path class="edge-no" d="M300 86 H430"/>
+            <line class="no-mark" x1="436" y1="77" x2="452" y2="95"/><line class="no-mark" x1="452" y1="77" x2="436" y2="95"/>
+            <text class="t-no" x="365" y="80" text-anchor="middle">他社・他アプリ</text>
+          
+            <path class="edge-no" d="M300 110 H430"/>
+            <line class="no-mark" x1="436" y1="101" x2="452" y2="119"/><line class="no-mark" x1="452" y1="101" x2="436" y2="119"/>
+            <text class="t-no" x="365" y="104" text-anchor="middle">全削除</text>
+          
+            <path class="edge-no" d="M300 134 H430"/>
+            <line class="no-mark" x1="436" y1="125" x2="452" y2="143"/><line class="no-mark" x1="452" y1="125" x2="436" y2="143"/>
+            <text class="t-no" x="365" y="128" text-anchor="middle">戻せない</text>
+          
+            <path class="edge-no" d="M300 158 H430"/>
+            <line class="no-mark" x1="436" y1="149" x2="452" y2="167"/><line class="no-mark" x1="452" y1="149" x2="436" y2="167"/>
+            <text class="t-no" x="365" y="152" text-anchor="middle">記録なし</text>
+          
+            <path class="edge-no" d="M300 182 H430"/>
+            <line class="no-mark" x1="436" y1="173" x2="452" y2="191"/><line class="no-mark" x1="452" y1="173" x2="436" y2="191"/>
+            <text class="t-no" x="365" y="176" text-anchor="middle">ファイル流出</text>
+          
+            <path class="edge-no" d="M300 206 H430"/>
+            <line class="no-mark" x1="436" y1="197" x2="452" y2="215"/><line class="no-mark" x1="452" y1="197" x2="436" y2="215"/>
+            <text class="t-no" x="365" y="200" text-anchor="middle">ログインの穴</text>
+          
+            <path class="edge-auto" d="M300 272 H608"/><polygon class="head-auto" points="608,265 620,272 608,279"/>
+          
+            <rect class="box-gray" x="620" y="50" width="320" height="170" rx="12"/>
+            <text class="t-title" x="780" y="126" text-anchor="middle">守るもの</text>
+          
+            <rect class="box" x="620" y="230" width="320" height="84" rx="12"/>
+            <text class="t-title" x="780" y="266" text-anchor="middle">触ってよいもの</text>
+            <text class="t-sub" x="780" y="290" text-anchor="middle">自分のアプリのデータ</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 10.</b> 気をつけて防ぐのではなく、構造が通さない — 7 つとも壁の手前で止まる。<span class="lg">凡例:<i class="sw r d"></i>起こせない (止まる)<i class="sw b"></i>門を通る操作<i class="fl g"></i>灰 = AI のコードから直接は触れないもの</span></figcaption></figure>
+      <details class="more"><summary>7 つそれぞれの止まり方と、構造では守らないもの</summary><ul><li>鍵の漏れ — アプリは鍵を持たない。接続の権限は、共通基盤だけが持つ</li><li>他社・他アプリのデータ — 共通基盤が接続元を確かめ、宣言の外への到達を拒む</li><li>全削除 — 危険な操作は共通基盤が止めるか、人の承認が要る</li><li>戻せない — 自動バックアップから戻せる (標準構成で 7 日 — 復元の実演はこれから)</li><li>記録なし — すべての書き込みを、共通基盤が記録する</li><li>ファイル流出 — ファイルは共通基盤を通してだけ読み書きする</li><li>ログインの穴 — ログインはいつもの ID を組み込むだけ、権限は共通基盤が強制する</li><li>構造では守らないもの — 業務の計算の正しさ (それは品質の話。守るのは、情報と権限) / AI の出力の正しさ (構造が守るのは、秘密を持たせず、利用を記録するまで)</li></ul></details>
+    </div>
+  </section>
+
+  <section class="slide" id="s-one-path" data-ch="safety">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>集約</span>
+      <h2>アプリは、データに直接触れない — すべて<em>共通基盤</em>を通る。</h2>
+            <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 350" role="img" aria-label="左上に作ったアプリ (鍵を持たない)。アプリからデータベースへ直接向かう赤い破線は止まる。アプリから下へ降りて右へ向かう青い線が共通基盤に入り、共通基盤からデータベース・ファイル・AI へ届く。共通基盤には認可・記録・ファイル・AI の窓口が集約されている">
+          <rect class="box" x="30" y="30" width="220" height="90" rx="12"/>
+          <text class="t-title" x="140" y="66" text-anchor="middle">作ったアプリ</text>
+          <text class="t-sub" x="140" y="94" text-anchor="middle">鍵を持たない</text>
+
+          <path class="edge-no" d="M250 75 H865 V92"/>
+          <line class="no-mark" x1="853" y1="96" x2="877" y2="120"/><line class="no-mark" x1="877" y1="96" x2="853" y2="120"/>
+          <text class="t-no" x="560" y="62" text-anchor="middle">直接は触れない — 鍵が無い</text>
+
+          <path class="edge-auto" d="M140 120 V225 H348"/><polygon class="head-auto" points="348,218 360,225 348,232"/>
+          <text class="t-auto" x="250" y="213" text-anchor="middle">この 1 本だけ</text>
+
+          <rect class="box-auto" x="360" y="120" width="280" height="210" rx="12"/>
+          <text class="t-title" x="500" y="164" text-anchor="middle">共通基盤</text>
+          <text class="t-sub" x="500" y="196" text-anchor="middle">認可・記録</text>
+          <text class="t-sub" x="500" y="216" text-anchor="middle">ファイル・AI の窓口</text>
+          <text class="t-sub" x="500" y="256" text-anchor="middle">やるべきことは、</text>
+          <text class="t-sub" x="500" y="276" text-anchor="middle">ここに集約</text>
+
+          <path class="edge-auto" d="M640 150 H748"/><polygon class="head-auto" points="748,143 760,150 748,157"/>
+          <path class="edge-auto" d="M640 225 H748"/><polygon class="head-auto" points="748,218 760,225 748,232"/>
+          <path class="edge-auto" d="M640 300 H748"/><polygon class="head-auto" points="748,293 760,300 748,307"/>
+          <rect class="box-gray" x="760" y="120" width="210" height="60" rx="12"/>
+          <text class="t-title" x="865" y="157" text-anchor="middle">データベース</text>
+          <rect class="box-gray" x="760" y="195" width="210" height="60" rx="12"/>
+          <text class="t-title" x="865" y="232" text-anchor="middle">ファイル</text>
+          <rect class="box-gray" x="760" y="270" width="210" height="60" rx="12"/>
+          <text class="t-title" x="865" y="307" text-anchor="middle">AI</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 11.</b> 守る仕組みは 1 か所にある — アプリごとに作らない。<span class="lg">凡例:<i class="sw b"></i>通る道<i class="sw r d"></i>直接は触れない (否定)<i class="fl b"></i>青の塗り = 共通基盤 (既製)<i class="fl g"></i>灰 = AI のコードから直接は触れないもの</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-lint" data-ch="safety">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>強制</span>
+      <h2>「共通基盤を使え」と指示するだけでは、すり抜けられる — だから <em>SDK を作り、lint で強制する</em>。</h2>
+      <p class="lead">指示は忘れられるが、部品と検査は忘れない。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 340" role="img" aria-label="上段: 指示だけ。共通基盤を使えという指示を受けた Agent が、共通基盤を通らない書き方をしてすり抜けることがある。下段: SDK と lint。安全な使い方を部品にした SDK と、規格外のコードを落とす lint を受けた Agent は、必ず共通基盤を通る。共通基盤を通らない書き方のコードは lint が落とす">
+          <defs>
+            <g id="i16-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+              <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+              <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+              <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+            </g>
+          </defs>
+          <text class="t-bound" x="20" y="28">指示だけ</text>
+          <rect class="box-hand" x="20" y="44" width="220" height="70" rx="12"/>
+          <text class="t-title" x="130" y="74" text-anchor="middle">「共通基盤を使え」</text>
+          <text class="t-sub" x="130" y="100" text-anchor="middle">指示 (文章)</text>
+          <path class="edge-hand" d="M240 79 H288"/><polygon class="head-hand" points="288,72 300,79 288,86"/>
+          <rect class="box" x="300" y="44" width="160" height="70" rx="12"/>
+          <use href="#i16-bot" transform="translate(330,64) scale(1.2)"/>
+          <text class="t-title" x="400" y="86" text-anchor="middle">Agent</text>
+          <path class="edge" d="M460 79 H588"/><polygon class="head" points="588,73 600,79 588,85"/>
+          <text class="t-edge" x="524" y="66" text-anchor="middle">すり抜ける</text>
+          <rect class="box" x="600" y="44" width="200" height="70" rx="12"/>
+          <text class="t-badge" x="700" y="74" text-anchor="middle">共通基盤を通らない書き方</text>
+          <text class="t-sub" x="700" y="100" text-anchor="middle">指示は忘れられる</text>
+
+          <text class="t-bound" x="20" y="178">部品と検査</text>
+          <rect class="box-auto" x="20" y="194" width="220" height="88" rx="12"/>
+          <text class="t-title" x="130" y="224" text-anchor="middle">SDK + lint</text>
+          <text class="t-sub" x="130" y="250" text-anchor="middle">安全な使い方を部品に</text>
+          <text class="t-sub" x="130" y="268" text-anchor="middle">規格外のコードは落とす</text>
+          <path class="edge-auto" d="M240 238 H288"/><polygon class="head-auto" points="288,231 300,238 288,245"/>
+          <rect class="box" x="300" y="203" width="160" height="70" rx="12"/>
+          <use href="#i16-bot" transform="translate(330,223) scale(1.2)"/>
+          <text class="t-title" x="400" y="245" text-anchor="middle">Agent</text>
+          <path class="edge-auto" d="M460 238 H588"/><polygon class="head-auto" points="588,231 600,238 588,245"/>
+          <text class="t-auto" x="524" y="226" text-anchor="middle">必ず通る</text>
+          <rect class="box-auto" x="600" y="203" width="200" height="70" rx="12"/>
+          <text class="t-title" x="700" y="245" text-anchor="middle">共通基盤</text>
+          <path class="edge-no" d="M380 273 V296"/>
+          <line class="no-mark" x1="368" y1="300" x2="392" y2="324"/><line class="no-mark" x1="392" y1="300" x2="368" y2="324"/>
+          <text class="t-no" x="404" y="318">規格外のコードは、lint が落とす</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 12.</b> 同じ Agent でも、上段はすり抜け、下段は必ず通る。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw k"></i>AI の操作<i class="sw b"></i>機構が通す道<i class="sw r d"></i>止まる (否定)<i class="fl b"></i>青の塗り = 機構</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-keys" data-ch="safety">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>秘密のファイル</span>
+      <h2>Agent の動きを監視し、秘密のファイルに触ろうとしたら、<em>プログラムが強制キャンセル</em>する。</h2>
+      <p class="lead">外部サービスの鍵やパスワードは、コードの外のファイルに置かれる。下は、実際に止められた出力。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 200" role="img" aria-label="左の Agent が右の秘密のファイル (鍵・パスワード) を開こうとする。中央上の監視プログラムがその操作を見つけ、強制キャンセルする (赤い印)">
+          <defs>
+            <g id="i17-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+              <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+              <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+              <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+            </g>
+          </defs>
+          <rect class="box" x="30" y="60" width="230" height="90" rx="12"/>
+          <use href="#i17-bot" transform="translate(131,66) scale(1.2)"/>
+          <text class="t-title" x="145" y="116" text-anchor="middle">Agent</text>
+          <text class="t-sub" x="145" y="138" text-anchor="middle">作業の途中で開こうとする</text>
+
+          <rect class="box-auto" x="380" y="8" width="240" height="40" rx="12"/>
+          <text class="t-badge" x="500" y="34" text-anchor="middle">監視プログラム</text>
+          <path class="edge-auto" d="M500 48 V80"/><polygon class="head-auto" points="493,80 500,92 507,80"/>
+
+          <path class="edge-no" d="M260 105 H486"/>
+          <line class="no-mark" x1="488" y1="93" x2="512" y2="117"/><line class="no-mark" x1="512" y1="93" x2="488" y2="117"/>
+          <text class="t-no" x="500" y="142" text-anchor="middle">強制キャンセル</text>
+
+          <rect class="box-gray" x="720" y="60" width="250" height="90" rx="12"/>
+          <text class="t-title" x="845" y="98" text-anchor="middle">秘密のファイル</text>
+          <text class="t-sub" x="845" y="124" text-anchor="middle">外部サービスの鍵・パスワード</text>
+        </svg>
+      </div>
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>nangok-ai-workflow — 2026-08-22 (本資料の制作中の実出力)</span></div>
+        <div class="term-body"><pre><span class="p">&gt;</span> grep -n -E "deny|\.env|pem|\.key" nkuma/skills/nk-init/templates/settings.json   <span class="dim">← Agent が鍵ファイル名を含むコマンドを実行しようとする</span>
+
+<span class="err">nkuma hook (check-bash-secrets): 機密ファイル (.env / 認証鍵 / ~/.aws 等) への Bash アクセスの可能性を検知したためブロックしました。機密が不要な操作なら対象を変えて再実行してください (ハーネスエンジニアリング.md §4.3.2)。</span>
+
+<span class="dim">[hook exit 2 — コマンドは実行されない。この例は設定ファイルを読むだけの無害な grep だが、鍵ファイル名を含むため止まる — 粗い一致・誤検知は許容の設計]</span></pre></div>
+      </div>
+      <figcaption><b class="figno">Figure 13.</b> 止めるのは AI の外側のプログラム — AI の判断では外せない。<span class="lg">凡例:<i class="sw r d"></i>止められる操作 (否定)<i class="sw b"></i>機構が止めに入る<i class="fl b"></i>青の塗り = 機構 (監視プログラム)<i class="fl g"></i>灰 = AI から直接は触れないもの</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-ai-gate" data-ch="safety">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>AI 自身</span>
+      <h2>AI は、レビュー Agent の許可が無いと <em>PR を作れない</em>。</h2>
+      <p class="lead">Nkuma は AI を使って開発していることを隠さない。下は、実際に止められた出力。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 200" role="img" aria-label="左から右へ。AI がコードを書き PR を作ろうとする。レビュー Agent が独立した目で確認し、許可の印を出す。許可があれば PR が作られ、無ければ止まる">
+          <defs>
+            <g id="i18-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+              <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+              <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+              <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+            </g>
+          </defs>
+          <rect class="box" x="20" y="55" width="240" height="90" rx="12"/>
+          <use href="#i18-bot" transform="translate(126,61) scale(1.2)"/>
+          <text class="t-title" x="140" y="111" text-anchor="middle">AI</text>
+          <text class="t-sub" x="140" y="133" text-anchor="middle">コードを書き、PR を作ろうとする</text>
+          <path class="edge" d="M260 100 H318"/><polygon class="head" points="318,94 330,100 318,106"/>
+
+          <rect class="box-auto" x="330" y="30" width="300" height="140" rx="12"/>
+          <text class="t-title" x="480" y="68" text-anchor="middle">レビュー Agent</text>
+          <text class="t-sub" x="480" y="96" text-anchor="middle">独立した目で確認し、</text>
+          <text class="t-sub" x="480" y="116" text-anchor="middle">許可の印を出す</text>
+          <text class="t-sub" x="480" y="148" text-anchor="middle">(コードを書いた AI とは別)</text>
+
+          <path class="edge-auto" d="M630 66 H718"/><polygon class="head-auto" points="718,59 730,66 718,73"/>
+          <text class="t-auto" x="674" y="54" text-anchor="middle">許可あり</text>
+          <rect class="box" x="730" y="40" width="250" height="52" rx="12"/>
+          <text class="t-badge" x="855" y="72" text-anchor="middle">PR が作られる</text>
+
+          <path class="edge-no" d="M630 134 H690"/>
+          <line class="no-mark" x1="696" y1="122" x2="720" y2="146"/><line class="no-mark" x1="720" y1="122" x2="696" y2="146"/>
+          <text class="t-no" x="660" y="164" text-anchor="middle">許可なし</text>
+          <rect class="box" x="730" y="108" width="250" height="52" rx="12"/>
+          <text class="t-badge" x="855" y="140" text-anchor="middle">PR は作られない</text>
+        </svg>
+      </div>
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>nangok-ai-workflow — 2026-08-21 (Nkuma 自身の開発での実出力)</span></div>
+        <div class="term-body"><pre><span class="p">&gt;</span> gh pr create …   <span class="dim">← レビュー済みの印が今のコミットと合っていない状態で、AI (Claude) が PR を作ろうとする</span>
+
+<span class="err">nkuma hook (pre-pr-review-gate): レビュー済み sha (9480089f80f874d62ce57f31d0cc5418bca3a8e2) が現在の HEAD (f93c01d6494b21d2bffb577ff3982e369ea16182) と一致しません。レビュー後に commit が増えています — 再レビューして .nkuma-review-ok を更新してください。</span>
+
+<span class="dim">[hook exit 2 — PR は作られない。意味: 「レビュー済み」の印が今のコミットと合わないので、作らせない]</span></pre></div>
+      </div>
+      <figcaption><b class="figno">Figure 14.</b> AI 自身も、別の AI の許可なしには進めない。許可は印なので偽装はできる — 動線を強制する仕組み。<span class="lg">凡例:<i class="sw k"></i>AI の操作<i class="sw b"></i>通る<i class="sw r d"></i>止まる (否定)<i class="fl b"></i>青の塗り = 機構</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ===== 第 4 章 公開 ===== -->
+  <section class="slide divider" id="d-release" data-ch="release">
+    <div class="slide-inner">
+      <p class="ch-num">第 4 章</p>
+      <h2 class="ch-title">公開</h2>
+      <p class="ch-q"><b>問い ③</b>「作った本人しか、使えない」</p>
+      <p class="ch-a"><b>答え</b>透明性のあるクオリティでリリースまで届ける — 合図ひとつで公開し、いつもの ID で使える</p>
+      <ol class="qmap"><li class="done">① 何のために作ったのか、分からない</li><li class="done">② 安全に動いているのか、分からない</li><li class="on">③ 作った本人しか、使えない</li></ol>
+    </div>
+  </section>
+
+  <section class="slide" id="s-release-flow" data-ch="release">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">公開</span><span class="q">問い ③</span>合図</span>
+      <h2>作ったアプリは、<em>合図ひとつ</em>で公開される。</h2>
+      <p class="lead">作った本人以外が、いつもの ID でその日から使える。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 220" role="img" aria-label="左から右へ。作る人の公開の合図、自動で配備 (配備の鍵を置かずに)、Azure に立つ (標準の構成で)、一般ユーザーがいつもの ID で使える">
+          <defs>
+            <g id="i20-user" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="5" vector-effect="non-scaling-stroke"/>
+              <path d="M20 21a8 8 0 0 0-16 0" vector-effect="non-scaling-stroke"/>
+            </g>
+            <g id="i20-users" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 21a8 8 0 0 0-16 0" vector-effect="non-scaling-stroke"/>
+              <circle cx="10" cy="8" r="5" vector-effect="non-scaling-stroke"/>
+              <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3" vector-effect="non-scaling-stroke"/>
+            </g>
+          </defs>
+          <rect class="box-hand" x="20" y="50" width="200" height="120" rx="12"/>
+          <use href="#i20-user" transform="translate(102,58) scale(1.5)"/>
+          <text class="t-title" x="120" y="122" text-anchor="middle">公開の合図</text>
+          <text class="t-sub" x="120" y="148" text-anchor="middle">作る人が 1 回だけ</text>
+          <path class="edge-hand" d="M220 110 H258"/><polygon class="head-hand" points="258,103 270,110 258,117"/>
+
+          <rect class="box-auto" x="270" y="50" width="200" height="120" rx="12"/>
+          <text class="t-title" x="370" y="106" text-anchor="middle">自動で配備</text>
+          <text class="t-sub" x="370" y="134" text-anchor="middle">配備の鍵を置かずに</text>
+          <path class="edge-auto" d="M470 110 H508"/><polygon class="head-auto" points="508,103 520,110 508,117"/>
+
+          <rect class="box" x="520" y="50" width="200" height="120" rx="12"/>
+          <text class="t-title" x="620" y="106" text-anchor="middle">Azure に立つ</text>
+          <text class="t-sub" x="620" y="134" text-anchor="middle">標準の構成で</text>
+          <path class="edge-auto" d="M720 110 H758"/><polygon class="head-auto" points="758,103 770,110 758,117"/>
+
+          <rect class="box" x="770" y="50" width="210" height="120" rx="12"/>
+          <use href="#i20-users" transform="translate(857,58) scale(1.5)"/>
+          <text class="t-title" x="875" y="122" text-anchor="middle">使える</text>
+          <text class="t-sub" x="875" y="148" text-anchor="middle">いつもの ID で</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 15.</b> 合図のあとは、自動で進む。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw b"></i>機構が自動で繋ぐ<i class="fl b"></i>青の塗り = 機構</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-login" data-ch="release">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">公開</span><span class="q">問い ③</span>ログイン</span>
+      <h2>認証・認可は、アプリの外で済んでいる — アプリが考えるのは、<em>ビジネスロジックだけ</em>。</h2>
+      <p class="lead">ログイン画面も認可のコードも書かない — ログインは会社の ID (Entra ID)、認可はロールの宣言 1 枚を置くだけで、強制するのは共通基盤。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 310" role="img" aria-label="上段の帯「作ったアプリ」の中には、大きなビジネスロジックと小さな認可の宣言の 2 つだけがあり、右側は空いている。その認可の宣言から青い矢印が下へ落ち、下段の帯「共通基盤」に並ぶ認証・認可・記録の 3 つのうち、認可へ入る">
+            <rect class="box" x="30" y="20" width="940" height="120" rx="14"/>
+            <text class="t-title" x="55" y="50">作ったアプリ</text>
+            <rect class="box-hand" x="55" y="64" width="329" height="64" rx="12"/>
+            <text class="t-title" x="219.5" y="102" text-anchor="middle">ビジネスロジック</text>
+            <rect class="box-hand" x="412" y="74" width="176" height="44" rx="10"/>
+            <text class="t-badge" x="500" y="102" text-anchor="middle">認可の宣言</text>
+          
+            <rect class="bound-in" x="30" y="174" width="940" height="115" rx="14"/>
+            <text class="t-title" x="55" y="201">共通基盤</text>
+            <rect class="box-auto" x="55" y="217" width="280" height="60" rx="12"/>
+            <text class="t-title" x="195" y="253" text-anchor="middle">認証</text>
+            <rect class="box-auto" x="360" y="217" width="280" height="60" rx="12"/>
+            <text class="t-title" x="500" y="253" text-anchor="middle">認可</text>
+            <rect class="box-auto" x="665" y="217" width="280" height="60" rx="12"/>
+            <text class="t-title" x="805" y="253" text-anchor="middle">記録</text>
+          
+            <path class="edge-auto" d="M500 118 V205"/><polygon class="head-auto" points="493,205 500,217 507,205"/>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 16.</b> 作る人が枠の中に書くのは、上段の 2 つだけ。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 作る人が書くところ<i class="fl k"></i>白 = 作ったアプリ<i class="sw b"></i>共通基盤へ通る道<i class="fl b"></i>青の塗り = 共通基盤 (既製)</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-gates" data-ch="release">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">公開</span><span class="q">問い ③</span>検問</span>
+      <h2>作ったアプリは、公開の前に <em>3 つの検問</em>を通る。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 220" role="img" aria-label="左から右へ。変更 (人と AI が書く) が、送るとき (push) の規格の検査、PR のたびのレビュー Agent の許可、公開の前の本物の画面での確認 (必ず行う節目)、の 3 つの検問を通って公開される">
+          <rect class="box" x="20" y="70" width="120" height="80" rx="12"/>
+          <text class="t-title" x="80" y="104" text-anchor="middle">変更</text>
+          <text class="t-sub" x="80" y="130" text-anchor="middle">人 + AI が書く</text>
+          <path class="edge" d="M140 110 H178"/><polygon class="head" points="178,104 190,110 178,116"/>
+
+          <rect class="box-auto" x="190" y="60" width="190" height="100" rx="12"/>
+          <text class="t-title" x="285" y="100" text-anchor="middle">送るとき (push)</text>
+          <text class="t-sub" x="285" y="128" text-anchor="middle">規格の検査 (自動)</text>
+          <path class="edge-auto" d="M380 110 H408"/><polygon class="head-auto" points="408,103 420,110 408,117"/>
+
+          <rect class="box-auto" x="420" y="60" width="190" height="100" rx="12"/>
+          <text class="t-title" x="515" y="100" text-anchor="middle">PR のたび</text>
+          <text class="t-sub" x="515" y="128" text-anchor="middle">レビュー Agent の許可</text>
+          <path class="edge-auto" d="M610 110 H638"/><polygon class="head-auto" points="638,103 650,110 638,117"/>
+
+          <rect class="box" x="650" y="60" width="190" height="100" rx="12"/>
+          <text class="t-title" x="745" y="100" text-anchor="middle">公開の前</text>
+          <text class="t-sub" x="745" y="128" text-anchor="middle">本物の画面で必ず確認</text>
+          <path class="edge-auto" d="M840 110 H868"/><polygon class="head-auto" points="868,103 880,110 868,117"/>
+
+          <rect class="box" x="880" y="70" width="100" height="80" rx="12"/>
+          <text class="t-title" x="930" y="116" text-anchor="middle">公開</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 17.</b> 引き金が違うから、抜けが重ならない。<span class="lg">凡例:<i class="sw k"></i>AI の操作 (送る)<i class="sw b"></i>機構が自動で繋ぐ<i class="fl b"></i>青の塗り = 機械が止める検問 / 白の検問 = 機械では止めない、必ず通る節目</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-ledger" data-ch="release">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">公開</span><span class="q">問い ③</span>版</span>
+      <h2>公開のたびに、アプリの版が<em>自動で刻まれる</em>。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 250" role="img" aria-label="左の公開の合図 (何回でも) から右へ。公開のたびに版の印 v1、v2、v3 が付いて残り、右端の台帳は最後に配備した版 (v3) を記録する。アプリ本体は前の版に戻せる。データの復元は別の仕組み (標準構成で 7 日)">
+          <rect class="box-hand" x="20" y="90" width="170" height="80" rx="12"/>
+          <text class="t-title" x="105" y="124" text-anchor="middle">公開の合図</text>
+          <text class="t-sub" x="105" y="150" text-anchor="middle">何回でも</text>
+          <path class="edge-hand" d="M190 130 H238"/><polygon class="head-hand" points="238,123 250,130 238,137"/>
+
+          <rect class="bound" x="250" y="20" width="480" height="212" rx="16"/>
+          <text class="t-bound" x="270" y="46">版の印 — 公開のたびに付いて、残る</text>
+          <rect class="box" x="270" y="70" width="120" height="70" rx="12"/>
+          <text class="t-title" x="330" y="100" text-anchor="middle">v1</text>
+          <text class="t-sub" x="330" y="126" text-anchor="middle">1 回目</text>
+          <path class="edge-auto" d="M390 105 H413"/><polygon class="head-auto" points="413,98 425,105 413,112"/>
+          <rect class="box" x="425" y="70" width="120" height="70" rx="12"/>
+          <text class="t-title" x="485" y="100" text-anchor="middle">v2</text>
+          <text class="t-sub" x="485" y="126" text-anchor="middle">2 回目</text>
+          <path class="edge-auto" d="M545 105 H568"/><polygon class="head-auto" points="568,98 580,105 568,112"/>
+          <rect class="box" x="580" y="70" width="120" height="70" rx="12"/>
+          <text class="t-title" x="640" y="100" text-anchor="middle">v3</text>
+          <text class="t-sub" x="640" y="126" text-anchor="middle">3 回目</text>
+          <text class="t-sub" x="270" y="178">アプリ本体は、前の版に戻せる</text>
+          <text class="t-sub" x="270" y="202">データの復元は別の仕組み (標準構成で 7 日)</text>
+
+          <path class="edge-auto" d="M730 105 H768"/><polygon class="head-auto" points="768,98 780,105 768,112"/>
+          <rect class="box-auto" x="780" y="70" width="200" height="70" rx="12"/>
+          <text class="t-title" x="880" y="100" text-anchor="middle">台帳 (自動)</text>
+          <text class="t-sub" x="880" y="126" text-anchor="middle">最後に配備した版: v3</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 18.</b> 何度公開しても、人の手順は増えない。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw b"></i>機構が自動で繋ぐ<i class="fl b"></i>青の塗り = 台帳 (機構) / 枠 = 版の記録</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ===== 第 5 章 ドメインの上にアプリが展開されるメリット ===== -->
+  <section class="slide divider" id="d-loops" data-ch="loops">
+    <div class="slide-inner">
+      <p class="ch-num">第 5 章</p>
+      <h2 class="ch-title long">ドメインの上にアプリが展開されるメリット</h2>
+      <p class="ch-lead">3 つの答えが揃った場所には、ドメインの理解が残る。その上にアプリが展開されると、3 つのメリットが生まれる — いずれも実装はこれから。</p>
+      <ol class="qmap list"><li>① 作る Agent としてだけでなく、使う Agent としても働く</li><li>② 業務の変更を伝えれば、影響範囲の調査からアプリの変更まで進む</li><li>③ 作るだけで、AI から使われる口 (MCP) の形も自動で付く</li></ol>
+    </div>
+  </section>
+
+  <section class="slide" id="s-place" data-ch="loops">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">展開のメリット</span><span class="q">メリット ①</span>使う Agent</span>
+      <h2>Nkuma は、作る Agent としてだけでなく、<em>使う Agent</em> としても働く。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 300" role="img" aria-label="左のドメイン (業務の理解) から中央の Agent へ。Agent から右へ 2 本、上はアプリを作る、下はドメインの言葉でデータを読む・動かす (破線 — 実装はこれから)">
+          <defs>
+            <g id="i25-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+              <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+              <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+              <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+              <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+            </g>
+          </defs>
+          <rect class="box-auto" x="20" y="100" width="220" height="100" rx="12"/>
+          <text class="t-title" x="130" y="140" text-anchor="middle">ドメイン</text>
+          <text class="t-sub" x="130" y="168" text-anchor="middle">業務の理解 (文書)</text>
+          <path class="edge-auto" d="M240 150 H308"/><polygon class="head-auto" points="308,143 320,150 308,157"/>
+
+          <rect class="box" x="320" y="40" width="240" height="220" rx="12"/>
+          <use href="#i25-bot" transform="translate(422,56) scale(1.5)"/>
+          <text class="t-title" x="440" y="118" text-anchor="middle">Agent</text>
+          <text class="t-sub" x="440" y="150" text-anchor="middle">ドメインを知っている</text>
+          <text class="t-sub" x="440" y="190" text-anchor="middle">作るときも</text>
+          <text class="t-sub" x="440" y="210" text-anchor="middle">使うときも、同じ Agent</text>
+
+          <path class="edge" d="M560 100 H628"/><polygon class="head" points="628,94 640,100 628,106"/>
+          <text class="t-edge" x="600" y="88" text-anchor="middle">作る</text>
+          <rect class="box" x="640" y="60" width="340" height="80" rx="12"/>
+          <text class="t-title" x="810" y="94" text-anchor="middle">アプリを作る</text>
+          <text class="t-sub" x="810" y="120" text-anchor="middle">ドメインに即した機能</text>
+
+          <path class="edge" d="M560 200 H628"/><polygon class="head" points="628,194 640,200 628,206"/>
+          <text class="t-edge" x="600" y="188" text-anchor="middle">使う</text>
+          <rect class="box-ghost" x="640" y="160" width="340" height="80" rx="12"/>
+          <text class="t-title" x="810" y="194" text-anchor="middle">データを読む・動かす</text>
+          <text class="t-sub" x="810" y="220" text-anchor="middle">「先月、未入金の顧客は?」— 実装はこれから</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 19.</b> 作るときに貯めた理解が、使うときにも効く。<span class="lg">凡例:<i class="sw b"></i>機構が自動で繋ぐ (ドメインを渡す)<i class="sw k"></i>AI の操作<i class="fl b"></i>青の塗り = ドメイン<i class="fl d"></i>破線 = 実装はこれから</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-catchup" data-ch="loops">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">展開のメリット</span><span class="q">メリット ②</span>追いつく</span>
+      <h2>業務の変更を伝えれば、<em>影響範囲の調査からアプリの変更まで</em>進む。</h2>
+      <p class="lead">この流れは、Nkuma 自身の開発で手動の型として回っている。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 290" role="img" aria-label="左から右へ、作る人が業務が変わったと伝えると、Agent が影響範囲を調査し、アプリ A は変更・B はなし・C は連携と振り分け、直す A と C だけが Issue にするへ集まる (調査と Issue 化は破線 — 実装はこれから)">
+            <defs>
+              <g id="i26-user" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="5" vector-effect="non-scaling-stroke"/>
+                <path d="M20 21a8 8 0 0 0-16 0" vector-effect="non-scaling-stroke"/>
+              </g>
+              <g id="i26-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+                <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+                <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+                <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+              </g>
+            </defs>
+          
+            <rect class="box-hand" x="20" y="104" width="190" height="92" rx="12"/>
+            <use href="#i26-user" transform="translate(99,116) scale(1.3)"/>
+            <text class="t-title" x="115" y="178" text-anchor="middle">業務が変わった</text>
+            <path class="edge-hand" d="M210 150 H248"/><polygon class="head-hand" points="248,143 260,150 248,157"/>
+          
+            <rect class="box-ghost" x="260" y="104" width="190" height="92" rx="12"/>
+            <use href="#i26-bot" transform="translate(339,116) scale(1.3)"/>
+            <text class="t-title" x="355" y="178" text-anchor="middle">影響範囲を調査</text>
+          
+            <path class="edge-auto" d="M450 150 H476"/>
+            <path class="edge-idle" d="M476 62 V238"/>
+            <path class="edge-auto" d="M476 62 H488"/><polygon class="head-auto" points="488,55 500,62 488,69"/>
+            <path class="edge-auto" d="M476 150 H488"/><polygon class="head-auto" points="488,143 500,150 488,157"/>
+            <path class="edge-auto" d="M476 238 H488"/><polygon class="head-auto" points="488,231 500,238 488,245"/>
+          
+            <text class="t-bound" x="620" y="20" text-anchor="middle">アプリ</text>
+            <rect class="box" x="500" y="30" width="240" height="64" rx="12"/>
+            <circle class="num-k" cx="598" cy="62" r="13"/><text class="num-t" x="598" y="67" text-anchor="middle">A</text>
+            <text class="t-title" x="623" y="68">変更</text>
+          
+            <rect class="box-more" x="500" y="118" width="240" height="64" rx="12"/>
+            <circle class="num-k" cx="598" cy="150" r="13"/><text class="num-t" x="598" y="155" text-anchor="middle">B</text>
+            <text class="t-title" x="623" y="156">なし</text>
+          
+            <rect class="box" x="500" y="206" width="240" height="64" rx="12"/>
+            <circle class="num-k" cx="598" cy="238" r="13"/><text class="num-t" x="598" y="243" text-anchor="middle">C</text>
+            <text class="t-title" x="623" y="244">連携</text>
+          
+            <path class="edge-auto" d="M740 62 H766"/>
+            <path class="edge-auto" d="M740 238 H766"/>
+            <path class="edge-idle" d="M766 62 V238"/>
+            <path class="edge-auto" d="M766 150 H778"/><polygon class="head-auto" points="778,143 790,150 778,157"/>
+          
+            <rect class="box-ghost" x="790" y="104" width="190" height="92" rx="12"/>
+            <text class="t-title" x="885" y="156" text-anchor="middle">Issue にする</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 20.</b> どのアプリをどう直すかまで、Agent が振り分ける — 案件の中で回す仕組みは、実装はこれから。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw b"></i>機構が自動で繋ぐ<i class="fl d"></i>破線 = 実装はこれから<i class="fl m"></i>薄い枠 = 直さないアプリ<i class="sw g"></i>矢印の無い灰線 = 振り分け・集約</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-mcp" data-ch="loops">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">展開のメリット</span><span class="q">メリット ③</span>AI から使われる口</span>
+      <h2>Nkuma でアプリを作ると、<em>AI から使われる口 (MCP) の形も自動で付く</em>。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 260" role="img" aria-label="左の橙の山形「作る」から青い線が上下 2 本に分かれ、上はアプリの枠の中の白い箱「人が使う画面」へ、下は同じ枠の中の青い箱「AI から使われる口 (MCP)」へ届く。下の枝には「自動で付く」と添えてあり、口の右辺から破線の帯が枠の外へ伸びて、右端の AI の箱に繋がっている (口の中身と MCP の経路は、実装はこれから)">
+            <defs>
+              <!-- Lucide bot (ISC, (c) Lucide Icons and Contributors) — assets/icons/icons-defs.html より -->
+              <g id="i27-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
+                <rect width="16" height="12" x="4" y="8" rx="2" vector-effect="non-scaling-stroke"/>
+                <path d="M2 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M20 14h2" vector-effect="non-scaling-stroke"/>
+                <path d="M15 13v2" vector-effect="non-scaling-stroke"/>
+                <path d="M9 13v2" vector-effect="non-scaling-stroke"/>
+              </g>
+            </defs>
+          
+            <rect class="bound" x="320" y="20" width="550" height="212" rx="14"/>
+            <text class="t-bound" x="340" y="46">アプリ</text>
+          
+            <polygon class="chev-hand" points="20,90 208,90 232,125 208,160 20,160"/>
+            <text class="t-title" x="114" y="131" text-anchor="middle">作る</text>
+          
+            <path class="edge-auto" d="M242 125 V90 H334"/><polygon class="head-auto" points="334,83 346,90 334,97"/>
+            <path class="edge-auto" d="M242 125 V178 H334"/><polygon class="head-auto" points="334,171 346,178 334,185"/>
+            <text class="t-auto" x="284" y="168" text-anchor="middle">自動で付く</text>
+          
+            <rect class="box-ghost" x="796" y="163" width="104" height="30"/>
+          
+            <rect class="box" x="346" y="58" width="300" height="64" rx="12"/>
+            <text class="t-title" x="496" y="96" text-anchor="middle">人が使う画面</text>
+          
+            <rect class="box-auto" x="346" y="138" width="460" height="80" rx="12"/>
+            <text class="t-title" x="576" y="174" text-anchor="middle">AI から使われる口</text>
+            <text class="t-tech" x="576" y="198" text-anchor="middle">MCP</text>
+          
+            <rect class="box" x="890" y="138" width="90" height="80" rx="12"/>
+            <use href="#i27-bot" transform="translate(911,154) scale(2)"/>
+          
+            <text class="t-sub" x="980" y="252" text-anchor="end">口の中身と MCP の経路は、実装はこれから</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 21.</b> 人の 1 手は「作る」だけ — 2 つ目の面は自動で生える。口の形は作り方のルールで決めてあり、中身と MCP の経路は、実装はこれから。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 人の 1 手<i class="sw b"></i>機構が自動で繋ぐ<i class="fl k"></i>白 = 登場人物と、起こる結果<i class="fl b"></i>青の面 = 決めてある形 (自動で付く)<i class="fl d"></i>破線 = 実装はこれから<i class="fl c"></i>枠 = 1 つのアプリ</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ===== 第 6 章 提供方法 ===== -->
+  <section class="slide divider" id="d-delivery" data-ch="delivery">
+    <div class="slide-inner">
+      <p class="ch-num">第 6 章</p>
+      <h2 class="ch-title">提供方法</h2>
+      <p class="ch-lead">どう売り、どう届き、どう動くか。</p>
+    </div>
+  </section>
+
+  <section class="slide" id="s-two-tier" data-ch="delivery">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">提供方法</span>売り方</span>
+      <h2>Nkuma で作るのは、<em>顧客か、南国ソフトか</em> — 提供はこの 2 通りに分かれる。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 330" role="img" aria-label="上段は、南国ソフトの枠の中の青い箱「Nkuma」から橙の線「渡す」が枠を越えて右へ伸び、顧客の枠の中の青い箱「Nkuma」へ届く。そこから黒い線「作る」で白い箱「アプリ」ができる。下段は、南国ソフトの枠の中の青い箱「Nkuma」から黒い線「作る」で白い箱「アプリ」ができ、そこから橙の線「渡す」が枠を越えて右へ伸びて、顧客の枠の中の白い箱「アプリ」へ届く">
+            <rect class="bound" x="20" y="20" width="450" height="290" rx="16"/>
+            <rect class="bound" x="530" y="20" width="450" height="290" rx="16"/>
+          
+            <rect class="box-auto" x="50" y="62" width="170" height="64" rx="12"/>
+            <rect class="box-auto" x="560" y="62" width="170" height="64" rx="12"/>
+            <rect class="box" x="780" y="62" width="170" height="64" rx="12"/>
+          
+            <rect class="box-auto" x="50" y="204" width="170" height="64" rx="12"/>
+            <rect class="box" x="270" y="204" width="170" height="64" rx="12"/>
+            <rect class="box" x="780" y="204" width="170" height="64" rx="12"/>
+          
+            <path class="edge-hand" d="M220 94 H548"/>
+            <polygon class="head-hand" points="548,87 560,94 548,101"/>
+            <path class="edge" d="M730 94 H768"/>
+            <polygon class="head" points="768,88 780,94 768,100"/>
+          
+            <path class="edge" d="M220 236 H258"/>
+            <polygon class="head" points="258,230 270,236 258,242"/>
+            <path class="edge-hand" d="M440 236 H768"/>
+            <polygon class="head-hand" points="768,229 780,236 768,243"/>
+          
+            <text class="t-bound" x="40" y="46">南国ソフト</text>
+            <text class="t-bound" x="550" y="46">顧客</text>
+          
+            <text class="t-title" x="135" y="100" text-anchor="middle">Nkuma</text>
+            <text class="t-edge" x="390" y="82" text-anchor="middle">渡す</text>
+            <text class="t-title" x="645" y="100" text-anchor="middle">Nkuma</text>
+            <text class="t-edge" x="755" y="82" text-anchor="middle">作る</text>
+            <text class="t-title" x="865" y="100" text-anchor="middle">アプリ</text>
+          
+            <text class="t-title" x="135" y="242" text-anchor="middle">Nkuma</text>
+            <text class="t-edge" x="245" y="224" text-anchor="middle">作る</text>
+            <text class="t-title" x="355" y="242" text-anchor="middle">アプリ</text>
+            <text class="t-edge" x="610" y="224" text-anchor="middle">渡す</text>
+            <text class="t-title" x="865" y="242" text-anchor="middle">アプリ</text>
+          </svg>
+      </div>
+      <figcaption><b class="figno">Figure 22.</b> Nkuma を渡せば顧客が自分で作り、南国ソフトが作れば渡すのはアプリ — どちらの場で作るかで、顧客に届くものが変わる。販売と社外の実績はこれから。<span class="lg">凡例:<i class="fl b"></i>青の面 = Nkuma<i class="fl k"></i>白 = できたアプリ<i class="sw o"></i>橙の線 = 顧客へ渡す<i class="sw k"></i>AI の操作 (作る)<i class="fl c"></i>枠 = 場 (南国ソフト・顧客)</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-overview" data-ch="delivery">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">提供方法</span>全体像</span>
+      <h2>全体像 — 手元の PC・GitHub・Azure が、<em>1 本の経路</em>で繋がる。</h2>
+      <p class="lead">一度繋いだあとは、送ってから動くまでに手作業は無い。</p>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 380" role="img" aria-label="全体の俯瞰図。左の手元の PC に、案件リポジトリ、Claude Code と nkuma plugin、ローカル共通基盤 (Docker)。案件は GitHub に push され、Issue と CI を経て Azure に配備される。Azure には業務アプリ、共通基盤サーバ、データベース・ファイル・AI。一般ユーザーは上からブラウザで業務アプリを使う">
+          <defs>
+            <g id="i30-users" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 21a8 8 0 0 0-16 0" vector-effect="non-scaling-stroke"/>
+              <circle cx="10" cy="8" r="5" vector-effect="non-scaling-stroke"/>
+              <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3" vector-effect="non-scaling-stroke"/>
+            </g>
+          </defs>
+          <rect class="bound" x="20" y="60" width="340" height="260" rx="16"/>
+          <text class="t-bound" x="40" y="86">手元の PC</text>
+          <rect class="box" x="40" y="100" width="300" height="56" rx="12"/>
+          <text class="t-title" x="190" y="123" text-anchor="middle">案件リポジトリ</text>
+          <text class="t-sub" x="190" y="144" text-anchor="middle">業務の文書 + コード</text>
+          <rect class="box" x="40" y="172" width="300" height="56" rx="12"/>
+          <text class="t-title" x="190" y="195" text-anchor="middle">Claude Code + nkuma plugin</text>
+          <text class="t-sub" x="190" y="216" text-anchor="middle">対話で作る</text>
+          <rect class="box-auto" x="40" y="244" width="300" height="56" rx="12"/>
+          <text class="t-title" x="190" y="267" text-anchor="middle">ローカル共通基盤 (Docker)</text>
+          <text class="t-sub" x="190" y="288" text-anchor="middle">本番と同じ仕組みで試す</text>
+
+          <rect class="bound" x="400" y="60" width="210" height="188" rx="16"/>
+          <text class="t-bound" x="420" y="86">GitHub</text>
+          <path class="edge" d="M340 128 H403"/><polygon class="head" points="403,122 415,128 403,134"/>
+          <text class="t-edge" x="380" y="116" text-anchor="middle">push</text>
+
+          <rect class="box" x="415" y="100" width="180" height="56" rx="12"/>
+          <text class="t-title" x="505" y="123" text-anchor="middle">リポジトリ・Issue</text>
+          <text class="t-sub" x="505" y="144" text-anchor="middle">進行はすべて Issue</text>
+          <path class="edge-auto" d="M505 156 V164"/><polygon class="head-auto" points="498,164 505,176 512,164"/>
+          <rect class="box" x="415" y="176" width="180" height="56" rx="12"/>
+          <text class="t-title" x="505" y="199" text-anchor="middle">CI</text>
+          <text class="t-sub" x="505" y="220" text-anchor="middle">検査して、配備する</text>
+
+          <rect class="bound" x="660" y="118" width="320" height="258" rx="16"/>
+          <text class="t-bound" x="680" y="144">Azure (標準の構成)</text>
+          <path class="edge-auto" d="M595 204 H663"/><polygon class="head-auto" points="663,197 675,204 663,211"/>
+          <text class="t-edge" x="635" y="192" text-anchor="middle">配備</text>
+
+          <use href="#i30-users" transform="translate(902,8) scale(1.5)"/>
+          <text class="t-person" x="892" y="24" text-anchor="end">一般ユーザー</text>
+          <text class="t-sub" x="892" y="42" text-anchor="end">ブラウザから</text>
+          <path class="edge-hand" d="M920 46 V164"/><polygon class="head-hand" points="913,164 920,176 927,164"/>
+
+          <rect class="box" x="675" y="176" width="290" height="56" rx="12"/>
+          <text class="t-title" x="820" y="199" text-anchor="middle">業務アプリ</text>
+          <text class="t-sub" x="820" y="220" text-anchor="middle">各アプリの管理画面つき</text>
+          <path class="edge-auto" d="M820 232 V236"/><polygon class="head-auto" points="813,236 820,248 827,236"/>
+          <rect class="box-auto" x="675" y="248" width="290" height="52" rx="12"/>
+          <text class="t-title" x="820" y="270" text-anchor="middle">共通基盤サーバ</text>
+          <text class="t-sub" x="820" y="291" text-anchor="middle">既製 — 案件に 1 台</text>
+          <path class="edge-auto" d="M820 300 V304"/><polygon class="head-auto" points="813,304 820,316 827,304"/>
+          <rect class="box-gray" x="675" y="316" width="290" height="44" rx="12"/>
+          <text class="t-title" x="820" y="344" text-anchor="middle">データベース・ファイル・AI</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 23.</b> 作る場所、送る場所、動く場所。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="sw k"></i>AI の操作<i class="sw b"></i>機構が自動で繋ぐ<i class="fl k"></i>白 = 登場人物<i class="fl b"></i>青の塗り = 共通基盤 (既製)<i class="fl g"></i>灰 = AI のコードから直接は触れないもの / 枠 = 場</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-architecture" data-ch="delivery">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">提供方法</span>構成図</span>
+      <h2>構成図</h2>
+      <p class="lead">Azure の実リソースの並びと、Claude Code が関わる場所。</p>
+      <figure data-fig><div class="fig tall">
+        <svg role="img" aria-label="構成図。左から順に、手元の PC (Claude Code と nkuma plugin・案件リポジトリ・ローカル共通基盤)、GitHub (リポジトリと Issue・GitHub Actions)、Azure の標準の構成 (Microsoft Entra ID、Azure Container Apps 環境の中の業務アプリと共通基盤サーバ、その下に Azure Key Vault・Azure Database for PostgreSQL・Azure Blob Storage・Azure OpenAI)。作る人は手元の PC に、一般ユーザーは Entra ID に繋がる" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1006 430"><style type="text/css">@supports (color: #000) { #ge-svg-wQ_c1CIxPvQCyWBE2rOY { --ge-adaptive-bg: #ffffff; } }</style><defs><symbol id="mx-image-1wm15h6" viewBox="0 0 28 28" preserveAspectRatio="none"><image width="28" height="28" xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjMyYTM4IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI1Ii8+PHBhdGggZD0iTTIwIDIxYTggOCAwIDAgMC0xNiAwIi8+PC9zdmc+" preserveAspectRatio="none"/></symbol></defs><rect fill="#ffffff" width="100%" height="100%" x="0" y="0" style="fill: rgb(255, 255, 255);"/><g><g data-cell-id="0"><g data-cell-id="1"><g data-cell-id="driver"><g><use href="#mx-image-1wm15h6" xlink:href="#mx-image-1wm15h6" x="32.6" y="9.5" width="28" height="28"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe flex-start; width: 1px; height: 1px; padding-top: 24px; margin-left: 69px;"><div style="box-sizing: border-box; font-size: 0; text-align: left; color: #232a38; "><div style="display: inline-block; font-size: 15px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: nowrap; ">作る人<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">対話で運転する</span></div></div></div></foreignObject><text x="69" y="19" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="15px" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="69" y="19">作る人</tspan><tspan x="69" y="37">対話で運転する</tspan></text></switch></g></g></g><g data-cell-id="user"><g><use href="#mx-image-1wm15h6" xlink:href="#mx-image-1wm15h6" x="500.6" y="9.5" width="28" height="28"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe flex-start; width: 1px; height: 1px; padding-top: 24px; margin-left: 537px;"><div style="box-sizing: border-box; font-size: 0; text-align: left; color: #232a38; "><div style="display: inline-block; font-size: 15px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: nowrap; ">一般ユーザー<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">ブラウザ + いつもの社内 ID</span></div></div></div></foreignObject><text x="537" y="19" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="15px" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="537" y="19">一般ユーザー</tspan><tspan x="537" y="37">ブラウザ + いつもの社内 ID</tspan></text></switch></g></g></g><g data-cell-id="zonePc"><g transform="translate(0.5,0.5)"><path d="M 228.6 71.5 L 228.6 45.1 Q 228.6 41.5 225 41.5 L 18.2 41.5 Q 14.6 41.5 14.6 45.1 L 14.6 71.5" fill="#f8f1e3" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(248, 241, 227); stroke: rgb(217, 207, 186);"/><path d="M 14.6 71.5 L 14.6 323.9 Q 14.6 327.5 18.2 327.5 L 225 327.5 Q 228.6 327.5 228.6 323.9 L 228.6 71.5" fill="none" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(217, 207, 186);"/><path d="M 14.6 71.5 L 228.6 71.5" fill="none" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(217, 207, 186);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 57px; margin-left: 122px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #5b6472; "><div style="display: inline-block; font-size: 14px; font-family: 'Noto Sans JP', sans-serif; color: #5b6472; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: nowrap; ">案件の場 (手元の PC)</div></div></div></foreignObject><text x="122" y="61" fill="#5b6472" font-family="'Noto Sans JP', sans-serif" font-size="14px" text-anchor="middle" font-weight="bold" style="fill: rgb(91, 100, 114);">案件の場 (手元の PC)</text></switch></g></g><g data-cell-id="pcClaude"><g><rect x="28.6" y="71.5" width="186" height="62" rx="7.44" ry="7.44" fill="#ffffff" stroke="#232a38" stroke-width="2" pointer-events="all" style="fill: rgb(255, 255, 255); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 184px; height: 1px; padding-top: 103px; margin-left: 30px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">Claude Code<br />+ nkuma plugin<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">対話で作る</span></div></div></div></foreignObject><text x="122" y="88" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="122" y="88">Claude Code</tspan><tspan x="122" y="107">+ nkuma plugin</tspan><tspan x="122" y="126">対話で作る</tspan></text></switch></g></g></g><g data-cell-id="pcRepo"><g><rect x="28.6" y="151.5" width="186" height="70" rx="8.4" ry="8.4" fill="#ffffff" stroke="#232a38" stroke-width="2" pointer-events="all" style="fill: rgb(255, 255, 255); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 184px; height: 1px; padding-top: 187px; margin-left: 30px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">案件リポジトリ<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">業務の文書 + コード<br />既製 SDK を版固定で</span></div></div></div></foreignObject><text x="122" y="172" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="122" y="172">案件リポジトリ</tspan><tspan x="122" y="191">業務の文書 + コード</tspan><tspan x="122" y="210">既製 SDK を版固定で</tspan></text></switch></g></g></g><g data-cell-id="pcDocker"><g><rect x="28.6" y="239.5" width="186" height="70" rx="8.4" ry="8.4" fill="#eaf6fc" stroke="#276a91" stroke-width="2" pointer-events="all" style="fill: rgb(234, 246, 252); stroke: rgb(39, 106, 145);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 184px; height: 1px; padding-top: 275px; margin-left: 30px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #1f5a7d; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #1f5a7d; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">ローカル共通基盤<br /><span style="font-size: 13px; font-weight: normal; color: rgb(31, 90, 125);">本番と同じイメージで試す</span></div></div></div></foreignObject><text x="122" y="260" fill="#1f5a7d" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(31, 90, 125);"><tspan x="122" y="260">ローカル共通基盤</tspan><tspan x="122" y="279">本番と同じイメージで試</tspan><tspan x="122" y="298">す</tspan></text></switch></g></g></g></g><g data-cell-id="zoneGh"><g transform="translate(0.5,0.5)"><path d="M 418.6 71.5 L 418.6 45.1 Q 418.6 41.5 415 41.5 L 242.2 41.5 Q 238.6 41.5 238.6 45.1 L 238.6 71.5" fill="#f8f1e3" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(248, 241, 227); stroke: rgb(217, 207, 186);"/><path d="M 238.6 71.5 L 238.6 323.9 Q 238.6 327.5 242.2 327.5 L 415 327.5 Q 418.6 327.5 418.6 323.9 L 418.6 71.5" fill="none" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(217, 207, 186);"/><path d="M 238.6 71.5 L 418.6 71.5" fill="none" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(217, 207, 186);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 57px; margin-left: 329px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #5b6472; "><div style="display: inline-block; font-size: 14px; font-family: 'Noto Sans JP', sans-serif; color: #5b6472; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: nowrap; ">GitHub (案件)</div></div></div></foreignObject><text x="329" y="61" fill="#5b6472" font-family="'Noto Sans JP', sans-serif" font-size="14px" text-anchor="middle" font-weight="bold" style="fill: rgb(91, 100, 114);">GitHub (案件)</text></switch></g></g><g data-cell-id="ghRepo"><g><rect x="250.6" y="151.5" width="156" height="70" rx="8.4" ry="8.4" fill="#ffffff" stroke="#232a38" stroke-width="2" pointer-events="all" style="fill: rgb(255, 255, 255); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 154px; height: 1px; padding-top: 187px; margin-left: 252px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">リポジトリ + Issue<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">進行はすべて Issue</span></div></div></div></foreignObject><text x="329" y="182" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="329" y="182">リポジトリ + Issue</tspan><tspan x="329" y="201">進行はすべて Issue</tspan></text></switch></g></g></g><g data-cell-id="ghActions"><g><rect x="250.6" y="239.5" width="156" height="70" rx="8.4" ry="8.4" fill="#ffffff" stroke="#232a38" stroke-width="2" pointer-events="all" style="fill: rgb(255, 255, 255); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 154px; height: 1px; padding-top: 275px; margin-left: 252px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">GitHub Actions<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">検査して、配備する<br />長生きする鍵は置かない</span></div></div></div></foreignObject><text x="329" y="251" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="329" y="251">GitHub Actions</tspan><tspan x="329" y="270">検査して、配備する</tspan><tspan x="329" y="289">長生きする鍵は置か</tspan><tspan x="329" y="308">ない</tspan></text></switch></g></g></g></g><g data-cell-id="zoneAz"><g transform="translate(0.5,0.5)"><path d="M 998.6 71.5 L 998.6 45.1 Q 998.6 41.5 995 41.5 L 432.2 41.5 Q 428.6 41.5 428.6 45.1 L 428.6 71.5" fill="#f8f1e3" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(248, 241, 227); stroke: rgb(217, 207, 186);"/><path d="M 428.6 71.5 L 428.6 417.9 Q 428.6 421.5 432.2 421.5 L 995 421.5 Q 998.6 421.5 998.6 417.9 L 998.6 71.5" fill="none" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(217, 207, 186);"/><path d="M 428.6 71.5 L 998.6 71.5" fill="none" stroke="#d9cfba" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(217, 207, 186);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 57px; margin-left: 714px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #5b6472; "><div style="display: inline-block; font-size: 14px; font-family: 'Noto Sans JP', sans-serif; color: #5b6472; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: nowrap; ">Azure — 標準の構成 (案件ごとに 1 つ)</div></div></div></foreignObject><text x="714" y="61" fill="#5b6472" font-family="'Noto Sans JP', sans-serif" font-size="14px" text-anchor="middle" font-weight="bold" style="fill: rgb(91, 100, 114);">Azure — 標準の構成 (案件ごとに 1 つ)</text></switch></g></g><g data-cell-id="azEntra"><g><rect x="438.6" y="71.5" width="150" height="76" fill="none" stroke="none" pointer-events="all"/><image width="36" height="36" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgaWQ9ImJkYjU2MzI5LTQ3MTctNDQxMC1hYTEzLTQ1MDVlY2FhNGU0NiIKICAgd2lkdGg9IjE4IgogICBoZWlnaHQ9IjE2LjM3OTk5OSIKICAgdmlld0JveD0iMCAwIDE4IDE2LjM3OTk5OSIKICAgdmVyc2lvbj0iMS4xIgogICBzb2RpcG9kaTpkb2NuYW1lPSJBenVyZV9BY3RpdmVfRGlyZWN0b3J5LnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMC45Mi4zICgyNDA1NTQ2LCAyMDE4LTAzLTExKSI+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiIKICAgICBib3JkZXJvcGFjaXR5PSIxIgogICAgIG9iamVjdHRvbGVyYW5jZT0iMTAiCiAgICAgZ3JpZHRvbGVyYW5jZT0iMTAiCiAgICAgZ3VpZGV0b2xlcmFuY2U9IjEwIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjEwMTciCiAgICAgaWQ9Im5hbWVkdmlldzUyOTM5IgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBmaXQtbWFyZ2luLXRvcD0iMCIKICAgICBmaXQtbWFyZ2luLWxlZnQ9IjAiCiAgICAgZml0LW1hcmdpbi1yaWdodD0iMCIKICAgICBmaXQtbWFyZ2luLWJvdHRvbT0iMCIKICAgICBpbmtzY2FwZTp6b29tPSI0OC4xMTExMTEiCiAgICAgaW5rc2NhcGU6Y3g9IjkiCiAgICAgaW5rc2NhcGU6Y3k9IjguMTkiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii04IgogICAgIGlua3NjYXBlOndpbmRvdy15PSItOCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImJkYjU2MzI5LTQ3MTctNDQxMC1hYTEzLTQ1MDVlY2FhNGU0NiIgLz4KICA8ZGVmcwogICAgIGlkPSJkZWZzNTI5MTgiPgogICAgPGxpbmVhckdyYWRpZW50CiAgICAgICBpZD0iYmEyNjEwYzMtYTQ1YS00ZTdlLWEwYzAtMjg1Y2ZkN2UwMDVkIgogICAgICAgeDE9IjEzLjI1IgogICAgICAgeTE9IjEzLjAyIgogICAgICAgeDI9IjguNjE5OTk5OSIKICAgICAgIHkyPSI0LjI1IgogICAgICAgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiCiAgICAgICBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMC44MSkiPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAiCiAgICAgICAgIHN0b3AtY29sb3I9IiMxOTg4ZDkiCiAgICAgICAgIGlkPSJzdG9wNTI5MDIiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC45IgogICAgICAgICBzdG9wLWNvbG9yPSIjNTRhZWYwIgogICAgICAgICBpZD0ic3RvcDUyOTA0IiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudAogICAgICAgaWQ9ImJkOGY2MThiLTRmMmYtNGNiNy1hZmYwLTJmZDJkMjExMzI2ZCIKICAgICAgIHgxPSIxMS4yNiIKICAgICAgIHkxPSIxMC40NyIKICAgICAgIHgyPSIxNC40NiIKICAgICAgIHkyPSIxNS45OSIKICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIgogICAgICAgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgwLDAuODEpIj4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjEiCiAgICAgICAgIHN0b3AtY29sb3I9IiM1NGFlZjAiCiAgICAgICAgIGlkPSJzdG9wNTI5MDciIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC4yOSIKICAgICAgICAgc3RvcC1jb2xvcj0iIzRmYWJlZSIKICAgICAgICAgaWQ9InN0b3A1MjkwOSIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjUxIgogICAgICAgICBzdG9wLWNvbG9yPSIjNDFhMmU5IgogICAgICAgICBpZD0ic3RvcDUyOTExIiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuNzQiCiAgICAgICAgIHN0b3AtY29sb3I9IiMyYTkzZTAiCiAgICAgICAgIGlkPSJzdG9wNTI5MTMiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC44OCIKICAgICAgICAgc3RvcC1jb2xvcj0iIzE5ODhkOSIKICAgICAgICAgaWQ9InN0b3A1MjkxNSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDx0aXRsZQogICAgIGlkPSJ0aXRsZTUyOTIwIj5JY29uLWlkZW50aXR5LTIyMTwvdGl0bGU+CiAgPHBvbHlnb24KICAgICBwb2ludHM9IjE2Ljk5LDEwLjE3IDE4LDExLjM1IDguOTMsMTcuMTkgMCwxMS4zNSAxLjAxLDEwLjE5IDguOTMsMTUuMzMgIgogICAgIGlkPSJwb2x5Z29uNTI5MjIiCiAgICAgc3R5bGU9ImZpbGw6IzUwZTZmZiIKICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLC0wLjgxKSIgLz4KICA8cG9seWdvbgogICAgIHBvaW50cz0iMTYuNCw5LjU0IDguOTMsMTQuMjYgMS42MSw5LjUzIDguOTMsMC44MSAiCiAgICAgaWQ9InBvbHlnb241MjkyNCIKICAgICBzdHlsZT0iZmlsbDojZmZmZmZmIgogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsLTAuODEpIiAvPgogIDxwb2x5Z29uCiAgICAgcG9pbnRzPSIxLjYxLDkuNTMgOC45MywwLjgxIDguOTMsMTQuMjYgIgogICAgIGlkPSJwb2x5Z29uNTI5MjYiCiAgICAgc3R5bGU9ImZpbGw6IzUwZTZmZiIKICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLC0wLjgxKSIgLz4KICA8cG9seWdvbgogICAgIHBvaW50cz0iMTYuNCw5LjU0IDguOTMsMC44MSA4LjkzLDE0LjI2ICIKICAgICBpZD0icG9seWdvbjUyOTI4IgogICAgIHN0eWxlPSJmaWxsOnVybCgjYmEyNjEwYzMtYTQ1YS00ZTdlLWEwYzAtMjg1Y2ZkN2UwMDVkKSIKICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLC0wLjgxKSIgLz4KICA8cG9seWdvbgogICAgIHBvaW50cz0iOC45MywxNC4yNiA4LjkzLDcuNzYgMTYuNCw5LjU0ICIKICAgICBpZD0icG9seWdvbjUyOTMwIgogICAgIHN0eWxlPSJmaWxsOiM1M2IxZTAiCiAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwtMC44MSkiIC8+CiAgPHBvbHlnb24KICAgICBwb2ludHM9IjguOTMsNy43NiA4LjkzLDE0LjI2IDEuNjEsOS41MyAiCiAgICAgaWQ9InBvbHlnb241MjkzMiIKICAgICBzdHlsZT0iZmlsbDojOWNlYmZmIgogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsLTAuODEpIiAvPgogIDxwb2x5Z29uCiAgICAgcG9pbnRzPSIxNi45OSwxMC4xNyA4LjkzLDE1LjMzIDguOTMsMTcuMTkgMTgsMTEuMzUgIgogICAgIGlkPSJwb2x5Z29uNTI5MzQiCiAgICAgc3R5bGU9ImZpbGw6dXJsKCNiZDhmNjE4Yi00ZjJmLTRjYjctYWZmMC0yZmQyZDIxMTMyNmQpIgogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsLTAuODEpIiAvPgogIDxtZXRhZGF0YQogICAgIGlkPSJtZXRhZGF0YTUyOTM2Ij4KICAgIDxyZGY6UkRGPgogICAgICA8cmRmOmxpPnB1YmxpYzp0cnVlPC9yZGY6bGk+CiAgICAgIDxyZGY6bGk+c2RrOk1zUG9ydGFsRnguQmFzZS5JbWFnZXMuUG9seWNocm9tYXRpYy5BY3RpdmVEaXJlY3RvcnkoKTwvcmRmOmxpPgogICAgICA8cmRmOmxpPmNhdGVnb3J5OiBJZGVudGl0eTwvcmRmOmxpPgogICAgICA8Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+CiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+CiAgICAgICAgPGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPgogICAgICAgIDxkYzp0aXRsZT5JY29uLWlkZW50aXR5LTIyMTwvZGM6dGl0bGU+CiAgICAgIDwvY2M6V29yaz4KICAgIDwvcmRmOlJERj4KICA8L21ldGFkYXRhPgo8L3N2Zz4K" preserveAspectRatio="none" x="495.6" y="76.5"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-end; justify-content: unsafe center; width: 148px; height: 1px; padding-top: 145px; margin-left: 440px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">Microsoft Entra ID<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">いつもの社内 ID</span></div></div></div></foreignObject><text x="514" y="126" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="514" y="126">Microsoft Entra ID</tspan><tspan x="514" y="145">いつもの社内 ID</tspan></text></switch></g></g></g><g data-cell-id="azAcaEnv"><g transform="translate(0.5,0.5)"><path d="M 986.6 233.5 L 986.6 210.54 Q 986.6 205.5 981.56 205.5 L 529.64 205.5 Q 524.6 205.5 524.6 210.54 L 524.6 233.5" fill="#eaf6fc" stroke="#b9d6e6" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(234, 246, 252); stroke: rgb(185, 214, 230);"/><path d="M 524.6 233.5 L 524.6 312.46 Q 524.6 317.5 529.64 317.5 L 981.56 317.5 Q 986.6 317.5 986.6 312.46 L 986.6 233.5" fill="none" stroke="#b9d6e6" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(185, 214, 230);"/><path d="M 524.6 233.5 L 986.6 233.5" fill="none" stroke="#b9d6e6" stroke-miterlimit="10" pointer-events="none" style="stroke: rgb(185, 214, 230);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 220px; margin-left: 756px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #1f5a7d; "><div style="display: inline-block; font-size: 14px; font-family: 'Noto Sans JP', sans-serif; color: #1f5a7d; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: nowrap; ">Azure Container Apps 環境</div></div></div></foreignObject><text x="756" y="224" fill="#1f5a7d" font-family="'Noto Sans JP', sans-serif" font-size="14px" text-anchor="middle" font-weight="bold" style="fill: rgb(31, 90, 125);">Azure Container Apps 環境</text></switch></g></g><g data-cell-id="azApp"><g><rect x="534.6" y="239.5" width="180" height="70" rx="8.4" ry="8.4" fill="#ffffff" stroke="#232a38" stroke-width="2" pointer-events="all" style="fill: rgb(255, 255, 255); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 178px; height: 1px; padding-top: 275px; margin-left: 536px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">業務アプリ<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">AI が作った側<br />鍵を持たない</span></div></div></div></foreignObject><text x="625" y="260" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="625" y="260">業務アプリ</tspan><tspan x="625" y="279">AI が作った側</tspan><tspan x="625" y="298">鍵を持たない</tspan></text></switch></g></g></g><g data-cell-id="azData"><g><rect x="796.6" y="239.5" width="180" height="70" rx="8.4" ry="8.4" fill="#dcecf7" stroke="#276a91" stroke-width="2" pointer-events="all" style="fill: rgb(220, 236, 247); stroke: rgb(39, 106, 145);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 178px; height: 1px; padding-top: 275px; margin-left: 798px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #1f5a7d; "><div style="display: inline-block; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: #1f5a7d; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">共通基盤サーバ<br /><span style="font-size: 13px; font-weight: normal; color: rgb(31, 90, 125);">既製 — データに<br />触れるのはここだけ</span></div></div></div></foreignObject><text x="887" y="260" fill="#1f5a7d" font-family="'Noto Sans JP', sans-serif" font-size="16px" text-anchor="middle" font-weight="bold" style="fill: rgb(31, 90, 125);"><tspan x="887" y="260">共通基盤サーバ</tspan><tspan x="887" y="279">既製 — データに</tspan><tspan x="887" y="298">触れるのはここだけ</tspan></text></switch></g></g></g></g><g data-cell-id="azKv"><g><rect x="436.6" y="323.5" width="134" height="92" fill="none" stroke="none" pointer-events="all"/><image width="36" height="36" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgaWQ9ImJjOTMxNjlhLTI0YzQtNDY4Ni05ZjM3LWM3ZTRmNTNiM2QzNCIKICAgd2lkdGg9IjE3IgogICBoZWlnaHQ9IjE3IgogICB2aWV3Qm94PSIwIDAgMTcgMTciCiAgIHZlcnNpb249IjEuMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iS2V5X1ZhdWx0cy5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjAuOTIuMyAoMjQwNTU0NiwgMjAxOC0wMy0xMSkiPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBvYmplY3R0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwIgogICAgIGd1aWRldG9sZXJhbmNlPSIxMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMDE3IgogICAgIGlkPSJuYW1lZHZpZXc3Mzg1MCIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgZml0LW1hcmdpbi10b3A9IjAiCiAgICAgZml0LW1hcmdpbi1sZWZ0PSIwIgogICAgIGZpdC1tYXJnaW4tcmlnaHQ9IjAiCiAgICAgZml0LW1hcmdpbi1ib3R0b209IjAiCiAgICAgaW5rc2NhcGU6em9vbT0iNDguMTExMTExIgogICAgIGlua3NjYXBlOmN4PSI4LjUiCiAgICAgaW5rc2NhcGU6Y3k9IjguNSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iLTgiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9Ii04IgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0iYmM5MzE2OWEtMjRjNC00Njg2LTlmMzctYzdlNGY1M2IzZDM0IiAvPgogIDxkZWZzCiAgICAgaWQ9ImRlZnM3MzgzNCI+CiAgICA8cmFkaWFsR3JhZGllbnQKICAgICAgIGlkPSJmYjExNGM5My03YzE2LTQ1NDAtODk5YS0wNzk2MDQxNjI5ZTYiCiAgICAgICBjeD0iOSIKICAgICAgIGN5PSI5IgogICAgICAgcj0iOC41IgogICAgICAgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuMTgiCiAgICAgICAgIHN0b3AtY29sb3I9IiM1ZWEwZWYiCiAgICAgICAgIGlkPSJzdG9wNzM4MDgiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC41NiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzVjOWZlZSIKICAgICAgICAgaWQ9InN0b3A3MzgxMCIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjY5IgogICAgICAgICBzdG9wLWNvbG9yPSIjNTU5Y2VkIgogICAgICAgICBpZD0ic3RvcDczODEyIiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuNzgiCiAgICAgICAgIHN0b3AtY29sb3I9IiM0YTk3ZTkiCiAgICAgICAgIGlkPSJzdG9wNzM4MTQiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC44NiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzM5OTBlNCIKICAgICAgICAgaWQ9InN0b3A3MzgxNiIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjkzIgogICAgICAgICBzdG9wLWNvbG9yPSIjMjM4N2RlIgogICAgICAgICBpZD0ic3RvcDczODE4IiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuOTkiCiAgICAgICAgIHN0b3AtY29sb3I9IiMwODdiZDYiCiAgICAgICAgIGlkPSJzdG9wNzM4MjAiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMSIKICAgICAgICAgc3RvcC1jb2xvcj0iIzAwNzhkNCIKICAgICAgICAgaWQ9InN0b3A3MzgyMiIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQKICAgICAgIGlkPSJlYzQ3OGJkMy01YjM4LTRlN2YtYjY2MS0xMWYzNTU1NzhiZmYiCiAgICAgICBjeD0iMzguOTUwMDAxIgogICAgICAgY3k9IjE4Mi4wNzAwMSIKICAgICAgIHI9IjkuODgwMDAwMSIKICAgICAgIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMC45NCwwLDAsMC45NCwtMjguMjEsLTE2Mi43NCkiCiAgICAgICBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC4yNyIKICAgICAgICAgc3RvcC1jb2xvcj0iI2ZmZDcwZiIKICAgICAgICAgaWQ9InN0b3A3MzgyNSIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjQ5IgogICAgICAgICBzdG9wLWNvbG9yPSIjZmZjYjEyIgogICAgICAgICBpZD0ic3RvcDczODI3IiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuODgiCiAgICAgICAgIHN0b3AtY29sb3I9IiNmZWFjMTkiCiAgICAgICAgIGlkPSJzdG9wNzM4MjkiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMSIKICAgICAgICAgc3RvcC1jb2xvcj0iI2ZlYTExYiIKICAgICAgICAgaWQ9InN0b3A3MzgzMSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDx0aXRsZQogICAgIGlkPSJ0aXRsZTczODM2Ij5JY29uLXNlY3VyaXR5LTI0NTwvdGl0bGU+CiAgPHBhdGgKICAgICBpZD0iYWFjZjgzMTEtYTMxNy00MDBmLWI2MTMtNzRiZDAwZGE1Y2UzIgogICAgIGQ9Ik0gOC41LDAgQSA4LjUsOC41IDAgMSAwIDE3LDguNSA4LjUxLDguNTEgMCAwIDAgOC41LDAgWiBtIDAsMTUuODQgQSA3LjM0LDcuMzQgMCAxIDEgMTUuODQsOC41IDcuMzQsNy4zNCAwIDAgMSA4LjUsMTUuODQgWiIKICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIgogICAgIHN0eWxlPSJmaWxsOnVybCgjZmIxMTRjOTMtN2MxNi00NTQwLTg5OWEtMDc5NjA0MTYyOWU2KSIgLz4KICA8Y2lyY2xlCiAgICAgY3g9IjguNSIKICAgICBjeT0iOC41IgogICAgIHI9IjcuMzQwMDAwMiIKICAgICBpZD0iY2lyY2xlNzM4MzkiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZiIgLz4KICA8ZwogICAgIGlkPSJnNzM4NDUiCiAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTAuNSwtMC41KSI+CiAgICA8cGF0aAogICAgICAgaWQ9ImJkOTgzYzQxLWRiNzMtNDBlYy1hNGY0LWRhMTIxM2ZjOTkyNCIKICAgICAgIGQ9Im0gMTMuNDQsNy4zMyBhIDEuODQsMS44NCAwIDAgMCAwLC0yLjU5IHYgMCBMIDEwLjI5LDEuNTggYSAxLjgzLDEuODMgMCAwIDAgLTIuNTgsMCB2IDAgTCA0LjU2LDQuNzQgYSAxLjg0LDEuODQgMCAwIDAgMCwyLjU5IEwgNy4xOCwxMCBhIDAuNTEsMC41MSAwIDAgMSAwLjE1LDAuMzYgdiA0Ljg4IGEgMC42MywwLjYzIDAgMCAwIDAuMTgsMC40NCBsIDEuMiwxLjIgYSAwLjQxLDAuNDEgMCAwIDAgMC41OCwwIGwgMS4xNiwtMS4xNiB2IDAgbCAwLjY4LC0wLjY4IGEgMC4yNSwwLjI1IDAgMCAwIDAsLTAuMzQgbCAtMC40OSwtMC40OSBhIDAuMjcsMC4yNyAwIDAgMSAwLC0wLjM3IGwgMC40OSwtMC40OSBhIDAuMjUsMC4yNSAwIDAgMCAwLC0wLjM0IGwgLTAuNDksLTAuNDkgYSAwLjI3LDAuMjcgMCAwIDEgMCwtMC4zNyBsIDAuNDksLTAuNDkgYSAwLjI1LDAuMjUgMCAwIDAgMCwtMC4zNCBMIDEwLjQ1LDEwLjYzIFYgMTAuMzggWiBNIDksMi4zNSBBIDEuMDM1LDEuMDM1IDAgMCAxIDksNC40MiAxLjAzNSwxLjAzNSAwIDEgMSA5LDIuMzUgWiIKICAgICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgICBzdHlsZT0iZmlsbDp1cmwoI2VjNDc4YmQzLTViMzgtNGU3Zi1iNjYxLTExZjM1NTU3OGJmZikiIC8+CiAgICA8cGF0aAogICAgICAgaWQ9ImFkMmU3ZTQ0LTliZmQtNDc3NS04YmY0LThlZjI2YTU0NDkyMSIKICAgICAgIGQ9Im0gOC4xOCwxNS4zIHYgMCBhIDAuMjMsMC4yMyAwIDAgMCAwLjM4LC0wLjE3IHYgLTQgYSAwLjI0LDAuMjQgMCAwIDAgLTAuMTEsLTAuMiB2IDAgYSAwLjIyLDAuMjIgMCAwIDAgLTAuMzQsMC4yIHYgNCBhIDAuMjgsMC4yOCAwIDAgMCAwLjA3LDAuMTcgeiIKICAgICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgICBzdHlsZT0ib3BhY2l0eTowLjc1O2ZpbGw6I2ZmOTMwMCIgLz4KICAgIDxyZWN0CiAgICAgICBpZD0iYTk5NmZiZmYtMzkzNi00YjI0LWI0MDctMzY5MzM2YzE0M2JhIgogICAgICAgeD0iNi40OCIKICAgICAgIHk9IjUuNzkiCiAgICAgICB3aWR0aD0iNS4xNzAwMDAxIgogICAgICAgaGVpZ2h0PSIwLjYxMDAwMDAxIgogICAgICAgcng9IjAuMjgiCiAgICAgICBzdHlsZT0ib3BhY2l0eTowLjc1O2ZpbGw6I2ZmOTMwMCIgLz4KICAgIDxyZWN0CiAgICAgICBpZD0iYmIxMmQzMWMtMzM1Mi00YTE4LTg3ZGQtYTE2OWE0YTg3MjFkIgogICAgICAgeD0iNi40OCIKICAgICAgIHk9IjYuNzgwMDAwMiIKICAgICAgIHdpZHRoPSI1LjE3MDAwMDEiCiAgICAgICBoZWlnaHQ9IjAuNjEwMDAwMDEiCiAgICAgICByeD0iMC4yOCIKICAgICAgIHN0eWxlPSJvcGFjaXR5OjAuNzU7ZmlsbDojZmY5MzAwIiAvPgogIDwvZz4KICA8bWV0YWRhdGEKICAgICBpZD0ibWV0YWRhdGE3Mzg0NyI+CiAgICA8cmRmOlJERj4KICAgICAgPHJkZjpsaT5wdWJsaWM6dHJ1ZTwvcmRmOmxpPgogICAgICA8cmRmOmxpPnNkazpmYWxzZTwvcmRmOmxpPgogICAgICA8cmRmOmxpPmNhdGVnb3J5OiBTZWN1cml0eTwvcmRmOmxpPgogICAgICA8Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+CiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+CiAgICAgICAgPGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPgogICAgICAgIDxkYzp0aXRsZT5JY29uLXNlY3VyaXR5LTI0NTwvZGM6dGl0bGU+CiAgICAgIDwvY2M6V29yaz4KICAgIDwvcmRmOlJERj4KICA8L21ldGFkYXRhPgo8L3N2Zz4K" preserveAspectRatio="none" x="485.6" y="328.5"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-end; justify-content: unsafe center; width: 132px; height: 1px; padding-top: 412px; margin-left: 438px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 15px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">Azure Key Vault<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">ログインの鍵だけ</span></div></div></div></foreignObject><text x="504" y="394" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="15px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="504" y="394">Azure Key Vault</tspan><tspan x="504" y="412">ログインの鍵だけ</tspan></text></switch></g></g></g><g data-cell-id="azPg"><g><rect x="576.6" y="323.5" width="134" height="92" fill="none" stroke="none" pointer-events="all"/><image width="30" height="37" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgaWQ9ImZjODkwMTI3LTcyOGItNGFjMC1iNWRhLTg2Y2RmYzE5MWU4NiIKICAgd2lkdGg9IjEyLjgyIgogICBoZWlnaHQ9IjE3IgogICB2aWV3Qm94PSIwIDAgMTIuODIgMTciCiAgIHZlcnNpb249IjEuMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iQXp1cmVfRGF0YWJhc2VfUG9zdGdyZVNRTF9TZXJ2ZXIuc3ZnIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkyLjMgKDI0MDU1NDYsIDIwMTgtMDMtMTEpIj4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2IgogICAgIGJvcmRlcm9wYWNpdHk9IjEiCiAgICAgb2JqZWN0dG9sZXJhbmNlPSIxMCIKICAgICBncmlkdG9sZXJhbmNlPSIxMCIKICAgICBndWlkZXRvbGVyYW5jZT0iMTAiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAiCiAgICAgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE5MjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTAxNyIKICAgICBpZD0ibmFtZWR2aWV3MTIxMjciCiAgICAgc2hvd2dyaWQ9ImZhbHNlIgogICAgIGZpdC1tYXJnaW4tdG9wPSIwIgogICAgIGZpdC1tYXJnaW4tbGVmdD0iMCIKICAgICBmaXQtbWFyZ2luLXJpZ2h0PSIwIgogICAgIGZpdC1tYXJnaW4tYm90dG9tPSIwIgogICAgIGlua3NjYXBlOnpvb209IjQ4LjExMTExMSIKICAgICBpbmtzY2FwZTpjeD0iNi40MSIKICAgICBpbmtzY2FwZTpjeT0iOC41IgogICAgIGlua3NjYXBlOndpbmRvdy14PSItOCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTgiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJmYzg5MDEyNy03MjhiLTRhYzAtYjVkYS04NmNkZmMxOTFlODYiIC8+CiAgPGRlZnMKICAgICBpZD0iZGVmczEyMTEwIj4KICAgIDxsaW5lYXJHcmFkaWVudAogICAgICAgaWQ9ImEyOGRlZTIwLTRjNzEtNDZiNS1iOTU3LTgwNGM2N2RhNzI1YSIKICAgICAgIHgxPSIyLjQ0MDAwMDEiCiAgICAgICB5MT0iMTAuNjciCiAgICAgICB4Mj0iMTUuMjciCiAgICAgICB5Mj0iMTAuNjciCiAgICAgICBncmFkaWVudFRyYW5zZm9ybT0icm90YXRlKC0wLjAxLC0yODY0LjcxOSwtODAyLjM2OTQ1KSIKICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwIgogICAgICAgICBzdG9wLWNvbG9yPSIjMDA1YmExIgogICAgICAgICBpZD0ic3RvcDEyMDk1IiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuMDciCiAgICAgICAgIHN0b3AtY29sb3I9IiMwMDYwYTkiCiAgICAgICAgIGlkPSJzdG9wMTIwOTciIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC4zNiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzAwNzFjOCIKICAgICAgICAgaWQ9InN0b3AxMjA5OSIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjUyIgogICAgICAgICBzdG9wLWNvbG9yPSIjMDA3OGQ0IgogICAgICAgICBpZD0ic3RvcDEyMTAxIiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuNjQiCiAgICAgICAgIHN0b3AtY29sb3I9IiMwMDc0Y2QiCiAgICAgICAgIGlkPSJzdG9wMTIxMDMiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC44MiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzAwNmFiYiIKICAgICAgICAgaWQ9InN0b3AxMjEwNSIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIxIgogICAgICAgICBzdG9wLWNvbG9yPSIjMDA1YmExIgogICAgICAgICBpZD0ic3RvcDEyMTA3IiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHRpdGxlCiAgICAgaWQ9InRpdGxlMTIxMTIiPkljb24tZGF0YWJhc2VzLTEzMTwvdGl0bGU+CiAgPHBhdGgKICAgICBkPSJNIDYuNDEsNC42NCBDIDIuODcsNC42NCAwLDMuNjQgMCwyLjMyIHYgMTIuMzYgYyAwLDEuMjcgMi44MiwyLjMgNi4zMiwyLjMyIGggMC4wOSBjIDMuNTQsMCA2LjQxLC0xIDYuNDEsLTIuMzIgViAyLjMyIGMgMCwxLjI4IC0yLjg3LDIuMzIgLTYuNDEsMi4zMiB6IgogICAgIGlkPSJwYXRoMTIxMTQiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDp1cmwoI2EyOGRlZTIwLTRjNzEtNDZiNS1iOTU3LTgwNGM2N2RhNzI1YSkiIC8+CiAgPHBhdGgKICAgICBkPSJNIDEyLjgyLDIuMzIgQyAxMi44MiwzLjYgOS45NSw0LjY0IDYuNDEsNC42NCAyLjg3LDQuNjQgMCwzLjY0IDAsMi4zMiAwLDEgMi44NywwIDYuNDEsMCBjIDMuNTQsMCA2LjQxLDEgNi40MSwyLjMyIgogICAgIGlkPSJwYXRoMTIxMTYiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojZThlOGU4IiAvPgogIDxwYXRoCiAgICAgZD0ibSAxMS4zMiwyLjEzIGMgMCwwLjgyIC0yLjIsMS40OCAtNC45MSwxLjQ4IC0yLjcxLDAgLTQuOTIsLTAuNjYgLTQuOTIsLTEuNDcgMCwtMC44MSAyLjIsLTEuNDggNC45MiwtMS40OCAyLjcyLDAgNC45MSwwLjY2IDQuOTEsMS40NyIKICAgICBpZD0icGF0aDEyMTE4IgogICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgc3R5bGU9ImZpbGw6IzUwZTZmZiIgLz4KICA8cGF0aAogICAgIGQ9Ik0gNi40MSwyLjUgQSAxMS42NSwxMS42NSAwIDAgMCAyLjUxLDMuMDcgMTEuNTMsMTEuNTMgMCAwIDAgNi40MSwzLjYxIDExLjQ3LDExLjQ3IDAgMCAwIDEwLjMsMy4wMyAxMS45MywxMS45MyAwIDAgMCA2LjQxLDIuNSBaIgogICAgIGlkPSJwYXRoMTIxMjAiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojMTk4YWIzIiAvPgogIDxwYXRoCiAgICAgZD0ibSA5LjQxLDguNSBjIDAsMC4wOCAwLDAuMjQgMCwwLjQyIEEgNS4xMiw1LjEyIDAgMCAwIDkuMzMsOS41NSBjIDAsMC4xMiAwLDAuMyAwLjA1LDAuNDYgMC4wNSwwLjE2IDAsMC4yNyAwLDAuMzYgYSAxLjY4LDEuNjggMCAwIDEgLTAuMjUsMC44NiAwLjQzLDAuNDMgMCAwIDAgMCwwLjA3IGwgMC4xLDAuMTIgYSAxMC41NSwxMC41NSAwIDAgMCAxLjA2LC0yLjM4IHYgMCBDIDEwLjU3LDguMDkgMTAuNiw3LjQxIDEwLjM4LDcuMTIgQSAyLjU4LDIuNTggMCAwIDAgNy43LDYuMjYgMy4yOSwzLjI5IDAgMCAxIDguNjEsNi45MyAyLjI4LDIuMjggMCAwIDEgOS40MSw4LjUgWiBNIDkuMSw4LjU4IEEgMS4xNSwxLjE1IDAgMCAwIDguMzEsOC42NyBjIC0wLjI5LDAuMTggLTAuMiwwLjU1IDAsMSBhIDcuNzcsNy43NyAwIDAgMCAwLjM1LDAuODUgbCAwLjA5LDAuMTYgdiAwIGMgMC4wNSwwLjA4IDAuMDgsMC4xNSAwLjExLDAuMiBsIDAuMDgsMC4xMyBhIDEuMjgsMS4yOCAwIDAgMCAwLjE4LC0wLjY1IDIuODYsMi44NiAwIDAgMCAwLC0wLjMzIGMgMCwtMC4xNyAwLC0wLjM2IC0wLjA1LC0wLjQ5IEEgNi4xLDYuMSAwIDAgMSA5LjE1LDguODUgQyA5LjEyLDguNzQgOS4xMyw4LjYzIDkuMTQsOC41NSBaIE0gOC44LDguOTkgYSAwLjQsMC40IDAgMCAxIC0wLjE4LDAuMSB2IDAgQSAwLjMzLDAuMzMgMCAwIDEgOC40OCw5LjA5IDAuMjMsMC4yMyAwIDAgMSA4LjQxLDguOSB2IDAgYyAwLC0wLjA3IDAuMTEsLTAuMTMgMC4yNCwtMC4xNSBoIDAuMTkgYyAwLDAgMC4wOSwwIDAuMDksMC4wOCBBIDAuMiwwLjIgMCAwIDEgOC44NCw4Ljk2IFogTSA0LjExLDkuODggYyAwLC0wLjA3IDAsLTAuMTMgMCwtMC4xNyBhIDEsMSAwIDAgMCAwLC0wLjE3IDUuNTUsNS41NSAwIDAgMSAwLC0xIDUuMjIsNS4yMiAwIDAgMSAwLjMsLTEuMSBBIDIuNDEsMi40MSAwIDAgMSA0Ljk5LDYuNSA0Ljc4LDQuNzggMCAwIDAgMy42NCw2LjMgMS44NywxLjg3IDAgMCAwIDIuNTQsNi42IDIsMiAwIDAgMCAxLjkxLDguNDIgYSAxMi4yNywxMi4yNyAwIDAgMCAwLjUsMi4yNCBjIDAuMzQsMS4xNCAwLjczLDEuODQgMS4wNywxLjk1IHYgMCBjIDAuMTUsMC4wNSAwLjMxLDAgMC40NywtMC4yMSAwLjI4LC0wLjM0IDAuNTQsLTAuNjMgMC42OSwtMC44IEEgMS44OCwxLjg4IDAgMCAxIDQuMTUsOS44NSBaIG0gMC4yNiwwLjQgYSAyLjE4LDIuMTggMCAwIDAgMC4wNiwwLjU2IDEuNSwxLjUgMCAwIDAgMC4yNiwwLjQ0IDEuMDcsMS4wNyAwIDAgMCAwLjM1LDAuMjUgMS4wOSwxLjA5IDAgMCAwIDAuMzksMC4wOCBjIDAsLTAuMTcgMC4xNCwtMC4zOCAwLjIzLC0wLjYgYSA0LjM1LDQuMzUgMCAwIDAgMC4yMSwtMC41OSA2LjYxLDYuNjEgMCAwIDAgMCwtMS4xMSBjIDAsLTAuMDkgMCwtMC4xOSAtMC4wNiwtMC4zIEEgMC40NSwwLjQ1IDAgMCAwIDUuNjksOC43NCB2IDAgQSAwLjY2LDAuNjYgMCAwIDAgNS40MSw4LjU4IEggNS4yMSBBIDEuNTYsMS41NiAwIDAgMCA0LjczLDguNzIgMiwyIDAgMCAwIDQuNDEsOC45MSB2IDAuMTEgYyAwLDAuMiAwLDAuNDEgMCwwLjYxIHYgMCBhIDAuODYsMC44NiAwIDAgMSAwLDAuMTUgdiAwLjM5IDAgeiBNIDUuMDMsOC45NCB2IDAgYSAwLjQ2LDAuNDYgMCAwIDEgMC4yOCwwIEEgMC42LDAuNiAwIDAgMSA1LjUsOSBjIDAuMDksMCAwLjEsMC4xMSAwLjA5LDAuMTQgdiAwIEEgMC4zNywwLjM3IDAgMCAxIDUuNDcsOS4yNyAwLjMsMC4zIDAgMCAxIDUuNDEsOS4yMyB2IDAgQSAwLjM0LDAuMzQgMCAwIDEgNS4xMyw4Ljk1IFogbSAwLjc0LDMgQSAwLjIzLDAuMjMgMCAwIDAgNS42NCwxMiBMIDUuNSwxMi4xNyBjIC0wLjE3LDAuMjEgLTAuMjQsMC4yOCAtMC43MywwLjM4IGEgMC41MiwwLjUyIDAgMCAwIC0wLjI2LDAuMSAwLjU4LDAuNTggMCAwIDAgMC4yNCwwLjExIDEuMTgsMS4xOCAwIDAgMCAwLjcyLDAgMS43LDEuNyAwIDAgMCAwLjM5LC0wLjI2IDAuNjEsMC42MSAwIDAgMCAwLjIsLTAuMzEgMC4zNiwwLjM2IDAgMCAwIC0wLjEsLTAuMjggMC4xNSwwLjE1IDAgMCAwIC0wLjE1LC0wLjAyIHogbSA0LjYxLDAgYSAxLjYzLDEuNjMgMCAwIDEgLTEuMTMsMCAwLjIyLDAuMjIgMCAwIDAgLTAuMTQsMCAwLjMsMC4zIDAgMCAwIC0wLjE3LDAuMTQgMS4wOSwxLjA5IDAgMCAwIDAsMC4zMSAxLjgsMS44IDAgMCAwIDEuMSwtMC4xIDEuMzYsMS4zNiAwIDAgMCAwLjQ4LC0wLjM0IHogTSA3Ljk4LDkuOCBDIDcuODQsOS4zOSA3LjY0LDguOCA4LjE2LDguNDQgQSAxLjM1LDEuMzUgMCAwIDEgOS4wNSw4LjI5IDMuMTgsMy4xOCAwIDAgMCA4LjQxLDcuMTQgTCA4LjMxLDcuMDQgOC4yNSw2Ljk4IHYgMCBBIDAuMzQsMC4zNCAwIDAgMCA4LjE5LDYuOTIgdiAwIDAgQSAyLjM0LDIuMzQgMCAwIDAgNy41Miw2LjUgMi42MywyLjYzIDAgMCAwIDYuNDEsNi4yOCAxLjUyLDEuNTIgMCAwIDAgNS43MSw2LjM5IDEuNzcsMS43NyAwIDAgMCA1LjQxLDYuNSBhIDIuMSwyLjEgMCAwIDAgLTAuNzQsMSA1Ljg0LDUuODQgMCAwIDAgLTAuMjEsMSAxLjY2LDEuNjYgMCAwIDEgMSwtMC4yMyAwLjg0LDAuODQgMCAwIDEgMC43NywwLjkxIDcuMjYsNy4yNiAwIDAgMSAwLDEuMjcgQSAzLjg3LDMuODcgMCAwIDEgNiwxMS4wOCBjIC0wLjA2LDAuMTcgLTAuMTQsMC4zNSAtMC4xOCwwLjQ5IGEgMC41LDAuNSAwIDAgMSAwLjM4LDAuMTQgMC42NiwwLjY2IDAgMCAxIDAuMTksMC41MyBoIDAuMDIgYyAwLDAuMDggMCwwLjE2IDAsMC4yNCBhIDYuNTUsNi41NSAwIDAgMCAwLjI0LDIuNDQgMC41NCwwLjU0IDAgMCAwIDAuMjQsMC4yMSAwLjYsMC42IDAgMCAwIDAuMzEsMC4xIDEuMywxLjMgMCAwIDAgMSwtMC4zNCAxLjA1LDEuMDUgMCAwIDAgMC4yOSwtMC42NiBjIDAuMDcsLTAuNDUgMC4yMiwtMS43IDAuMjQsLTIgdiAwIEEgMC43MiwwLjcyIDAgMCAxIDguODIsMTEuNzkgMC42MywwLjYzIDAgMCAxIDkuMDksMTEuNTUgNS4zNiw1LjM2IDAgMCAxIDguMDIsOS43NCBaIgogICAgIGlkPSJwYXRoMTIxMjIiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojZjJmMmYyIiAvPgogIDxtZXRhZGF0YQogICAgIGlkPSJtZXRhZGF0YTEyMTI0Ij4KICAgIDxyZGY6UkRGPgogICAgICA8cmRmOmxpPnB1YmxpYzp0cnVlPC9yZGY6bGk+CiAgICAgIDxyZGY6bGk+c2RrOmZhbHNlPC9yZGY6bGk+CiAgICAgIDxyZGY6bGk+Y2F0ZWdvcnk6IERhdGFiYXNlczwvcmRmOmxpPgogICAgICA8Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+CiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+CiAgICAgICAgPGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPgogICAgICAgIDxkYzp0aXRsZT5JY29uLWRhdGFiYXNlcy0xMzE8L2RjOnRpdGxlPgogICAgICA8L2NjOldvcms+CiAgICA8L3JkZjpSREY+CiAgPC9tZXRhZGF0YT4KPC9zdmc+Cg==" preserveAspectRatio="none" x="628.6" y="328.5"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-end; justify-content: unsafe center; width: 132px; height: 1px; padding-top: 412px; margin-left: 578px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 15px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">Azure Database<br />for PostgreSQL<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">パスワードは無い</span></div></div></div></foreignObject><text x="644" y="376" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="15px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="644" y="376">Azure Database</tspan><tspan x="644" y="394">for PostgreSQL</tspan><tspan x="644" y="412">パスワードは無い</tspan></text></switch></g></g></g><g data-cell-id="azBlob"><g><rect x="716.6" y="323.5" width="134" height="92" fill="none" stroke="none" pointer-events="all"/><image width="42" height="34" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgaWQ9ImYyZjA0MzQ5LThhZWUtNDQxMy04NGM5LWE5MDUzNjExYjMxOSIKICAgd2lkdGg9IjE3IgogICBoZWlnaHQ9IjEzLjY3IgogICB2aWV3Qm94PSIwIDAgMTcgMTMuNjciCiAgIHZlcnNpb249IjEuMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iU3RvcmFnZV9BY2NvdW50cy5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjAuOTIuMyAoMjQwNTU0NiwgMjAxOC0wMy0xMSkiPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBvYmplY3R0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwIgogICAgIGd1aWRldG9sZXJhbmNlPSIxMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMDE3IgogICAgIGlkPSJuYW1lZHZpZXc3NTU0NCIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgZml0LW1hcmdpbi10b3A9IjAiCiAgICAgZml0LW1hcmdpbi1sZWZ0PSIwIgogICAgIGZpdC1tYXJnaW4tcmlnaHQ9IjAiCiAgICAgZml0LW1hcmdpbi1ib3R0b209IjAiCiAgICAgaW5rc2NhcGU6em9vbT0iNDguMTExMTExIgogICAgIGlua3NjYXBlOmN4PSI4LjUiCiAgICAgaW5rc2NhcGU6Y3k9IjYuODQiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii04IgogICAgIGlua3NjYXBlOndpbmRvdy15PSItOCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImYyZjA0MzQ5LThhZWUtNDQxMy04NGM5LWE5MDUzNjExYjMxOSIgLz4KICA8ZGVmcwogICAgIGlkPSJkZWZzNzU1MjciPgogICAgPGxpbmVhckdyYWRpZW50CiAgICAgICBpZD0iYWQ0YzRmOTYtMDlhYS00ZjkxLWJhMTAtNWNiOGFkNTMwZjc0IgogICAgICAgeDE9IjkiCiAgICAgICB5MT0iMTUuODMiCiAgICAgICB4Mj0iOSIKICAgICAgIHkyPSI1Ljc5IgogICAgICAgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAiCiAgICAgICAgIHN0b3AtY29sb3I9IiNiM2IzYjMiCiAgICAgICAgIGlkPSJzdG9wNzU1MjAiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC4yNiIKICAgICAgICAgc3RvcC1jb2xvcj0iI2MxYzFjMSIKICAgICAgICAgaWQ9InN0b3A3NTUyMiIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIxIgogICAgICAgICBzdG9wLWNvbG9yPSIjZTZlNmU2IgogICAgICAgICBpZD0ic3RvcDc1NTI0IiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHRpdGxlCiAgICAgaWQ9InRpdGxlNzU1MjkiPkljb24tc3RvcmFnZS04NjwvdGl0bGU+CiAgPHBhdGgKICAgICBkPSJtIDAsMy42MiBoIDE3IHYgOS40OCBhIDAuNTcsMC41NyAwIDAgMSAtMC41NywwLjU3IEggMC41NyBBIDAuNTcsMC41NyAwIDAgMSAwLDEzLjEgWiIKICAgICBpZD0icGF0aDc1NTMxIgogICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgc3R5bGU9ImZpbGw6dXJsKCNhZDRjNGY5Ni0wOWFhLTRmOTEtYmExMC01Y2I4YWQ1MzBmNzQpIiAvPgogIDxwYXRoCiAgICAgZD0iTSAwLjU3LDAgSCAxNi40MyBBIDAuNTcsMC41NyAwIDAgMSAxNywwLjU3MDAwMDAxIFYgMy42MiBIIDAgViAwLjU2MDAwMDAxIEEgMC41NywwLjU3IDAgMCAxIDAuNTcsMCBaIgogICAgIGlkPSJwYXRoNzU1MzMiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojMzdjMmIxIiAvPgogIDxwYXRoCiAgICAgZD0ibSAyLjMxLDQuNzIgaCAxMi4zNyBhIDAuMjcsMC4yNyAwIDAgMSAwLjI2LDAuMjcgdiAxLjQgQSAwLjI3LDAuMjcgMCAwIDEgMTQuNjgsNi42NiBIIDIuMzEgQSAwLjI3LDAuMjcgMCAwIDEgMi4wNSw2LjM5IFYgNC45OSBBIDAuMjcsMC4yNyAwIDAgMSAyLjMxLDQuNzIgWiIKICAgICBpZD0icGF0aDc1NTM1IgogICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZiIgLz4KICA8cGF0aAogICAgIGQ9Im0gMi4zMiw3LjUxIGggMTIuMzcgYSAwLjI3LDAuMjcgMCAwIDEgMC4yNiwwLjI3IFYgOS4xOSBBIDAuMjcsMC4yNyAwIDAgMSAxNC42OSw5LjQ2IEggMi4zMiBBIDAuMjcsMC4yNyAwIDAgMSAyLjA2LDkuMTkgViA3LjgzIEEgMC4yNywwLjI3IDAgMCAxIDIuMzIsNy41MSBaIgogICAgIGlkPSJwYXRoNzU1MzciCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojMzdjMmIxIiAvPgogIDxwYXRoCiAgICAgZD0ibSAyLjMyLDEwLjMzIGggMTIuMzcgYSAwLjI3LDAuMjcgMCAwIDEgMC4yNiwwLjI3IHYgMS40MSBhIDAuMjcsMC4yNyAwIDAgMSAtMC4yNiwwLjI3IEggMi4zMiBBIDAuMjcsMC4yNyAwIDAgMSAyLjA2LDEyLjAxIFYgMTAuNiBhIDAuMjcsMC4yNyAwIDAgMSAwLjI2LC0wLjI3IHoiCiAgICAgaWQ9InBhdGg3NTUzOSIKICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIgogICAgIHN0eWxlPSJmaWxsOiMyNTgyNzciIC8+CiAgPG1ldGFkYXRhCiAgICAgaWQ9Im1ldGFkYXRhNzU1NDEiPgogICAgPHJkZjpSREY+CiAgICAgIDxyZGY6bGk+cHVibGljOnRydWU8L3JkZjpsaT4KICAgICAgPHJkZjpsaT5zZGs6TXNQb3J0YWxGeC5CYXNlLkltYWdlcy5Qb2x5Y2hyb21hdGljLlN0b3JhZ2UoKTwvcmRmOmxpPgogICAgICA8cmRmOmxpPmNhdGVnb3J5OiBTdG9yYWdlPC9yZGY6bGk+CiAgICAgIDxjYzpXb3JrCiAgICAgICAgIHJkZjphYm91dD0iIj4KICAgICAgICA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4KICAgICAgICA8ZGM6dHlwZQogICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+CiAgICAgICAgPGRjOnRpdGxlPkljb24tc3RvcmFnZS04NjwvZGM6dGl0bGU+CiAgICAgIDwvY2M6V29yaz4KICAgIDwvcmRmOlJERj4KICA8L21ldGFkYXRhPgo8L3N2Zz4K" preserveAspectRatio="none" x="762.6" y="328.5"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-end; justify-content: unsafe center; width: 132px; height: 1px; padding-top: 412px; margin-left: 718px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 15px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">Azure Blob<br />Storage<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">版を残す・戻せる</span></div></div></div></foreignObject><text x="784" y="376" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="15px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="784" y="376">Azure Blob</tspan><tspan x="784" y="394">Storage</tspan><tspan x="784" y="412">版を残す・戻せる</tspan></text></switch></g></g></g><g data-cell-id="azOai"><g><rect x="856.6" y="323.5" width="134" height="92" fill="none" stroke="none" pointer-events="all"/><image width="36" height="36" xlink:href="data:image/svg+xml;base64,PHN2ZyBpZD0idXVpZC1hZGJkYWU4ZS01YTQxLTQ2ZDEtOGMxOC1hYTczY2RiZmVlMzIiCgl4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij4KCTxkZWZzPgoJCTxyYWRpYWxHcmFkaWVudCBpZD0idXVpZC0yYTc0MDdhYS1iNzg3LTQ4ZGQtYTk2YS0wZDgxYWI2ZTkzYmIiIGN4PSItNjcuOTgxIiBjeT0iNzkzLjE5OSIgcj0iLjQ1IiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNzkzOS4wMyAyMDM2OC4wMjkpIHJvdGF0ZSg0NSkgc2NhbGUoMjUuMDkxIC0zNC4xNDkpIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CgkJCTxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzgzYjlmOSIgLz4KCQkJPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA3OGQ0IiAvPgoJCTwvcmFkaWFsR3JhZGllbnQ+Cgk8L2RlZnM+Cgk8cGF0aCBkPSJtMCwyLjd2MTIuNmMwLDEuNDkxLDEuMjA5LDIuNywyLjcsMi43aDEyLjZjMS40OTEsMCwyLjctMS4yMDksMi43LTIuN1YyLjdjMC0xLjQ5MS0xLjIwOS0yLjctMi43LTIuN0gyLjdDMS4yMDksMCwwLDEuMjA5LDAsMi43Wk0xMC44LDB2My42YzAsMy45NzYsMy4yMjQsNy4yLDcuMiw3LjJoLTMuNmMtMy45NzYsMC03LjE5OSwzLjIyMi03LjIsNy4xOTh2LTMuNTk4YzAtMy45NzYtMy4yMjQtNy4yLTcuMi03LjJoMy42YzMuOTc2LDAsNy4yLTMuMjI0LDcuMi03LjJaIiBmaWxsPSJ1cmwoI3V1aWQtMmE3NDA3YWEtYjc4Ny00OGRkLWE5NmEtMGQ4MWFiNmU5M2JiKSIgc3Ryb2tlLXdpZHRoPSIwIiAvPgo8L3N2Zz4=" preserveAspectRatio="none" x="905.6" y="328.5"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-end; justify-content: unsafe center; width: 132px; height: 1px; padding-top: 412px; margin-left: 858px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #232a38; "><div style="display: inline-block; font-size: 15px; font-family: 'Noto Sans JP', sans-serif; color: #232a38; line-height: 1.2; pointer-events: all; font-weight: bold; white-space: normal; word-wrap: normal; ">Azure OpenAI<br /><span style="font-size: 13px; font-weight: normal; color: rgb(91, 100, 114);">共通基盤から呼ぶ</span></div></div></div></foreignObject><text x="924" y="394" fill="#232a38" font-family="'Noto Sans JP', sans-serif" font-size="15px" text-anchor="middle" font-weight="bold" style="fill: rgb(35, 42, 56);"><tspan x="924" y="394">Azure OpenAI</tspan><tspan x="924" y="412">共通基盤から呼ぶ</tspan></text></switch></g></g></g></g><g data-cell-id="eDrv"><g><path d="M 46.6 37.5 L 46.6 46 Q 46.6 54.5 45.04 54.5 L 44.27 54.5 Q 43.49 54.5 43.49 57.88 L 43.49 61.26" fill="none" stroke="#d97716" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(217, 119, 22);"/><path d="M 43.48 69.26 L 39.49 61.26 L 47.49 61.27 Z" fill="#d97716" stroke="#d97716" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(217, 119, 22); stroke: rgb(217, 119, 22);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 59px; margin-left: 19px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">対話</div></div></div></foreignObject><text x="19" y="62" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">対話</text></switch></g></g></g><g data-cell-id="eEdit"><g><path d="M 121.6 133.5 L 121.6 138.5 Q 121.6 143.5 121.6 142.5 L 121.6 142 Q 121.6 141.5 121.6 141.38 L 121.6 141.26" fill="none" stroke="#232a38" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(35, 42, 56);"/><path d="M 121.6 149.26 L 117.6 141.26 L 125.6 141.26 Z" fill="#232a38" stroke="#232a38" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(35, 42, 56); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 142px; margin-left: 122px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">書く</div></div></div></foreignObject><text x="122" y="146" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">書く</text></switch></g></g></g><g data-cell-id="eLocal"><g><path d="M 121.6 221.5 L 121.6 226.5 Q 121.6 231.5 121.6 230.5 L 121.6 230 Q 121.6 229.5 121.6 229.38 L 121.6 229.26" fill="none" stroke="#232a38" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(35, 42, 56);"/><path d="M 121.6 237.26 L 117.6 229.26 L 125.6 229.26 Z" fill="#232a38" stroke="#232a38" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(35, 42, 56); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 230px; margin-left: 122px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">手元で動かす</div></div></div></foreignObject><text x="122" y="234" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">手元で動かす</text></switch></g></g></g><g data-cell-id="ePush"><g><path d="M 214.6 186.5 L 240.36 186.5" fill="none" stroke="#232a38" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(35, 42, 56);"/><path d="M 248.36 186.5 L 240.36 190.5 L 240.36 182.5 Z" fill="#232a38" stroke="#232a38" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(35, 42, 56); stroke: rgb(35, 42, 56);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 187px; margin-left: 232px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">送る</div></div></div></foreignObject><text x="232" y="190" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">送る</text></switch></g></g></g><g data-cell-id="eMerge"><g><path d="M 328.6 221.5 L 328.6 229.26" fill="none" stroke="#d97716" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(217, 119, 22);"/><path d="M 328.6 237.26 L 324.6 229.26 L 332.6 229.26 Z" fill="#d97716" stroke="#d97716" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(217, 119, 22); stroke: rgb(217, 119, 22);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 230px; margin-left: 329px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">公開の合図</div></div></div></foreignObject><text x="329" y="234" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">公開の合図</text></switch></g></g></g><g data-cell-id="eDeploy"><g><path d="M 406.6 274.5 L 524.36 274.5" fill="none" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(39, 106, 145);"/><path d="M 532.36 274.5 L 524.36 278.5 L 524.36 270.5 Z" fill="#276a91" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(39, 106, 145); stroke: rgb(39, 106, 145);"/></g></g><g data-cell-id="eLogin"><g><path d="M 514.6 37.5 L 514.6 46 Q 514.6 54.5 514.4 57.89 L 514.2 61.28" fill="none" stroke="#d97716" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(217, 119, 22);"/><path d="M 513.73 69.27 L 510.21 61.05 L 518.19 61.52 Z" fill="#d97716" stroke="#d97716" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(217, 119, 22); stroke: rgb(217, 119, 22);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 54px; margin-left: 482px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">ログイン</div></div></div></foreignObject><text x="482" y="58" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">ログイン</text></switch></g></g></g><g data-cell-id="eAuth"><g><path d="M 513.6 147.5 L 513.6 183.5 Q 513.6 193.5 523.6 193.5 L 542.6 193.5 Q 552.6 193.5 552.6 203.5 L 552.6 229.26" fill="none" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(39, 106, 145);"/><path d="M 552.6 237.26 L 548.6 229.26 L 556.6 229.26 Z" fill="#276a91" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(39, 106, 145); stroke: rgb(39, 106, 145);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 175px; margin-left: 575px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">認証はアプリの外で済む</div></div></div></foreignObject><text x="575" y="179" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">認証はアプリの外で済む</text></switch></g></g></g><g data-cell-id="eSdk"><g><path d="M 714.6 274.5 L 786.36 274.5" fill="none" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(39, 106, 145);"/><path d="M 794.36 274.5 L 786.36 278.5 L 786.36 270.5 Z" fill="#276a91" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(39, 106, 145); stroke: rgb(39, 106, 145);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 261px; margin-left: 756px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">既製 SDK で</div></div></div></foreignObject><text x="756" y="264" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">既製 SDK で</text></switch></g></g></g><g data-cell-id="eKv"><g><path d="M 533.84 317.5 L 533.83 322.5 Q 533.82 327.5 524.21 327.5 L 519.41 327.5 Q 514.6 327.5 514.6 320.5 L 514.6 317 Q 514.6 313.5 509.1 313.5 L 506.35 313.5 Q 503.6 313.5 503.6 313.38 L 503.6 313.26" fill="none" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(39, 106, 145);"/><path d="M 503.6 321.26 L 499.6 313.26 L 507.6 313.26 Z" fill="#276a91" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(39, 106, 145); stroke: rgb(39, 106, 145);"/></g><g><g><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 319px; margin-left: 519px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: #3f4654; background-color: #ffffff; "><div style="display: inline-block; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: #3f4654; line-height: 1.2; pointer-events: all; background-color: var(--ge-adaptive-bg, #ffffff); white-space: nowrap; ">アプリの外の認証が読む</div></div></div></foreignObject><text x="519" y="322" fill="#3f4654" font-family="'Noto Sans JP', sans-serif" font-size="13px" text-anchor="middle" style="fill: rgb(63, 70, 84);">アプリの外の認証が読む</text></switch></g></g></g><g data-cell-id="ePg"><g><path d="M 841.6 309.5 L 841.6 314.5 Q 841.6 319.5 831.6 319.5 L 763.6 319.5 Q 753.6 319.5 753.6 316.5 L 753.6 315 Q 753.6 313.5 743.6 313.5 L 653.6 313.5 Q 643.6 313.5 643.6 313.38 L 643.6 313.26" fill="none" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(39, 106, 145);"/><path d="M 643.6 321.26 L 639.6 313.26 L 647.6 313.26 Z" fill="#276a91" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(39, 106, 145); stroke: rgb(39, 106, 145);"/></g></g><g data-cell-id="eBlob"><g><path d="M 886.6 309.5 L 886.6 314.5 Q 886.6 319.5 876.6 319.5 L 796.6 319.5 Q 786.6 319.5 786.6 316.5 L 786.6 315 Q 786.6 313.5 785.1 313.5 L 784.35 313.5 Q 783.6 313.5 783.6 313.38 L 783.6 313.26" fill="none" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(39, 106, 145);"/><path d="M 783.6 321.26 L 779.6 313.26 L 787.6 313.26 Z" fill="#276a91" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(39, 106, 145); stroke: rgb(39, 106, 145);"/></g></g><g data-cell-id="eOai"><g><path d="M 931.6 309.5 L 927.6 309.5 Q 923.6 309.5 923.6 311.38 L 923.6 313.26" fill="none" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="stroke" style="stroke: rgb(39, 106, 145);"/><path d="M 923.6 321.26 L 919.6 313.26 L 927.6 313.26 Z" fill="#276a91" stroke="#276a91" stroke-width="2" stroke-miterlimit="10" pointer-events="all" style="fill: rgb(39, 106, 145); stroke: rgb(39, 106, 145);"/></g></g></g></g></g></svg>
+      </div>
+      <figcaption><b class="figno">Figure 24.</b> 案件ごとに同じ形が 1 セット立ち、データに触れるのはその中の 1 か所だけ。<span class="lg">凡例:<i class="sw o"></i>人の操作・合図<i class="sw k"></i>AI の操作<i class="sw b"></i>機構が自動で繋ぐ<i class="fl k"></i>白 = 登場人物<i class="fl b"></i>青の塗り = 共通基盤 (既製)<i class="fl c"></i>枠 = 場<br>Azure の各サービスのアイコンは Microsoft 公式 (図解での利用)。人物は Lucide。</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-native" data-ch="delivery">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">提供方法</span>デスクトップアプリ</span>
+      <h2>Nkuma デスクトップアプリ (構想) — <em>1 つのアプリをダウンロードするだけ</em>で、開発を始められる。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 330" role="img" aria-label="Nkuma デスクトップアプリの窓 (構想段階なので破線)。中に 4 つの区画、ターミナル (Claude Code)、内蔵ランタイム (共通基盤・データベース・ストレージを内蔵、Docker のインストール不要)、Issue と CI の見える化、各アプリの管理画面">
+          <rect class="box-ghost" x="60" y="20" width="880" height="300" rx="16"/>
+          <rect x="62" y="22" width="876" height="38" rx="14" style="fill:var(--gray-fill)"/>
+          <rect x="62" y="46" width="876" height="14" style="fill:var(--gray-fill)"/>
+          <circle cx="84" cy="41" r="6" style="fill:var(--frame-dot)"/><circle cx="104" cy="41" r="6" style="fill:var(--frame-dot)"/><circle cx="124" cy="41" r="6" style="fill:var(--frame-dot)"/>
+          <text class="t-badge" x="150" y="46">Nkuma — デスクトップアプリ (構想段階)</text>
+
+          <rect x="80" y="80" width="410" height="100" rx="10" style="fill:var(--terminal)"/>
+          <text class="t-mono" x="100" y="110" style="fill:var(--term-prompt)">Claude Code (ターミナル)</text>
+          <text class="t-mono" x="100" y="134" style="fill:var(--term-text)">&gt; 業務の言葉で指示する</text>
+          <text class="t-mono" x="100" y="158" style="fill:var(--term-text)">ターミナルの設定は不要</text>
+
+          <rect class="box-auto" x="510" y="80" width="410" height="100" rx="10"/>
+          <text class="t-title" x="715" y="112" text-anchor="middle">内蔵ランタイム</text>
+          <text class="t-sub" x="715" y="138" text-anchor="middle">共通基盤・データベース・ストレージを内蔵</text>
+          <text class="t-sub" x="715" y="158" text-anchor="middle">Docker のインストールは不要</text>
+
+          <rect class="box" x="80" y="200" width="410" height="100" rx="10"/>
+          <text class="t-title" x="285" y="232" text-anchor="middle">Issue と CI の見える化</text>
+          <text class="t-sub" x="285" y="258" text-anchor="middle">進行と、検査の結果が分かる</text>
+          <text class="t-sub" x="285" y="278" text-anchor="middle">GitHub を開かなくてもよい</text>
+
+          <rect class="box" x="510" y="200" width="410" height="100" rx="10"/>
+          <text class="t-title" x="715" y="232" text-anchor="middle">各アプリの管理画面</text>
+          <text class="t-sub" x="715" y="258" text-anchor="middle">利用者・権限・データの状態</text>
+          <text class="t-sub" x="715" y="278" text-anchor="middle">見て、触って、整えられる</text>
+        </svg>
+      </div>
+      <figcaption><b class="figno">Figure 25.</b> インストールは、この 1 つだけ。<span class="lg">凡例:<i class="fl d"></i>破線 = 構想段階<i class="fl b"></i>青の塗り = 内蔵される既製の仕組み</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-cases" data-ch="delivery">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">提供方法</span>事例</span>
+      <h2>Nkuma 製のアプリは、南国ソフトの社内で<em>作られ始めている</em>。</h2>
+      <p class="lead">南国ソフトの社内の案件で、Nkuma を使って作られたアプリの例。社外の実案件での実績はこれから。</p>
+      <figure data-fig><div class="fig shots">
+        <div><span class="shot-t">作業日報</span><img src="images/case-1.png" alt="作業日報アプリの画面。左に月のカレンダー、中央に日ごとの入力欄と合計時間"></div>
+        <div><span class="shot-t">付箋ボード</span><img src="images/case-2.png" alt="付箋ボードアプリの画面。方眼の上に黄色と桃色の付箋が 3 枚貼られている"></div>
+        <div><span class="shot-t">勉強会の場</span><img src="images/case-3.png" alt="勉強会の場アプリの画面。開催中の場に投稿が 1 件、下に一言を投げる入力欄と話題が変わったボタン"></div>
+      </div>
+      <figcaption><b class="figno">Figure 26.</b> 社内で動いている 3 本の画面。どれも同じ作り方で作られ、いつもの社内 ID で入る。</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide hero" id="end" data-ch="" data-group="締め">
+    <div class="slide-inner">
+      <div>
+        <img class="logo" src="images/nkuma-main-logo.png" alt="Nkuma">
+        <h2>おわり</h2>
+        <p class="tagline">Claude Code は作れる。Nkuma は作り切れる。</p>
+        <p class="note">図中のアイコン: Lucide — ISC License, Copyright (c) Lucide Icons and Contributors (許諾文全文は本ファイル内のコメントに同梱)</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+<!--
+  本ファイルが埋め込むアイコン (Lucide: user-round / users-round / bot) はいずれも Lucide オリジナルで、
+  assets/icons/LICENSE.txt の「Feather 由来リスト」には含まれないため ISC 節のみを同梱する。
+
+  Lucide icons (user-round, users-round, bot) are embedded in this file under the ISC License:
+
+  ISC License
+
+  Copyright (c) 2026 Lucide Icons and Contributors
+
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+-->
+
+<script>
+  (function () {
+    document.documentElement.classList.add("js");
+    var deck = document.getElementById("deck");
+    var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+    var links = document.querySelectorAll(".chapnav a.ch");
+    var pager = document.getElementById("pager");
+    var map = {};
+    links.forEach(function (a) { map[a.dataset.ch] = a; });
+
+    // Figure 番号: 文書順に採番する
+    var figs = Array.prototype.slice.call(document.querySelectorAll("figure[data-fig]"));
+    figs.forEach(function (f, i) {
+      f.dataset.num = i + 1;
+      var no = f.querySelector(".figno");
+      if (no) no.textContent = "Figure " + (i + 1) + ".";
+    });
+
+    // 目次 (右のパネル): 章 → コマの見出し
+    var chNames = { position: "第 1 章 立ち位置", ddd: "第 2 章 DDD を決め切る", safety: "第 3 章 安全", release: "第 4 章 公開", loops: "第 5 章 ドメインの上にアプリが展開されるメリット", delivery: "第 6 章 提供方法" };
+    var tocList = document.getElementById("toc-list"), toc = document.getElementById("toc"), btn = document.getElementById("toc-btn");
+    var curKey = null, ul = null;
+    slides.forEach(function (s, i) {
+      s.dataset.n = i + 1;
+      var key = s.dataset.ch || s.id;
+      if (key !== curKey) {
+        curKey = key;
+        var h = document.createElement("div"); h.className = "toc-ch"; h.textContent = chNames[s.dataset.ch] || s.dataset.group || "";
+        tocList.appendChild(h);
+        ul = document.createElement("ol"); tocList.appendChild(ul);
+      }
+      var head = s.querySelector("h1, h2");
+      var li = document.createElement("li"), a = document.createElement("a");
+      a.href = "#" + s.id;
+      a.textContent = (i + 1) + ". " + (s.dataset.group ? s.dataset.group + " — " : "") + (head ? head.textContent.replace(/\s+/g, " ").trim() : "");
+      a.addEventListener("click", function () { toc.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); setTimeout(function () { deck.focus({ preventScroll: true }); }, 0); });
+      li.appendChild(a); ul.appendChild(li); s._toc = li;
+    });
+    btn.addEventListener("click", function () {
+      var open = toc.classList.toggle("open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) deck.focus({ preventScroll: true });
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { toc.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); deck.focus({ preventScroll: true }); } });
+    links.forEach(function (a) { a.addEventListener("click", function () { setTimeout(function () { deck.focus({ preventScroll: true }); }, 0); }); }); // 章ナビの後もキーボードでコマ送りできるように
+    var brand = document.querySelector(".brand"); if (brand) brand.addEventListener("click", function () { setTimeout(function () { deck.focus({ preventScroll: true }); }, 0); });
+    deck.addEventListener("click", function (e) { var a = e.target.closest ? e.target.closest('a[href^="#"]') : null; if (a) setTimeout(function () { deck.focus({ preventScroll: true }); }, 0); }); // 本文中のコマ内リンクも同じ
+
+    // 現在地: 画面の中央にあるコマを現在のコマとする (コマの高さが画面より大きくても更新される)
+    var ticking = false, current = null;
+    function update() {
+      ticking = false;
+      var mid = deck.scrollTop + deck.clientHeight / 2, cur = slides[0];
+      for (var i = 0; i < slides.length; i++) { if (slides[i].offsetTop <= mid) cur = slides[i]; else break; }
+      if (cur === current) return;
+      current = cur;
+      slides.forEach(function (s) { if (s._toc) s._toc.classList.toggle("cur", s === cur); });
+      links.forEach(function (a) { a.classList.remove("active"); });
+      if (map[cur.dataset.ch]) map[cur.dataset.ch].classList.add("active");
+      pager.textContent = cur.dataset.n + " / " + slides.length;
+      if (cur._toc && toc.classList.contains("open")) cur._toc.scrollIntoView({ block: "nearest" });
+    }
+    deck.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } });
+    window.addEventListener("resize", update);
+    update();
+    deck.focus(); // 矢印キー・スペースでコマ送りできるように、スクロール領域へ初期フォーカス
+  })();
+</script>
+</body>
+</html>
