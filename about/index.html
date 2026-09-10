@@ -60,7 +60,6 @@
     h1 { margin: 0 0 14px; font: 900 clamp(30px, 5vw, 48px)/1.35 var(--display); letter-spacing: -0.02em; }
     h2 { margin: 0 0 14px; font: 700 clamp(22px, 3.4vw, 31px)/1.5 var(--display); letter-spacing: -0.02em; }
     h2 em, h1 em { font-style: normal; color: var(--sky-deep); }
-    .lead { margin: 0 0 18px; font-size: clamp(15px, 1.6vw, 17.5px); color: var(--ink-2); max-width: 50em; }
     .note { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); }
     /* 畳んだ補足 (規約 A-1): 図の理由や限界を、読む人だけが開く */
     .more { margin: 6px 0 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.7; }
@@ -104,25 +103,13 @@
     .fig.tall svg { max-height: none; }
     .fig img { display: block; width: 100%; height: auto; border-radius: 6px; }
     /* 実画面 (スクショ) を同じ大きさの窓で並べる — 縦横比を揃え、左上を基準に切る */
-    .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .shots img { aspect-ratio: 16 / 10; object-fit: cover; object-position: left top; border: 1px solid var(--line); }
+    .shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .shots img { width: 100%; height: auto; object-fit: contain; border: 1px solid var(--line); }
     .shots .shot-t { display: block; margin: 0 0 6px; font: 700 13px var(--display); color: var(--ink); }
     /* 実画面を 2 枚だけ大きく見せる (証明のコマ) — 切らずに全体を出す */
-    .shots.two { grid-template-columns: repeat(2, 1fr); }
-    .shots.two img { aspect-ratio: auto; object-fit: contain; width: 100%; height: auto; }
-    @media (max-width: 720px) { .shots.two { grid-template-columns: 1fr; } .shots.two img { max-height: 26dvh; } }
+    @media (max-width: 720px) { .shots { grid-template-columns: 1fr; } .shots img { max-height: 26dvh; } }
     figure { margin: 0; }
-    figcaption { font-size: 12.5px; color: var(--ink-2); line-height: 1.8; padding: 8px 6px 0; }
-    figcaption b { color: var(--ink); font-weight: 700; }
 
-    /* 凡例 (キャプション内) */
-    .lg { display: block; margin-top: 4px; color: var(--muted); }
-    .lg i.sw { display: inline-block; width: 18px; height: 0; border-top: 3px solid; border-radius: 2px; vertical-align: middle; margin: 0 5px 0 12px; }
-    .lg i.sw.b { border-color: var(--sky-deep); } .lg i.sw.o { border-color: var(--orange-deep); } .lg i.sw.r { border-color: var(--no); } .lg i.sw.k { border-color: var(--ink); }
-    .lg i.sw.g { border-color: var(--muted); } .lg i.sw.d { border-top-style: dashed; }
-    .lg i.fl { display: inline-block; width: 16px; height: 11px; border: 2px solid; border-radius: 3px; vertical-align: middle; margin: 0 5px 0 12px; background: var(--white); }
-    .lg i.fl.b { background: var(--sky-pale); border-color: var(--sky-deep); } .lg i.fl.o { background: #fdeeda; border-color: var(--orange-deep); }
-    .lg i.fl.g { background: var(--gray-fill); border-color: var(--muted); } .lg i.fl.m { border-color: var(--soft); } .lg i.fl.d { border-style: dashed; border-color: var(--muted); } .lg i.fl.k { border-color: var(--ink); } .lg i.fl.c { background: var(--cream); border-color: var(--line); }
 
     /* ---------- SVG 共通 (規約 C 群: 同一テンプレ・色は述語・本文色 = 線色) ---------- */
     svg text { font-family: "Noto Sans JP", sans-serif; fill: var(--ink); font-feature-settings: "palt"; letter-spacing: -0.01em; }
@@ -181,11 +168,9 @@
     @media (max-height: 820px) {
       .slide { padding-top: 52px; padding-bottom: 28px; }
       h2 { font-size: clamp(20px, 2.9vw, 26px); margin-bottom: 8px; }
-      .lead { font-size: 14.5px; line-height: 1.7; margin-bottom: 10px; }
       .kicker { margin-bottom: 6px; }
       .fig { padding: 8px; }
       .fig svg { max-height: 54dvh; }
-      figcaption { font-size: 11.5px; line-height: 1.6; padding-top: 5px; }
       .term-body { padding: 8px 12px 10px; }
       .term-body pre { font-size: 12px; line-height: 1.5; }
       .fig + .term, figure .term { margin-top: 6px; }
@@ -198,7 +183,7 @@
     .hero .logo { width: min(400px, 100%); margin: 0 0 18px; }
     #end .slide-inner { grid-template-columns: 1fr; text-align: center; }
     #end .logo { margin: 0 auto 18px; }
-    #end .lead, #end .tagline { max-width: none; }
+    #end .tagline { max-width: none; }
     @media (max-width: 720px) { .hero .slide-inner { grid-template-columns: 1fr; } }
     .tagline { font: 700 clamp(16px, 2vw, 19px)/1.7 var(--display); color: var(--sky-deep); margin: 0 0 12px; }
   </style>
@@ -232,7 +217,6 @@
       <div>
         <p class="tagline">作る人のフレームワーク</p>
         <h1>業務の話をする。<br>それが、<em>会社の決めた形</em>で<br>アプリになっていく。</h1>
-        <p class="lead">作る人は、自分の業務を話すだけ。Agent が聞き取り、決められた形に沿って組み立て、公開まで運ぶ — 作る人 × AI の開発基盤。</p>
       </div>
       <img src="images/nkuma01.png" alt="Nkuma のマスコット、クマ君">
     </div>
@@ -270,7 +254,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">できること</span>体験</span>
       <h2>作る人がすることは、<em>業務の話をすること</em>。あとは会社の決めた形に沿って、少しずつ組み上がっていく。</h2>
-      <p class="lead">作り方を知らなくてよい。話した内容が文書になり、決められた形で組み上がり、使える状態まで運ばれる。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 218" role="img" aria-label="左端でクマ君が、右下のノート PC を見下ろしながら手振りを付けて話している。その右に橙の段「業務の話」があり、さらに右からクリームの囲み「会社の決めた形」が始まって、囲みの中で青い「業務の文書」「決めた形で組む」、白い「使えるアプリ」の順に段が右上へ高くなる。青い線が橙の段の右上から出て、段の角をなぞりながら最上段まで右上がりに 1 本だけ通る">
   <rect class="bound" x="455" y="14" width="525" height="188" rx="14"/>
@@ -291,7 +274,7 @@
   <polygon class="head-auto" points="-12,-7 0,0 -12,7" transform="translate(819,40) rotate(-10.17)"/>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 人の手は最下段の 1 つ。上の 3 段は、決めてある形の中で積み上がる。<span class="lg">凡例: クマ君 = 作る人 (業務の話をしているところ)<i class="fl o"></i>橙の塗り = 人の営み<i class="fl b"></i>青の塗り = 機構が進める段<i class="sw b"></i>青の線 = 機構が自動で繋ぐ<i class="fl k"></i>白 = 起こる結果<i class="fl c"></i>枠 = 会社の決めた形</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -299,12 +282,11 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">できること</span>実物</span>
       <h2>これは、Nkuma で作った<em>実際のアプリ</em>です。</h2>
-      <p class="lead">南国ソフトの社内で動いている。話すところから始めて、この画面まで届く。</p>
-      <figure data-fig><div class="fig shots two">
+      <figure data-fig><div class="fig shots">
           <div><span class="shot-t">作業日報</span><img src="images/case-1.png" alt="作業日報のアプリの画面。左に月のカレンダー、中央に日付ごとの入力欄が並び、右に案件を選ぶ欄がある"></div>
           <div><span class="shot-t">付箋ボード</span><img src="images/case-2.png" alt="付箋ボードのアプリの画面。方眼の台紙の上に色の違う付箋が貼られ、右上に参加者のアイコン、右下に表示倍率の操作が並ぶ"></div>
       </div>
-      <figcaption><b class="figno">Figure.</b> どちらも同じ作り方で作られ、いつもの社内 ID でそのまま入れる。<span class="lg">画面は実物 (南国ソフト社内)</span></figcaption>
+
       </figure>
     </div>
   </section>
@@ -324,7 +306,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">Claude Code との違い</span>3 つの問題</span>
       <h2>AI でアプリが作れるようになった現場には、<em>3 つの問題</em>が残る。</h2>
-      <p class="lead">作れはした。けれど、使われていない。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 399" role="img" aria-label="細い縦線で仕切られた 3 つの場面。左 (① 何のために作ったのか、分からない) はスタンドに載った画面の脇で 2 人が手を上げたり肩をすくめたりし、中央 (② 安全に動いているのか、分からない) は中の見えない水色の箱を 1 人が手をかざして覗き込みもう 1 人が腕を組み、右 (③ 作った本人しか、使えない) は机で画面を使う 1 人と、間の地面が途切れた先で手を伸ばす 2 人が離れて立っている">
           <image href="images/problems.png" x="0" y="0" width="1000" height="399"/>
@@ -333,7 +314,7 @@
           <text class="t-title" x="823" y="330" text-anchor="middle">③ 作った本人しか、使えない</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 作れたあとに、3 つとも起きる。<span class="lg">凡例:<i class="fl o"></i>橙 = 作った人<i class="fl g"></i>灰 = 分からない人・使えない人<i class="fl b"></i>青 = 作られたもの</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -341,7 +322,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">Claude Code との違い</span>作り切る</span>
       <h2>Claude Code は作れる。Nkuma は<em>作り切れる</em>。</h2>
-      <p class="lead">3 つとも、作れた後に起きる。Claude Code は「動くものを素早く書く」道具。Nkuma はその上で、業務に即したアプリを作り、安全に、公開まで届ける — 作り切る。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 445" role="img" aria-label="机に向かう人物とノート型の画面から右へ線が伸びる行程が上下 2 段に並び、上段 (Claude Code) は画面の停留点 1 つで途切れ、下段 (Nkuma) は同じ起点から画面・書類・盾・上向き矢印の 4 つの停留点を経て、大きな画面を囲む 3 人の人物まで続いている">
           <rect x="0" y="0" width="1000" height="445" style="fill:#fdfaf4"/>
@@ -350,7 +330,7 @@
           <text class="t-title" x="49" y="250" style="font-size:28px">Nkuma</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 同じところから始まって、どこまで届けるかが違う。<span class="lg">凡例:<i class="fl o"></i>橙 = 人と、人が決めること<i class="fl b"></i>青 = 作られるもの<i class="sw k"></i>線 = 行程</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -384,14 +364,14 @@
             <text class="t-sub" x="580" y="262">第 5 章 作った本人しか、使えない</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 問題 1 つに、答え 1 つ。<span class="lg">凡例:<i class="sw b"></i>構造で答える<i class="fl b"></i>青の塗り = 答え (章)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
   <section class="slide" id="s-overview-journey" data-ch="diff">
     <div class="slide-inner">
       <span class="kicker"><span class="n">Claude Code との違い</span>全体の地図</span>
-      <h2>Nkuma で作る、<em>全体の流れ</em>。</h2>
+      <h2>業務の話から公開まで — <em>作るのは Nkuma</em>。人は話して、決めて、触って、合図する。</h2>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 400" role="img" aria-label="時間が左から右へ進む 4 段階 (話す・作るものを決める・作る・公開する) を、上から作る人・Nkuma・できるものの 3 行で並べた俯瞰図。各箱にはアイコンが付く。作る人は業務の話をし (吹き出し)、アイデアを相談し (吹き出し)、Nkuma が作り終えたものを触り (目)、公開の合図を出す (ロケット)。作るものを決めると作るのあいだには「満足するまで繰り返し」の輪があり、できたものを触った人がまた相談に戻る。Nkuma は聞いて書き (鉛筆)、使い勝手も一緒に考えて案を出し (きらめき)、決めた形で組み (レンチ)、検問を通して配備する (盾)。一番下には業務の文書が土台の帯として横に広がり、そこから作るものの決め (文書) とアプリへ線が上がる。作るものの決めには照らす基準として効き、業務に無いものは赤い ✕ で不採用。アプリ (荷物) には内容の裏付けとして効く。作るものの決めからアプリへは決めを引き継ぐ矢印があり、最後にイントラ環境に公開される (ブラウザの窓)">
   <defs>
@@ -574,7 +554,7 @@
   <text class="t-hand" style="font-size:14px" x="578" y="70" text-anchor="middle">満足するまで繰り返し</text>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 縦に読めば 1 つの段階、横に読めば全行程。決めると作るは満足するまで繰り返し、作っている間、人は待つだけ。Nkuma は聞いて書くだけでなく、使い勝手やデザインまで一緒に考えて案を出す相談相手。業務の文書は、決めるときの基準になり (業務に無いものはそこで不採用)、作るものの内容を裏付ける。<span class="lg">凡例:<i class="fl o"></i>橙 = 作る人 (吹き出し = 話す / 目 = 見る)<i class="fl b"></i>青 = Nkuma (鉛筆 = 書く / きらめき = 案を出す / 工具 = 組む / 盾 = 検問)<i class="fl k"></i>白 = できるもの (文書 / 荷物 = 組み上がったアプリ / ブラウザの窓 = 公開されて開ける)<i class="sw o"></i>橙の線 = 人の操作 (輪 = 満足するまで繰り返し)<i class="sw b"></i>青の線 = 機構が自動で繋ぐ<i class="sw k"></i>黒の線 = 文書と決めが効くところ<i class="sw r"></i>赤 = 業務に無いものは不採用</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -594,7 +574,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>ずれ</span>
       <h2>本当に困っていたことが<em>伝わらないまま</em>、思っていたのと違うものが出来上がる。</h2>
-      <p class="lead">作り始めた動機は確かにあった。それが形になる途中で薄れていく。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 200" role="img" aria-label="橙の箱「困りごと」の中に人のアイコンがあり、短い黒い線で白い箱「話す」に繋がる。「話す」の右辺と、離れた先にある白い箱「作る」の左辺からは、赤い破線の短い断片が空白へ伸びて途中で終わり、互いに届いていない。「作る」は短い黒い線で白い箱「出来たもの」に繋がっている">
   <defs>
@@ -627,7 +606,7 @@
   <text class="t-title" x="865" y="111" text-anchor="middle">出来たもの</text>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 途切れても、ものは出来上がる — 出来上がるのが別のものになるだけ。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 人の営み (頭の中の困りごと)<i class="fl k"></i>白 = 起こる結果<i class="sw k"></i>黒の線 = 次に渡っているところ<i class="sw r d"></i>赤の破線 = 届いていない (否定)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -635,7 +614,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>原因</span>
       <h2>原因は 2 つ — <em>伝え方</em>と、<em>覚えさせ方</em>。</h2>
-      <p class="lead">言いたいことを言葉にしきれない。そして、決めたことが会話の中に散らばって消えていく。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 220" role="img" aria-label="上の白い箱「ずれ」から灰の枝が下へ分かれ、左下の橙の箱「言葉にできない (作るものの言葉が出ない)」と、右下の橙の箱「決めたことが消える (会話が長いほど抜ける)」の 2 つに至る">
 
@@ -656,7 +634,7 @@
   <text class="t-sub" x="735" y="187" text-anchor="middle">会話が長いほど抜ける</text>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> ずれは 1 つの失敗ではなく、言葉にする側と、覚えておく側の 2 か所で起きる。<span class="lg">凡例:<i class="fl k"></i>白 = 起こる結果<i class="fl o"></i>橙の塗り = 人の側で起きていること<i class="sw g"></i>灰の線 = 振り分け (方向を持たない)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -664,7 +642,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>手当て</span>
       <h2>伝え方は Agent が<em>聞き役</em>になって支え、覚えさせ方は<em>置き場を先に決めて</em>おく。</h2>
-      <p class="lead">2 つの原因に、2 つの手当てが 1 つずつ対応する。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 320" role="img" aria-label="薄い「ずれ」の箱と枝の下に、橙の箱「言葉にできない」と「決めたことが消える」が並び、それぞれの真下へ青い矢印が降りて、青い箱「Agent が問う (人は答えるだけ)」と「決まった置き場 (書くのも Agent、棚は 6 段)」に 1 つずつ対応する">
   <defs>
@@ -714,7 +691,35 @@
   <path class="edge-auto" d="M790 305 H912"/>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 原因 1 つに、手当て 1 つ — 言葉は Agent が問いで引き出し、決めたことは決まった置き場 (6 段) に書かれる。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 人の側で起きていること<i class="fl b"></i>青の塗り = 機構が引き受ける手当て<i class="sw b"></i>青の線 = 機構が繋ぐ<i class="sw b"></i>青の枠 = 決まった置き場 (6 段)<i class="fl m"></i>薄い箱と線 = 前のコマからの受け</span></figcaption></figure>
+</figure>
+    </div>
+  </section>
+
+  <section class="slide" id="s-ddd-what" data-ch="domain">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>DDD とは</span>
+      <h2>ドメイン駆動開発 (DDD) とは — <em>「仕組み」からではなく「業務」から</em>作る開発手法。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 282" role="img" aria-label="左上に白い箱「画面」、右上に白い箱「データ」、下に白い箱「処理」が同じ間隔で三方に散り、その真ん中に大きな橙の箱「業務」が座って中に「語彙・出来事・決まり」と書かれている。中央と三方は矢頭の無い短い灰の線でつながっている">
+  <path class="edge-idle" d="M380 102 L340 82"/>
+  <path class="edge-idle" d="M620 102 L660 82"/>
+  <path class="edge-idle" d="M500 170 L500 210"/>
+
+  <rect class="box-hand" x="380" y="70" width="240" height="100" rx="14"/>
+  <text class="t-big" x="500" y="126" text-anchor="middle">業務</text>
+  <text class="t-sub" x="500" y="152" text-anchor="middle">語彙・出来事・決まり</text>
+
+  <rect class="box" x="160" y="32" width="180" height="56" rx="12"/>
+  <text class="t-title" x="250" y="66" text-anchor="middle">画面</text>
+
+  <rect class="box" x="660" y="32" width="180" height="56" rx="12"/>
+  <text class="t-title" x="750" y="66" text-anchor="middle">データ</text>
+
+  <rect class="box" x="410" y="210" width="180" height="56" rx="12"/>
+  <text class="t-title" x="500" y="244" text-anchor="middle">処理</text>
+</svg>
+      </div>
+</figure>
     </div>
   </section>
 
@@ -723,7 +728,7 @@
       <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>なぜ DDD か</span>
       <h2>その作法は<em>自作しない</em> — DDD なら、Agent が最初から知っている。</h2>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 250" role="img" aria-label="左の枠では、作る人から橙の矢印 3 本「教え込む」が Agent へ注ぎ、その Agent の中に橙の箱「独自の作法」と「教えないと知らない」がある。右の枠では、同じ位置に立つ作る人と Agent の間に線が 1 本も無く、Agent の中に青の箱「DDD」と「教えなくても知っている」がある">
+        <svg viewBox="0 0 1000 250" role="img" aria-label="左の枠では、作る人から橙の矢印 3 本「教え込む」が Agent へ注ぎ、その Agent の中に橙の箱「独自の作法」と「教えないと知らない」がある。右の枠では、同じ位置に立つ作る人と Agent の間に線が 1 本も無く、Agent の中に青の箱「DDD」と「教えなくても知っている」がある。左の枠には赤い ✕ と「自社の試作で失敗 — 教えても、覚え切れない」、右の枠には「Nkuma はこちらを採用」">
             <defs>
               <!-- Lucide user-round / bot (ISC, (c) Lucide Icons and Contributors) — assets/icons/icons-defs.html より -->
               <g id="i9-user" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -754,6 +759,8 @@
             <rect class="box-hand" x="210" y="98" width="220" height="56" rx="12"/>
             <text class="t-title" x="320" y="132" text-anchor="middle">独自の作法</text>
             <text class="t-title" x="320" y="186" text-anchor="middle">教えないと知らない</text>
+          <line class="no-mark" x1="404" y1="44" x2="452" y2="92"/><line class="no-mark" x1="452" y1="44" x2="404" y2="92"/>
+          <text class="t-no" x="250" y="229" text-anchor="middle">自社の試作で失敗 — 教えても、覚え切れない</text>
           
             <use href="#i9-user" transform="translate(546,97.2) scale(2.4)"/>
           
@@ -762,37 +769,10 @@
             <rect class="box-auto" x="710" y="98" width="220" height="56" rx="12"/>
             <text class="t-big" x="820" y="142" text-anchor="middle">DDD</text>
             <text class="t-title" x="820" y="186" text-anchor="middle">教えなくても知っている</text>
+          <text class="t-auto" x="750" y="229" text-anchor="middle">Nkuma はこちらを採用</text>
           </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 自作の作法は、Agent に教え込むところから始まり、その定義を作業のたびに読ませ続ける — DDD は世の中の作法で、Agent は学習済み。Nkuma はその要点を装備させ、問いの立て方と整理の手順を足す。人が覚えるものも、教えるものも無い。<span class="lg">凡例:<i class="fl c"></i>クリームの枠 = 2 つの場合<i class="sw o"></i>橙の線 = 人が教え込む手間<i class="fl o"></i>橙の塗り = 自作の作法<i class="fl b"></i>青の塗り = 世の中で決まっている作法<i class="fl k"></i>白 = 登場人物</span></figcaption></figure>
-    </div>
-  </section>
-
-  <section class="slide" id="s-ddd-what" data-ch="domain">
-    <div class="slide-inner">
-      <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>DDD とは</span>
-      <h2>DDD とは — <em>「仕組み」からではなく「業務」から</em>作る開発手法。</h2>
-      <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 282" role="img" aria-label="左上に白い箱「画面」、右上に白い箱「データ」、下に白い箱「処理」が同じ間隔で三方に散り、その真ん中に大きな橙の箱「業務」が座って中に「語彙・出来事・決まり」と書かれている。中央と三方は矢頭の無い短い灰の線でつながっている">
-  <path class="edge-idle" d="M380 102 L340 82"/>
-  <path class="edge-idle" d="M620 102 L660 82"/>
-  <path class="edge-idle" d="M500 170 L500 210"/>
-
-  <rect class="box-hand" x="380" y="70" width="240" height="100" rx="14"/>
-  <text class="t-big" x="500" y="126" text-anchor="middle">業務</text>
-  <text class="t-sub" x="500" y="152" text-anchor="middle">語彙・出来事・決まり</text>
-
-  <rect class="box" x="160" y="32" width="180" height="56" rx="12"/>
-  <text class="t-title" x="250" y="66" text-anchor="middle">画面</text>
-
-  <rect class="box" x="660" y="32" width="180" height="56" rx="12"/>
-  <text class="t-title" x="750" y="66" text-anchor="middle">データ</text>
-
-  <rect class="box" x="410" y="210" width="180" height="56" rx="12"/>
-  <text class="t-title" x="500" y="244" text-anchor="middle">処理</text>
-</svg>
-      </div>
-      <figcaption><b class="figno">Figure.</b> DDD は、業務の語彙・出来事・決まりを先に決め、画面もデータも処理もそこから決める作り方。真ん中が入れ替わると、出来上がるものが変わる。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 業務 (人の営み)<i class="fl k"></i>白 = 業務から決まるもの<i class="sw g"></i>灰の線 = 位置づけ (順序ではない)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -838,7 +818,7 @@
             <text class="t-sub" x="483" y="170" text-anchor="middle">あとは Agent</text>
           </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 3 手のうち、人の手は最初の 1 手。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 人の 1 手<i class="sw k"></i>AI の操作<i class="fl k"></i>白 = 起こる結果</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -846,21 +826,20 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>決め切る</span>
       <h2>決めておくことは<em>業務情報だけではない</em> — Nkuma はそれを 6 つの層に振り分ける。</h2>
-      <p class="lead">中心は domain — 業務の語彙と構造。</p>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 350" role="img" aria-label="左に 6 つの層、その右に 1 本の括り線が全段をまとめ、横長の帯が上から下へ 6 段積まれている。上から customer は顧客と担当者、dialogue は会議と要望、vision はなぜ作るか、domain は語彙と構造、work は進行の記録、build はコードと規約">
+        <svg viewBox="0 0 1000 350" role="img" aria-label="左に 6 つの層、その右に 1 本の括り線が全段をまとめ、横長の帯が上から下へ 6 段積まれている。上から customer は使う人は誰か・一緒に作る人はいるか、dialogue は作る際の会議議事録やフラッシュアイデア、vision はなぜ作るのかを整理、domain は業務の情報整理、work は Agent が作るための進行管理、build はアプリの本体と成果物">
             <text class="t-big" x="80" y="191">6</text><text class="t-title" x="112" y="191">つの層</text>
             <path class="edge-idle" d="M256 30 H240 V322 H256"/>
           
-            <rect class="box-auto" x="280" y="30" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="57">customer</text><text class="t-title" x="440" y="57">顧客と担当者</text>
-            <rect class="box-auto" x="280" y="80" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="107">dialogue</text><text class="t-title" x="440" y="107">会議と要望</text>
-            <rect class="box-auto" x="280" y="130" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="157">vision</text><text class="t-title" x="440" y="157">なぜ作るか</text>
-            <rect class="box-auto" x="280" y="180" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="207">domain</text><text class="t-title" x="440" y="207">語彙と構造</text>
-            <rect class="box-auto" x="280" y="230" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="257">work</text><text class="t-title" x="440" y="257">進行の記録</text>
-            <rect class="box-auto" x="280" y="280" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="307">build</text><text class="t-title" x="440" y="307">コードと規約</text>
+            <rect class="box-auto" x="280" y="30" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="57">customer</text><text class="t-title" x="440" y="57">使う人は誰か、一緒に作る人はいるか</text>
+            <rect class="box-auto" x="280" y="80" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="107">dialogue</text><text class="t-title" x="440" y="107">作る際の会議議事録や、フラッシュアイデア</text>
+            <rect class="box-auto" x="280" y="130" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="157">vision</text><text class="t-title" x="440" y="157">なぜ作るのかを整理</text>
+            <rect class="box-auto" x="280" y="180" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="207">domain</text><text class="t-title" x="440" y="207">業務の情報整理</text>
+            <rect class="box-auto" x="280" y="230" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="257">work</text><text class="t-title" x="440" y="257">Agent が作るための進行管理</text>
+            <rect class="box-auto" x="280" y="280" width="690" height="42" rx="12"/><text class="t-tech" x="310" y="307">build</text><text class="t-title" x="440" y="307">アプリの本体と成果物</text>
           </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 置き場が決まっているから、後から同じ場所を見れば照合できる。<span class="lg">凡例:<i class="fl b"></i>青の塗り = 層 (置き場) — どこに何を書くかが決まっている</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -868,9 +847,8 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">業務から作る</span><span class="q">問い ①</span>質を測る</span>
       <h2>決めるべきことは、あらかじめ <em>14 に数え上げて</em>ある。</h2>
-      <p class="lead">6 つの層のうち 4 層に配られている。書く前は何を書くかの指針になり、書いた後は、どこが薄いかを測る目安になる。</p>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 320" role="img" aria-label="左に大きな 14 と決め所の文字。右に docs の 4 つの層の帯が縦に並び、customer に顧客の輪郭と担当者、vision に目指す姿・使う人・解く問題・制約、domain に初期の語彙・業務範囲の地図・業務の単位・用語集・繋がりの地図・まとまりの決め・破線の出来事の記録、build に作りの規約の札が入っている">
+        <svg viewBox="0 0 1000 320" role="img" aria-label="左に大きな 14 と決め所の文字。右に docs の 4 つの層の帯が縦に並び、customer に使う側は誰か・一緒に作る人、vision に目指す姿・使う人・解く問題・制約、domain に初期の語彙・業務範囲の地図・業務の単位・用語集・繋がりの地図・まとまりの決め・破線の出来事の記録、build に作りの規約の札が入っている。左の列に注記: 破線の札は案件判断で足す">
   <text class="t-big" x="85" y="146" text-anchor="middle">14</text>
   <text class="t-sub" x="85" y="172" text-anchor="middle">決め所</text>
   <text class="t-sub" x="85" y="196" text-anchor="middle">文書として残る</text>
@@ -879,9 +857,9 @@
   <rect class="box-auto" x="200" y="14" width="780" height="56" rx="12"/>
   <text class="t-tech" x="226" y="48">customer</text>
   <rect class="box-hand" x="352" y="27" width="146" height="30" rx="6"/>
-  <text class="t-title" x="425" y="48" text-anchor="middle">顧客の輪郭</text>
+  <text class="t-title" x="425" y="48" text-anchor="middle">使う側は誰か</text>
   <rect class="box-hand" x="508" y="27" width="146" height="30" rx="6"/>
-  <text class="t-title" x="581" y="48" text-anchor="middle">担当者</text>
+  <text class="t-title" x="581" y="48" text-anchor="middle">一緒に作る人</text>
 
   <rect class="box-auto" x="200" y="80" width="780" height="56" rx="12"/>
   <text class="t-tech" x="226" y="114">vision</text>
@@ -915,9 +893,11 @@
   <text class="t-tech" x="226" y="286">build</text>
   <rect class="box-hand" x="352" y="265" width="146" height="30" rx="6"/>
   <text class="t-title" x="425" y="286" text-anchor="middle">作りの規約</text>
-</svg>
+          <text class="t-sub" x="85" y="240" text-anchor="middle">破線の札は</text>
+          <text class="t-sub" x="85" y="262" text-anchor="middle">案件判断で足す</text>
+        </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 決めるべきことは 14 に数え上げられ、6 つの層のうち 4 層に配られている — 埋まった決め所は、その層の文書として残る。破線の 1 つだけが案件判断で足すもの。<span class="lg">凡例:<i class="fl o"></i>橙の札 = 決め所 1 つ (人が決めること)<i class="fl b"></i>青の帯 = 層 (置き場)<i class="fl d"></i>破線の札 = 案件判断で足す (必須ではない)<i class="sw g"></i>灰の細線 = 括り (方向なし)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -937,7 +917,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>決めてある形</span>
       <h2><em>部品で組む部分</em>と、<em>自由に作ってよい部分</em>が決めてある。</h2>
-      <p class="lead">どちらにするかは、作る人と Agent が会話しながら選ぶ。表紙で言った「会社の決めた形」は、ここのこと。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 240" role="img" aria-label="左の白い箱の中で作る人と Agent が会話して選び、そこから橙の線が右へ伸びてクリームの囲み「会社の決めた形」に入り、囲みの中は縦に 2 つに分かれて左が青い「部品で組む」、右が橙の「自由に作ってよい」になっている">
   <defs>
@@ -974,7 +953,7 @@
   <text class="t-sub" x="819" y="152" text-anchor="middle">業務の計算・画面の並べ方</text>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> どちらで作るかは決めてある — 決めるのは、機能ごとの会話。<span class="lg">凡例:<i class="fl k"></i>白 = 登場人物<i class="fl b"></i>青の塗り = 部品で組む<i class="fl o"></i>橙の塗り = 自由に作ってよい<i class="sw o"></i>橙の線 = 人の操作<i class="fl c"></i>枠 = 会社の決めた形</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -982,7 +961,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>守らせる</span>
       <h2>部品で組む側に、Agent が<em>自分で作ろうとしても通らない</em> — 通るのは、部品を使う道だけ。</h2>
-      <p class="lead">Agent が悪さをしうる前提に立っている。人の注意ではなく、機構が止める。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 320" role="img" aria-label="上の白い箱「Agent」から 3 本が下へ降りる。左の「ログインを自分で書く」は赤い破線で、クリームの囲み「会社の決めた形」に入ったあと青い「部品で組む」の手前で ✕ に止まり、中央の「ログインの部品を使う」は青い線で「部品で組む」に入り、右の「業務の計算を書く」は青い線で橙の「自由に作ってよい」に入る">
   <defs>
@@ -1020,7 +998,7 @@
   <path class="edge-auto" d="M736 62 V126"/><polygon class="head-auto" points="729,126 736,138 743,126"/>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 同じ「自分で書く」でも、部品で組む側では通らない — 通るのは、部品を使う道と、自由に作ってよい側。<span class="lg">凡例:<i class="fl k"></i>白 = Agent<i class="fl b"></i>青の塗り = 部品で組む<i class="fl o"></i>橙の塗り = 自由に作ってよい<i class="sw r d"></i>止められる操作 (否定)<i class="sw b"></i>通る動き<i class="fl c"></i>枠 = 会社の決めた形</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1028,9 +1006,8 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>定義</span>
       <h2>だから安全とは — 事故が「<em>起こせない</em>」構造のこと。</h2>
-      <p class="lead">注意深さに頼らないのは、AI が書いたコードの品質が揺れるから。</p>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 350" role="img" aria-label="左に AI が書いたコードの箱。中央に黒い壁が立ち、下寄りに門が 1 つだけ開いている。壁の向こう側は上下 2 つに分かれ、上は灰色の守るもの (鍵・記録・他社のデータ)、下は白い触ってよいもの (自分のアプリのデータ)。守るものへ向かう赤い破線の事故は壁の面で ✕ に止まり、門を通る青い線だけが触ってよいものへ届く">
+        <svg viewBox="0 0 1000 350" role="img" aria-label="左に AI が書いたコードの箱。中央に黒い壁が立ち、下寄りに門が 1 つだけ開いている。壁の向こう側は上下 2 つに分かれ、上は灰色の守るもの (秘密・記録・他社のデータ)、下は白い触ってよいもの (自分のアプリのデータ)。守るものへ向かう赤い破線の事故は壁の面で ✕ に止まり、門を通る青い線だけが触ってよいものへ届く">
             <rect class="box" x="40" y="50" width="260" height="264" rx="12"/>
             <text class="t-title" x="170" y="188" text-anchor="middle">AI が書いたコード</text>
           
@@ -1046,14 +1023,14 @@
           
             <rect class="box-gray" x="620" y="50" width="320" height="170" rx="12"/>
             <text class="t-title" x="780" y="126" text-anchor="middle">守るもの</text>
-            <text class="t-sub" x="780" y="152" text-anchor="middle">鍵・記録・他社のデータ</text>
+            <text class="t-sub" x="780" y="152" text-anchor="middle">秘密・記録・他社のデータ</text>
           
             <rect class="box" x="620" y="230" width="320" height="84" rx="12"/>
             <text class="t-title" x="780" y="266" text-anchor="middle">触ってよいもの</text>
             <text class="t-sub" x="780" y="290" text-anchor="middle">自分のアプリのデータ</text>
           </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 品質が揺れても、被害は壁を越えない — 届くのは、触ってよいものだけ。<span class="lg">凡例:<i class="sw r d"></i>止まる (否定)<i class="sw b"></i>門を通る操作<i class="fl g"></i>灰 = AI のコードから直接は触れないもの</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1061,7 +1038,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>起きないこと</span>
       <h2>Nkuma で作ったアプリでは、<em>こんな事故が起きない</em>。</h2>
-      <p class="lead">起こせない理由は 1 つ — 鍵・権限・記録・ファイルを持つのは共通基盤 (Nkuma が用意する全アプリ共通の土台) で、アプリは持たない。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 350" role="img" aria-label="左に作ったアプリの箱。そこから右へ向かう赤い破線 7 本 (鍵の漏れ、他社・他アプリ、全削除、戻せない、記録なし、ファイル流出、ログインの穴) が、中央の黒い壁の面ですべて ✕ で止まる。7 本の先にあるのは灰色の守るもの。壁の下寄りに開いた門を通る青い線 1 本だけが、白い触ってよいもの (自分のアプリのデータ) へ届く">
             <rect class="box" x="40" y="50" width="260" height="264" rx="12"/>
@@ -1109,7 +1085,7 @@
             <text class="t-sub" x="780" y="290" text-anchor="middle">自分のアプリのデータ</text>
           </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 気をつけて防ぐのではなく、構造が通さない — 7 つとも壁の手前で止まる。<span class="lg">凡例:<i class="sw r d"></i>起こせない (止まる)<i class="sw b"></i>門を通る操作<i class="fl g"></i>灰 = AI のコードから直接は触れないもの</span></figcaption></figure>
+</figure>
       <details class="more"><summary>7 つそれぞれの止まり方と、構造では守らないもの</summary><ul><li>鍵の漏れ — アプリは鍵を持たない。接続の権限は、共通基盤だけが持つ</li><li>他社・他アプリのデータ — 共通基盤が接続元を確かめ、宣言の外への到達を拒む</li><li>全削除 — 危険な操作は共通基盤が止めるか、人の承認が要る</li><li>戻せない — 自動バックアップから戻せる (標準構成で 7 日 — 復元の実演はこれから)</li><li>記録なし — すべての書き込みを、共通基盤が記録する</li><li>ファイル流出 — ファイルは共通基盤を通してだけ読み書きする</li><li>ログインの穴 — ログインはいつもの社内 ID を組み込むだけ、権限は共通基盤が強制する</li><li>構造では守らないもの — 業務の計算の正しさ (それは品質の話。守るのは、情報と権限) / AI の出力の正しさ (構造が守るのは、秘密を持たせず、利用を記録するまで)</li></ul></details>
     </div>
   </section>
@@ -1149,7 +1125,80 @@
           <text class="t-title" x="865" y="307" text-anchor="middle">AI</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 守る仕組みは 1 か所にある — アプリごとに作らない。<span class="lg">凡例:<i class="sw b"></i>通る道<i class="sw r d"></i>直接は触れない (否定)<i class="fl b"></i>青の塗り = 共通基盤 (既製)<i class="fl g"></i>灰 = AI のコードから直接は触れないもの</span></figcaption></figure>
+</figure>
+    </div>
+  </section>
+  <section class="slide" id="s-no-keys" data-ch="safety">
+    <div class="slide-inner">
+      <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>鍵が無い</span>
+      <h2>アプリも共通基盤も、鍵ではなく<em>身分証</em>で通す — 漏らす鍵が、そもそも作られない。</h2>
+      <figure data-fig><div class="fig">
+        <svg viewBox="0 0 1000 350" role="img" aria-label="左に作ったアプリ (鍵を持たない)。そこから下へ降りて右へ向かう青い線に、身分証のアイコンが付いた「身分証」のバッジが乗り、中央の共通基盤 (認可・記録。身分証を確かめて通す、と書かれている) に入る。共通基盤から右へ 3 本の青い線が伸び、いずれにも同じ身分証のバッジが乗って、データベース・ファイル・AI に届く。右の 3 つは「鍵は、作れない」の見出しの下に並び、それぞれ鍵のアイコンに赤い ✕ が重なって、パスワード認証・共有キー・API キーと書かれている">
+  <defs>
+    <!-- Lucide id-card / key-round (ISC, (c) Lucide Icons and Contributors) — assets/icons/icons-defs.html より -->
+    <g id="nokeys-id-card" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 10h2" vector-effect="non-scaling-stroke"/>
+      <path d="M16 14h2" vector-effect="non-scaling-stroke"/>
+      <path d="M6.17 15a3 3 0 0 1 5.66 0" vector-effect="non-scaling-stroke"/>
+      <circle cx="9" cy="11" r="2" vector-effect="non-scaling-stroke"/>
+      <rect x="2" y="5" width="20" height="14" rx="2" vector-effect="non-scaling-stroke"/>
+    </g>
+    <g id="nokeys-key" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" vector-effect="non-scaling-stroke"/>
+      <circle cx="16.5" cy="7.5" r=".5" fill="var(--muted)" vector-effect="non-scaling-stroke"/>
+    </g>
+  </defs>
+
+  <rect class="box" x="30" y="30" width="220" height="90" rx="12"/>
+  <text class="t-title" x="140" y="66" text-anchor="middle">作ったアプリ</text>
+  <text class="t-sub" x="140" y="94" text-anchor="middle">鍵を持たない</text>
+
+  <path class="edge-auto" d="M140 120 V225 H348"/><polygon class="head-auto" points="348,218 360,225 348,232"/>
+  <rect class="box-auto" x="191" y="203" width="74" height="22" rx="6"/>
+  <use href="#nokeys-id-card" transform="translate(197,206) scale(0.6667)"/>
+  <text class="t-auto" x="219" y="218">身分証</text>
+
+  <rect class="box-auto" x="360" y="120" width="280" height="210" rx="12"/>
+  <text class="t-title" x="500" y="164" text-anchor="middle">共通基盤</text>
+  <text class="t-sub" x="500" y="196" text-anchor="middle">認可・記録</text>
+  <text class="t-sub" x="500" y="244" text-anchor="middle">身分証を確かめて、通す</text>
+
+  <path class="edge-auto" d="M640 150 H748"/><polygon class="head-auto" points="748,143 760,150 748,157"/>
+  <path class="edge-auto" d="M640 225 H748"/><polygon class="head-auto" points="748,218 760,225 748,232"/>
+  <path class="edge-auto" d="M640 300 H748"/><polygon class="head-auto" points="748,293 760,300 748,307"/>
+  <rect class="box-auto" x="663" y="128" width="74" height="22" rx="6"/>
+  <use href="#nokeys-id-card" transform="translate(669,131) scale(0.6667)"/>
+  <text class="t-auto" x="691" y="143">身分証</text>
+  <rect class="box-auto" x="663" y="203" width="74" height="22" rx="6"/>
+  <use href="#nokeys-id-card" transform="translate(669,206) scale(0.6667)"/>
+  <text class="t-auto" x="691" y="218">身分証</text>
+  <rect class="box-auto" x="663" y="278" width="74" height="22" rx="6"/>
+  <use href="#nokeys-id-card" transform="translate(669,281) scale(0.6667)"/>
+  <text class="t-auto" x="691" y="293">身分証</text>
+
+  <text class="t-title" x="865" y="96" text-anchor="middle">鍵は、作れない</text>
+
+  <rect class="box-gray" x="760" y="120" width="210" height="60" rx="12"/>
+  <text class="t-title" x="865" y="146" text-anchor="middle">データベース</text>
+  <use href="#nokeys-key" transform="translate(806,152)"/>
+  <line class="no-mark" x1="808" y1="154" x2="828" y2="174"/><line class="no-mark" x1="828" y1="154" x2="808" y2="174"/>
+  <text class="t-no" x="836" y="168">パスワード認証</text>
+
+  <rect class="box-gray" x="760" y="195" width="210" height="60" rx="12"/>
+  <text class="t-title" x="865" y="221" text-anchor="middle">ファイル</text>
+  <use href="#nokeys-key" transform="translate(806,227)"/>
+  <line class="no-mark" x1="808" y1="229" x2="828" y2="249"/><line class="no-mark" x1="828" y1="229" x2="808" y2="249"/>
+  <text class="t-no" x="836" y="243">共有キー</text>
+
+  <rect class="box-gray" x="760" y="270" width="210" height="60" rx="12"/>
+  <text class="t-title" x="865" y="296" text-anchor="middle">AI</text>
+  <use href="#nokeys-key" transform="translate(806,302)"/>
+  <line class="no-mark" x1="808" y1="304" x2="828" y2="324"/><line class="no-mark" x1="828" y1="304" x2="808" y2="324"/>
+  <text class="t-no" x="836" y="318">API キー</text>
+</svg>
+      </div>
+</figure>
+      <details class="more"><summary>「鍵が無い」の限界 — 残る秘密 1 本と、期限付きの通行証</summary><ul><li>標準構成で残る秘密は 1 本 — ログインのトークン置き場 (Azure の仕様で共有キーが要る唯一の場所) の署名付き URL 1 本。Key Vault に置き、アプリは身分証で読む。1 年で失効し、再実行で入れ替わる。投入は人が行い、AI には通さない</li><li>身分証で得るのは期限付きの通行証 (トークン)。侵害されたアプリからは持ち出せるが、保管される鍵と違い期限で失効し、使えるのはそのアプリが共通基盤に宣言した範囲だけ (寿命の実測はしていない)</li></ul></details>
     </div>
   </section>
 
@@ -1157,7 +1206,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>強制</span>
       <h2>「共通基盤を使え」と指示するだけでは、すり抜けられる — だから <em>SDK を作り、lint で強制する</em>。</h2>
-      <p class="lead">指示は忘れられるが、部品と検査は忘れない。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 340" role="img" aria-label="上段: 指示だけ。共通基盤を使えという指示を受けた Agent が、共通基盤を通らない書き方をしてすり抜けることがある。下段: SDK と lint。安全な使い方を部品にした SDK と、規格外のコードを落とす lint を受けた Agent は、必ず共通基盤を通る。共通基盤を通らない書き方のコードは lint が落とす">
           <defs>
@@ -1202,7 +1250,7 @@
           <text class="t-no" x="404" y="318">規格外のコードは、lint が落とす</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 同じ Agent でも、上段はすり抜け、下段は必ず通る。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw k"></i>AI の操作<i class="sw b"></i>機構が通す道<i class="sw r d"></i>止まる (否定)<i class="fl b"></i>青の塗り = 機構</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1210,7 +1258,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>会話の中</span>
       <h2>危ないのは、<em>作ったアプリ</em>だけではない — 作っている最中の会話にも危険がある。</h2>
-      <p class="lead">Agent は手元のファイルに触れる。秘密のファイルを読んでしまう、大切なファイルを消してしまう — そこにも手当てが要る。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 260" role="img" aria-label="左のクリームの全体像に「作っている最中」と「動いているアプリ」の 2 区画があり、上の「作っている最中」だけが灰の枠で囲まれ、2 本の灰の細線が右へ開いて、右の大きな白い枠「手元」に拡大されている。枠の中では作る人と Agent から黒い線がまっすぐ右へ伸び、灰の箱「手元のもの (鍵・大切なファイル)」に触れている">
   <defs>
@@ -1254,7 +1301,7 @@
   <text class="t-sub" x="857" y="167" text-anchor="middle">鍵・大切なファイル</text>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 開けてみると、会話の場には何も挟まっていない — Agent の手は、手元のものに直に届く。<span class="lg">凡例:<i class="fl c"></i>クリームの枠 = 全体 (作っている最中と、動いてから)<i class="fl m"></i>薄い枠 = まだ開けていない区画<i class="sw g"></i>灰の細線 = 拡大して見せているところ<i class="fl k"></i>白 = 登場人物 (作る人・Agent) と拡大の枠<i class="fl g"></i>灰 = 機構の外にある手元のもの<i class="sw k"></i>黒の線 = AI の操作 (触れる)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1262,7 +1309,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>秘密のファイル</span>
       <h2>Agent の動きを監視し、秘密のファイルに触ろうとしたら、<em>プログラムが強制キャンセル</em>する。</h2>
-      <p class="lead">外部サービスの鍵やパスワードは、コードの外のファイルに置かれる。下は、実際に止められた出力。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 200" role="img" aria-label="左の Agent が右の秘密のファイル (鍵・パスワード) を開こうとする。中央上の監視プログラムがその操作を見つけ、強制キャンセルする (赤い印)">
           <defs>
@@ -1301,7 +1347,7 @@
 
 <span class="dim">[hook exit 2 — コマンドは実行されない。この例は設定ファイルを読むだけの無害な grep だが、鍵ファイル名を含むため止まる — 粗い一致・誤検知は許容の設計]</span></pre></div>
       </div>
-      <figcaption><b class="figno">Figure.</b> 止めるのは AI の外側のプログラム — AI の判断では外せない。<span class="lg">凡例:<i class="sw r d"></i>止められる操作 (否定)<i class="sw b"></i>機構が止めに入る<i class="fl b"></i>青の塗り = 機構 (監視プログラム)<i class="fl g"></i>灰 = AI から直接は触れないもの</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1309,9 +1355,8 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>AI 自身</span>
       <h2>AI は、レビュー Agent の許可が無いと <em>PR を作れない</em>。</h2>
-      <p class="lead">Nkuma は AI を使って開発していることを隠さない。下は、実際に止められた出力。</p>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 200" role="img" aria-label="左から右へ。AI がコードを書き PR を作ろうとする。レビュー Agent が独立した目で確認し、許可の印を出す。許可があれば PR が作られ、無ければ止まる">
+        <svg viewBox="0 0 1000 200" role="img" aria-label="左から右へ。AI がコードを書き PR を作ろうとする。レビュー Agent が独立した目で確認し、許可の印を出す。許可があれば PR が作られ、無ければ止まる。右下に注記: 許可は印で、偽装はできる (動線の強制であって、偽装の防止ではない)">
           <defs>
             <g id="i18-bot" fill="none" stroke="#232a38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 8V4H8" vector-effect="non-scaling-stroke"/>
@@ -1344,6 +1389,7 @@
           <text class="t-no" x="660" y="164" text-anchor="middle">許可なし</text>
           <rect class="box" x="730" y="108" width="250" height="52" rx="12"/>
           <text class="t-badge" x="855" y="140" text-anchor="middle">PR は作られない</text>
+                  <text class="t-sub" x="980" y="192" text-anchor="end">許可は印 — 偽装はできる (動線の強制であって、偽装の防止ではない)</text>
         </svg>
       </div>
       <div class="term">
@@ -1354,7 +1400,7 @@
 
 <span class="dim">[hook exit 2 — PR は作られない。意味: 「レビュー済み」の印が今のコミットと合わないので、作らせない]</span></pre></div>
       </div>
-      <figcaption><b class="figno">Figure.</b> AI 自身も、別の AI の許可なしには進めない。許可は印なので偽装はできる — 動線を強制する仕組み。<span class="lg">凡例:<i class="sw k"></i>AI の操作<i class="sw b"></i>通る<i class="sw r d"></i>止まる (否定)<i class="fl b"></i>青の塗り = 機構</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1362,7 +1408,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">安全</span><span class="q">問い ②</span>会社として</span>
       <h2>どこに、だれが、どんなアプリを作り、<em>どれだけ使われているか</em> — 会社として管理できる。</h2>
-      <p class="lead">すべてのアプリが同じ共通基盤を通り、同じ道で公開される。だから情報は一か所に集まる。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 260" role="img" aria-label="左に高さの揃った 4 つの案件 A・B・C・D が並び、そこから灰の線が 1 本の青い道 (共通基盤) に合流し、その先の白い箱に、どこに・だれが・どんなアプリ・どれだけが一か所に集まり、右端の破線の窓 (見る画面) だけがこれからである">
   <text class="t-bound" x="80" y="40" text-anchor="middle">いくつもの案件</text>
@@ -1394,7 +1439,7 @@
   <text class="t-sub" x="886" y="152" text-anchor="middle">見る画面 — これから</text>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 集まるところまでは、構造で決まっている — 足りないのは、見る画面だけ。<span class="lg">凡例:<i class="fl b"></i>青の塗り = 共通基盤 (すべてが通る 1 本の道)<i class="fl k"></i>白 = 案件と、集まった情報<i class="fl m"></i>薄い枠 = 同じ規格で増える案件<i class="sw g"></i>矢印の無い灰線 = 合流<i class="fl d"></i>破線 = まだ形にしていない (見る画面)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1415,7 +1460,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">公開</span><span class="q">問い ③</span>手元で止まる</span>
       <h2>AI で作ったアプリは、<em>作った本人の手元で止まる</em> — 配る先が設計されていない。</h2>
-      <p class="lead">Nkuma は、会社が決めた公開先への道をあらかじめ通してある。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 220" role="img" aria-label="左から右へ。作る人のアイコンがある白い箱「作ったアプリ (作った本人の手元)」があり、その右の隙間の上に「止まる」。そこから先は同じ大きさの灰の箱が 3 つ、配り方、置き場、複数の人のアイコンがある会社の人と等間隔に並び、箱と箱を繋ぐ線は 1 本も無い">
   <defs>
@@ -1450,7 +1494,7 @@
   <text class="t-title" x="875" y="122" text-anchor="middle">会社の人</text>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 箱は並んでいるのに、渡すものが 1 つも無い — 置き場も、配り方も、決まっていない。<span class="lg">凡例:<i class="fl k"></i>白 = 作った本人の手元にあるもの<i class="fl g"></i>灰 = 決まっていないもの (配り方・置き場) と、届いていない人 — 線が無い = 繋ぐものが無い</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1458,7 +1502,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">公開</span><span class="q">問い ③</span>合図</span>
       <h2>作ったアプリは、<em>合図ひとつ</em>で公開される。</h2>
-      <p class="lead">作った本人以外が、いつもの社内 ID でその日から使える。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 220" role="img" aria-label="左から右へ。作る人の公開の合図、自動で配備 (配備の鍵を置かずに)、Azure に立つ (標準の構成で)、一般ユーザーがいつもの社内 ID で使える">
           <defs>
@@ -1494,7 +1537,7 @@
           <text class="t-sub" x="875" y="148" text-anchor="middle">いつもの社内 ID で</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 合図のあとは、自動で進む。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw b"></i>機構が自動で繋ぐ<i class="fl b"></i>青の塗り = 機構</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1567,7 +1610,7 @@
   <image href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgaWQ9ImJjOTMxNjlhLTI0YzQtNDY4Ni05ZjM3LWM3ZTRmNTNiM2QzNCIKICAgd2lkdGg9IjE3IgogICBoZWlnaHQ9IjE3IgogICB2aWV3Qm94PSIwIDAgMTcgMTciCiAgIHZlcnNpb249IjEuMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iS2V5X1ZhdWx0cy5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjAuOTIuMyAoMjQwNTU0NiwgMjAxOC0wMy0xMSkiPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBvYmplY3R0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwIgogICAgIGd1aWRldG9sZXJhbmNlPSIxMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMDE3IgogICAgIGlkPSJuYW1lZHZpZXc3Mzg1MCIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgZml0LW1hcmdpbi10b3A9IjAiCiAgICAgZml0LW1hcmdpbi1sZWZ0PSIwIgogICAgIGZpdC1tYXJnaW4tcmlnaHQ9IjAiCiAgICAgZml0LW1hcmdpbi1ib3R0b209IjAiCiAgICAgaW5rc2NhcGU6em9vbT0iNDguMTExMTExIgogICAgIGlua3NjYXBlOmN4PSI4LjUiCiAgICAgaW5rc2NhcGU6Y3k9IjguNSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iLTgiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9Ii04IgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0iYmM5MzE2OWEtMjRjNC00Njg2LTlmMzctYzdlNGY1M2IzZDM0IiAvPgogIDxkZWZzCiAgICAgaWQ9ImRlZnM3MzgzNCI+CiAgICA8cmFkaWFsR3JhZGllbnQKICAgICAgIGlkPSJmYjExNGM5My03YzE2LTQ1NDAtODk5YS0wNzk2MDQxNjI5ZTYiCiAgICAgICBjeD0iOSIKICAgICAgIGN5PSI5IgogICAgICAgcj0iOC41IgogICAgICAgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuMTgiCiAgICAgICAgIHN0b3AtY29sb3I9IiM1ZWEwZWYiCiAgICAgICAgIGlkPSJzdG9wNzM4MDgiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC41NiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzVjOWZlZSIKICAgICAgICAgaWQ9InN0b3A3MzgxMCIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjY5IgogICAgICAgICBzdG9wLWNvbG9yPSIjNTU5Y2VkIgogICAgICAgICBpZD0ic3RvcDczODEyIiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuNzgiCiAgICAgICAgIHN0b3AtY29sb3I9IiM0YTk3ZTkiCiAgICAgICAgIGlkPSJzdG9wNzM4MTQiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC44NiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzM5OTBlNCIKICAgICAgICAgaWQ9InN0b3A3MzgxNiIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjkzIgogICAgICAgICBzdG9wLWNvbG9yPSIjMjM4N2RlIgogICAgICAgICBpZD0ic3RvcDczODE4IiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuOTkiCiAgICAgICAgIHN0b3AtY29sb3I9IiMwODdiZDYiCiAgICAgICAgIGlkPSJzdG9wNzM4MjAiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMSIKICAgICAgICAgc3RvcC1jb2xvcj0iIzAwNzhkNCIKICAgICAgICAgaWQ9InN0b3A3MzgyMiIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQKICAgICAgIGlkPSJlYzQ3OGJkMy01YjM4LTRlN2YtYjY2MS0xMWYzNTU1NzhiZmYiCiAgICAgICBjeD0iMzguOTUwMDAxIgogICAgICAgY3k9IjE4Mi4wNzAwMSIKICAgICAgIHI9IjkuODgwMDAwMSIKICAgICAgIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMC45NCwwLDAsMC45NCwtMjguMjEsLTE2Mi43NCkiCiAgICAgICBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC4yNyIKICAgICAgICAgc3RvcC1jb2xvcj0iI2ZmZDcwZiIKICAgICAgICAgaWQ9InN0b3A3MzgyNSIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjQ5IgogICAgICAgICBzdG9wLWNvbG9yPSIjZmZjYjEyIgogICAgICAgICBpZD0ic3RvcDczODI3IiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuODgiCiAgICAgICAgIHN0b3AtY29sb3I9IiNmZWFjMTkiCiAgICAgICAgIGlkPSJzdG9wNzM4MjkiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMSIKICAgICAgICAgc3RvcC1jb2xvcj0iI2ZlYTExYiIKICAgICAgICAgaWQ9InN0b3A3MzgzMSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDx0aXRsZQogICAgIGlkPSJ0aXRsZTczODM2Ij5JY29uLXNlY3VyaXR5LTI0NTwvdGl0bGU+CiAgPHBhdGgKICAgICBpZD0iYWFjZjgzMTEtYTMxNy00MDBmLWI2MTMtNzRiZDAwZGE1Y2UzIgogICAgIGQ9Ik0gOC41LDAgQSA4LjUsOC41IDAgMSAwIDE3LDguNSA4LjUxLDguNTEgMCAwIDAgOC41LDAgWiBtIDAsMTUuODQgQSA3LjM0LDcuMzQgMCAxIDEgMTUuODQsOC41IDcuMzQsNy4zNCAwIDAgMSA4LjUsMTUuODQgWiIKICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIgogICAgIHN0eWxlPSJmaWxsOnVybCgjZmIxMTRjOTMtN2MxNi00NTQwLTg5OWEtMDc5NjA0MTYyOWU2KSIgLz4KICA8Y2lyY2xlCiAgICAgY3g9IjguNSIKICAgICBjeT0iOC41IgogICAgIHI9IjcuMzQwMDAwMiIKICAgICBpZD0iY2lyY2xlNzM4MzkiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZiIgLz4KICA8ZwogICAgIGlkPSJnNzM4NDUiCiAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTAuNSwtMC41KSI+CiAgICA8cGF0aAogICAgICAgaWQ9ImJkOTgzYzQxLWRiNzMtNDBlYy1hNGY0LWRhMTIxM2ZjOTkyNCIKICAgICAgIGQ9Im0gMTMuNDQsNy4zMyBhIDEuODQsMS44NCAwIDAgMCAwLC0yLjU5IHYgMCBMIDEwLjI5LDEuNTggYSAxLjgzLDEuODMgMCAwIDAgLTIuNTgsMCB2IDAgTCA0LjU2LDQuNzQgYSAxLjg0LDEuODQgMCAwIDAgMCwyLjU5IEwgNy4xOCwxMCBhIDAuNTEsMC41MSAwIDAgMSAwLjE1LDAuMzYgdiA0Ljg4IGEgMC42MywwLjYzIDAgMCAwIDAuMTgsMC40NCBsIDEuMiwxLjIgYSAwLjQxLDAuNDEgMCAwIDAgMC41OCwwIGwgMS4xNiwtMS4xNiB2IDAgbCAwLjY4LC0wLjY4IGEgMC4yNSwwLjI1IDAgMCAwIDAsLTAuMzQgbCAtMC40OSwtMC40OSBhIDAuMjcsMC4yNyAwIDAgMSAwLC0wLjM3IGwgMC40OSwtMC40OSBhIDAuMjUsMC4yNSAwIDAgMCAwLC0wLjM0IGwgLTAuNDksLTAuNDkgYSAwLjI3LDAuMjcgMCAwIDEgMCwtMC4zNyBsIDAuNDksLTAuNDkgYSAwLjI1LDAuMjUgMCAwIDAgMCwtMC4zNCBMIDEwLjQ1LDEwLjYzIFYgMTAuMzggWiBNIDksMi4zNSBBIDEuMDM1LDEuMDM1IDAgMCAxIDksNC40MiAxLjAzNSwxLjAzNSAwIDEgMSA5LDIuMzUgWiIKICAgICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgICBzdHlsZT0iZmlsbDp1cmwoI2VjNDc4YmQzLTViMzgtNGU3Zi1iNjYxLTExZjM1NTU3OGJmZikiIC8+CiAgICA8cGF0aAogICAgICAgaWQ9ImFkMmU3ZTQ0LTliZmQtNDc3NS04YmY0LThlZjI2YTU0NDkyMSIKICAgICAgIGQ9Im0gOC4xOCwxNS4zIHYgMCBhIDAuMjMsMC4yMyAwIDAgMCAwLjM4LC0wLjE3IHYgLTQgYSAwLjI0LDAuMjQgMCAwIDAgLTAuMTEsLTAuMiB2IDAgYSAwLjIyLDAuMjIgMCAwIDAgLTAuMzQsMC4yIHYgNCBhIDAuMjgsMC4yOCAwIDAgMCAwLjA3LDAuMTcgeiIKICAgICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgICBzdHlsZT0ib3BhY2l0eTowLjc1O2ZpbGw6I2ZmOTMwMCIgLz4KICAgIDxyZWN0CiAgICAgICBpZD0iYTk5NmZiZmYtMzkzNi00YjI0LWI0MDctMzY5MzM2YzE0M2JhIgogICAgICAgeD0iNi40OCIKICAgICAgIHk9IjUuNzkiCiAgICAgICB3aWR0aD0iNS4xNzAwMDAxIgogICAgICAgaGVpZ2h0PSIwLjYxMDAwMDAxIgogICAgICAgcng9IjAuMjgiCiAgICAgICBzdHlsZT0ib3BhY2l0eTowLjc1O2ZpbGw6I2ZmOTMwMCIgLz4KICAgIDxyZWN0CiAgICAgICBpZD0iYmIxMmQzMWMtMzM1Mi00YTE4LTg3ZGQtYTE2OWE0YTg3MjFkIgogICAgICAgeD0iNi40OCIKICAgICAgIHk9IjYuNzgwMDAwMiIKICAgICAgIHdpZHRoPSI1LjE3MDAwMDEiCiAgICAgICBoZWlnaHQ9IjAuNjEwMDAwMDEiCiAgICAgICByeD0iMC4yOCIKICAgICAgIHN0eWxlPSJvcGFjaXR5OjAuNzU7ZmlsbDojZmY5MzAwIiAvPgogIDwvZz4KICA8bWV0YWRhdGEKICAgICBpZD0ibWV0YWRhdGE3Mzg0NyI+CiAgICA8cmRmOlJERj4KICAgICAgPHJkZjpsaT5wdWJsaWM6dHJ1ZTwvcmRmOmxpPgogICAgICA8cmRmOmxpPnNkazpmYWxzZTwvcmRmOmxpPgogICAgICA8cmRmOmxpPmNhdGVnb3J5OiBTZWN1cml0eTwvcmRmOmxpPgogICAgICA8Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+CiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+CiAgICAgICAgPGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPgogICAgICAgIDxkYzp0aXRsZT5JY29uLXNlY3VyaXR5LTI0NTwvZGM6dGl0bGU+CiAgICAgIDwvY2M6V29yaz4KICAgIDwvcmRmOlJERj4KICA8L21ldGFkYXRhPgo8L3N2Zz4K" x="390" y="230" width="36" height="36"/>
   <text class="t-bound" x="408" y="290" text-anchor="middle" style="fill:var(--ink)">Azure</text>
   <text class="t-bound" x="408" y="306" text-anchor="middle" style="fill:var(--ink)">Key Vault</text>
-  <text class="t-sub" x="408" y="326" text-anchor="middle" style="font-size:12.5px">鍵はここに</text>
+  <text class="t-sub" x="408" y="326" text-anchor="middle" style="font-size:12.5px">残る秘密はここに</text>
 
   <rect class="box-auto" x="494" y="220" width="152" height="118" rx="10"/>
   <image href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgaWQ9ImZjODkwMTI3LTcyOGItNGFjMC1iNWRhLTg2Y2RmYzE5MWU4NiIKICAgd2lkdGg9IjEyLjgyIgogICBoZWlnaHQ9IjE3IgogICB2aWV3Qm94PSIwIDAgMTIuODIgMTciCiAgIHZlcnNpb249IjEuMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iQXp1cmVfRGF0YWJhc2VfUG9zdGdyZVNRTF9TZXJ2ZXIuc3ZnIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkyLjMgKDI0MDU1NDYsIDIwMTgtMDMtMTEpIj4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2IgogICAgIGJvcmRlcm9wYWNpdHk9IjEiCiAgICAgb2JqZWN0dG9sZXJhbmNlPSIxMCIKICAgICBncmlkdG9sZXJhbmNlPSIxMCIKICAgICBndWlkZXRvbGVyYW5jZT0iMTAiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAiCiAgICAgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE5MjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTAxNyIKICAgICBpZD0ibmFtZWR2aWV3MTIxMjciCiAgICAgc2hvd2dyaWQ9ImZhbHNlIgogICAgIGZpdC1tYXJnaW4tdG9wPSIwIgogICAgIGZpdC1tYXJnaW4tbGVmdD0iMCIKICAgICBmaXQtbWFyZ2luLXJpZ2h0PSIwIgogICAgIGZpdC1tYXJnaW4tYm90dG9tPSIwIgogICAgIGlua3NjYXBlOnpvb209IjQ4LjExMTExMSIKICAgICBpbmtzY2FwZTpjeD0iNi40MSIKICAgICBpbmtzY2FwZTpjeT0iOC41IgogICAgIGlua3NjYXBlOndpbmRvdy14PSItOCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTgiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJmYzg5MDEyNy03MjhiLTRhYzAtYjVkYS04NmNkZmMxOTFlODYiIC8+CiAgPGRlZnMKICAgICBpZD0iZGVmczEyMTEwIj4KICAgIDxsaW5lYXJHcmFkaWVudAogICAgICAgaWQ9ImEyOGRlZTIwLTRjNzEtNDZiNS1iOTU3LTgwNGM2N2RhNzI1YSIKICAgICAgIHgxPSIyLjQ0MDAwMDEiCiAgICAgICB5MT0iMTAuNjciCiAgICAgICB4Mj0iMTUuMjciCiAgICAgICB5Mj0iMTAuNjciCiAgICAgICBncmFkaWVudFRyYW5zZm9ybT0icm90YXRlKC0wLjAxLC0yODY0LjcxOSwtODAyLjM2OTQ1KSIKICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwIgogICAgICAgICBzdG9wLWNvbG9yPSIjMDA1YmExIgogICAgICAgICBpZD0ic3RvcDEyMDk1IiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuMDciCiAgICAgICAgIHN0b3AtY29sb3I9IiMwMDYwYTkiCiAgICAgICAgIGlkPSJzdG9wMTIwOTciIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC4zNiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzAwNzFjOCIKICAgICAgICAgaWQ9InN0b3AxMjA5OSIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwLjUyIgogICAgICAgICBzdG9wLWNvbG9yPSIjMDA3OGQ0IgogICAgICAgICBpZD0ic3RvcDEyMTAxIiAvPgogICAgICA8c3RvcAogICAgICAgICBvZmZzZXQ9IjAuNjQiCiAgICAgICAgIHN0b3AtY29sb3I9IiMwMDc0Y2QiCiAgICAgICAgIGlkPSJzdG9wMTIxMDMiIC8+CiAgICAgIDxzdG9wCiAgICAgICAgIG9mZnNldD0iMC44MiIKICAgICAgICAgc3RvcC1jb2xvcj0iIzAwNmFiYiIKICAgICAgICAgaWQ9InN0b3AxMjEwNSIgLz4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIxIgogICAgICAgICBzdG9wLWNvbG9yPSIjMDA1YmExIgogICAgICAgICBpZD0ic3RvcDEyMTA3IiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHRpdGxlCiAgICAgaWQ9InRpdGxlMTIxMTIiPkljb24tZGF0YWJhc2VzLTEzMTwvdGl0bGU+CiAgPHBhdGgKICAgICBkPSJNIDYuNDEsNC42NCBDIDIuODcsNC42NCAwLDMuNjQgMCwyLjMyIHYgMTIuMzYgYyAwLDEuMjcgMi44MiwyLjMgNi4zMiwyLjMyIGggMC4wOSBjIDMuNTQsMCA2LjQxLC0xIDYuNDEsLTIuMzIgViAyLjMyIGMgMCwxLjI4IC0yLjg3LDIuMzIgLTYuNDEsMi4zMiB6IgogICAgIGlkPSJwYXRoMTIxMTQiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDp1cmwoI2EyOGRlZTIwLTRjNzEtNDZiNS1iOTU3LTgwNGM2N2RhNzI1YSkiIC8+CiAgPHBhdGgKICAgICBkPSJNIDEyLjgyLDIuMzIgQyAxMi44MiwzLjYgOS45NSw0LjY0IDYuNDEsNC42NCAyLjg3LDQuNjQgMCwzLjY0IDAsMi4zMiAwLDEgMi44NywwIDYuNDEsMCBjIDMuNTQsMCA2LjQxLDEgNi40MSwyLjMyIgogICAgIGlkPSJwYXRoMTIxMTYiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojZThlOGU4IiAvPgogIDxwYXRoCiAgICAgZD0ibSAxMS4zMiwyLjEzIGMgMCwwLjgyIC0yLjIsMS40OCAtNC45MSwxLjQ4IC0yLjcxLDAgLTQuOTIsLTAuNjYgLTQuOTIsLTEuNDcgMCwtMC44MSAyLjIsLTEuNDggNC45MiwtMS40OCAyLjcyLDAgNC45MSwwLjY2IDQuOTEsMS40NyIKICAgICBpZD0icGF0aDEyMTE4IgogICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiCiAgICAgc3R5bGU9ImZpbGw6IzUwZTZmZiIgLz4KICA8cGF0aAogICAgIGQ9Ik0gNi40MSwyLjUgQSAxMS42NSwxMS42NSAwIDAgMCAyLjUxLDMuMDcgMTEuNTMsMTEuNTMgMCAwIDAgNi40MSwzLjYxIDExLjQ3LDExLjQ3IDAgMCAwIDEwLjMsMy4wMyAxMS45MywxMS45MyAwIDAgMCA2LjQxLDIuNSBaIgogICAgIGlkPSJwYXRoMTIxMjAiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojMTk4YWIzIiAvPgogIDxwYXRoCiAgICAgZD0ibSA5LjQxLDguNSBjIDAsMC4wOCAwLDAuMjQgMCwwLjQyIEEgNS4xMiw1LjEyIDAgMCAwIDkuMzMsOS41NSBjIDAsMC4xMiAwLDAuMyAwLjA1LDAuNDYgMC4wNSwwLjE2IDAsMC4yNyAwLDAuMzYgYSAxLjY4LDEuNjggMCAwIDEgLTAuMjUsMC44NiAwLjQzLDAuNDMgMCAwIDAgMCwwLjA3IGwgMC4xLDAuMTIgYSAxMC41NSwxMC41NSAwIDAgMCAxLjA2LC0yLjM4IHYgMCBDIDEwLjU3LDguMDkgMTAuNiw3LjQxIDEwLjM4LDcuMTIgQSAyLjU4LDIuNTggMCAwIDAgNy43LDYuMjYgMy4yOSwzLjI5IDAgMCAxIDguNjEsNi45MyAyLjI4LDIuMjggMCAwIDEgOS40MSw4LjUgWiBNIDkuMSw4LjU4IEEgMS4xNSwxLjE1IDAgMCAwIDguMzEsOC42NyBjIC0wLjI5LDAuMTggLTAuMiwwLjU1IDAsMSBhIDcuNzcsNy43NyAwIDAgMCAwLjM1LDAuODUgbCAwLjA5LDAuMTYgdiAwIGMgMC4wNSwwLjA4IDAuMDgsMC4xNSAwLjExLDAuMiBsIDAuMDgsMC4xMyBhIDEuMjgsMS4yOCAwIDAgMCAwLjE4LC0wLjY1IDIuODYsMi44NiAwIDAgMCAwLC0wLjMzIGMgMCwtMC4xNyAwLC0wLjM2IC0wLjA1LC0wLjQ5IEEgNi4xLDYuMSAwIDAgMSA5LjE1LDguODUgQyA5LjEyLDguNzQgOS4xMyw4LjYzIDkuMTQsOC41NSBaIE0gOC44LDguOTkgYSAwLjQsMC40IDAgMCAxIC0wLjE4LDAuMSB2IDAgQSAwLjMzLDAuMzMgMCAwIDEgOC40OCw5LjA5IDAuMjMsMC4yMyAwIDAgMSA4LjQxLDguOSB2IDAgYyAwLC0wLjA3IDAuMTEsLTAuMTMgMC4yNCwtMC4xNSBoIDAuMTkgYyAwLDAgMC4wOSwwIDAuMDksMC4wOCBBIDAuMiwwLjIgMCAwIDEgOC44NCw4Ljk2IFogTSA0LjExLDkuODggYyAwLC0wLjA3IDAsLTAuMTMgMCwtMC4xNyBhIDEsMSAwIDAgMCAwLC0wLjE3IDUuNTUsNS41NSAwIDAgMSAwLC0xIDUuMjIsNS4yMiAwIDAgMSAwLjMsLTEuMSBBIDIuNDEsMi40MSAwIDAgMSA0Ljk5LDYuNSA0Ljc4LDQuNzggMCAwIDAgMy42NCw2LjMgMS44NywxLjg3IDAgMCAwIDIuNTQsNi42IDIsMiAwIDAgMCAxLjkxLDguNDIgYSAxMi4yNywxMi4yNyAwIDAgMCAwLjUsMi4yNCBjIDAuMzQsMS4xNCAwLjczLDEuODQgMS4wNywxLjk1IHYgMCBjIDAuMTUsMC4wNSAwLjMxLDAgMC40NywtMC4yMSAwLjI4LC0wLjM0IDAuNTQsLTAuNjMgMC42OSwtMC44IEEgMS44OCwxLjg4IDAgMCAxIDQuMTUsOS44NSBaIG0gMC4yNiwwLjQgYSAyLjE4LDIuMTggMCAwIDAgMC4wNiwwLjU2IDEuNSwxLjUgMCAwIDAgMC4yNiwwLjQ0IDEuMDcsMS4wNyAwIDAgMCAwLjM1LDAuMjUgMS4wOSwxLjA5IDAgMCAwIDAuMzksMC4wOCBjIDAsLTAuMTcgMC4xNCwtMC4zOCAwLjIzLC0wLjYgYSA0LjM1LDQuMzUgMCAwIDAgMC4yMSwtMC41OSA2LjYxLDYuNjEgMCAwIDAgMCwtMS4xMSBjIDAsLTAuMDkgMCwtMC4xOSAtMC4wNiwtMC4zIEEgMC40NSwwLjQ1IDAgMCAwIDUuNjksOC43NCB2IDAgQSAwLjY2LDAuNjYgMCAwIDAgNS40MSw4LjU4IEggNS4yMSBBIDEuNTYsMS41NiAwIDAgMCA0LjczLDguNzIgMiwyIDAgMCAwIDQuNDEsOC45MSB2IDAuMTEgYyAwLDAuMiAwLDAuNDEgMCwwLjYxIHYgMCBhIDAuODYsMC44NiAwIDAgMSAwLDAuMTUgdiAwLjM5IDAgeiBNIDUuMDMsOC45NCB2IDAgYSAwLjQ2LDAuNDYgMCAwIDEgMC4yOCwwIEEgMC42LDAuNiAwIDAgMSA1LjUsOSBjIDAuMDksMCAwLjEsMC4xMSAwLjA5LDAuMTQgdiAwIEEgMC4zNywwLjM3IDAgMCAxIDUuNDcsOS4yNyAwLjMsMC4zIDAgMCAxIDUuNDEsOS4yMyB2IDAgQSAwLjM0LDAuMzQgMCAwIDEgNS4xMyw4Ljk1IFogbSAwLjc0LDMgQSAwLjIzLDAuMjMgMCAwIDAgNS42NCwxMiBMIDUuNSwxMi4xNyBjIC0wLjE3LDAuMjEgLTAuMjQsMC4yOCAtMC43MywwLjM4IGEgMC41MiwwLjUyIDAgMCAwIC0wLjI2LDAuMSAwLjU4LDAuNTggMCAwIDAgMC4yNCwwLjExIDEuMTgsMS4xOCAwIDAgMCAwLjcyLDAgMS43LDEuNyAwIDAgMCAwLjM5LC0wLjI2IDAuNjEsMC42MSAwIDAgMCAwLjIsLTAuMzEgMC4zNiwwLjM2IDAgMCAwIC0wLjEsLTAuMjggMC4xNSwwLjE1IDAgMCAwIC0wLjE1LC0wLjAyIHogbSA0LjYxLDAgYSAxLjYzLDEuNjMgMCAwIDEgLTEuMTMsMCAwLjIyLDAuMjIgMCAwIDAgLTAuMTQsMCAwLjMsMC4zIDAgMCAwIC0wLjE3LDAuMTQgMS4wOSwxLjA5IDAgMCAwIDAsMC4zMSAxLjgsMS44IDAgMCAwIDEuMSwtMC4xIDEuMzYsMS4zNiAwIDAgMCAwLjQ4LC0wLjM0IHogTSA3Ljk4LDkuOCBDIDcuODQsOS4zOSA3LjY0LDguOCA4LjE2LDguNDQgQSAxLjM1LDEuMzUgMCAwIDEgOS4wNSw4LjI5IDMuMTgsMy4xOCAwIDAgMCA4LjQxLDcuMTQgTCA4LjMxLDcuMDQgOC4yNSw2Ljk4IHYgMCBBIDAuMzQsMC4zNCAwIDAgMCA4LjE5LDYuOTIgdiAwIDAgQSAyLjM0LDIuMzQgMCAwIDAgNy41Miw2LjUgMi42MywyLjYzIDAgMCAwIDYuNDEsNi4yOCAxLjUyLDEuNTIgMCAwIDAgNS43MSw2LjM5IDEuNzcsMS43NyAwIDAgMCA1LjQxLDYuNSBhIDIuMSwyLjEgMCAwIDAgLTAuNzQsMSA1Ljg0LDUuODQgMCAwIDAgLTAuMjEsMSAxLjY2LDEuNjYgMCAwIDEgMSwtMC4yMyAwLjg0LDAuODQgMCAwIDEgMC43NywwLjkxIDcuMjYsNy4yNiAwIDAgMSAwLDEuMjcgQSAzLjg3LDMuODcgMCAwIDEgNiwxMS4wOCBjIC0wLjA2LDAuMTcgLTAuMTQsMC4zNSAtMC4xOCwwLjQ5IGEgMC41LDAuNSAwIDAgMSAwLjM4LDAuMTQgMC42NiwwLjY2IDAgMCAxIDAuMTksMC41MyBoIDAuMDIgYyAwLDAuMDggMCwwLjE2IDAsMC4yNCBhIDYuNTUsNi41NSAwIDAgMCAwLjI0LDIuNDQgMC41NCwwLjU0IDAgMCAwIDAuMjQsMC4yMSAwLjYsMC42IDAgMCAwIDAuMzEsMC4xIDEuMywxLjMgMCAwIDAgMSwtMC4zNCAxLjA1LDEuMDUgMCAwIDAgMC4yOSwtMC42NiBjIDAuMDcsLTAuNDUgMC4yMiwtMS43IDAuMjQsLTIgdiAwIEEgMC43MiwwLjcyIDAgMCAxIDguODIsMTEuNzkgMC42MywwLjYzIDAgMCAxIDkuMDksMTEuNTUgNS4zNiw1LjM2IDAgMCAxIDguMDIsOS43NCBaIgogICAgIGlkPSJwYXRoMTIxMjIiCiAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICBzdHlsZT0iZmlsbDojZjJmMmYyIiAvPgogIDxtZXRhZGF0YQogICAgIGlkPSJtZXRhZGF0YTEyMTI0Ij4KICAgIDxyZGY6UkRGPgogICAgICA8cmRmOmxpPnB1YmxpYzp0cnVlPC9yZGY6bGk+CiAgICAgIDxyZGY6bGk+c2RrOmZhbHNlPC9yZGY6bGk+CiAgICAgIDxyZGY6bGk+Y2F0ZWdvcnk6IERhdGFiYXNlczwvcmRmOmxpPgogICAgICA8Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+CiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+CiAgICAgICAgPGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPgogICAgICAgIDxkYzp0aXRsZT5JY29uLWRhdGFiYXNlcy0xMzE8L2RjOnRpdGxlPgogICAgICA8L2NjOldvcms+CiAgICA8L3JkZjpSREY+CiAgPC9tZXRhZGF0YT4KPC9zdmc+Cg==" x="555" y="229" width="30" height="37"/>
@@ -1595,7 +1638,7 @@
   <path class="edge-hand" d="M126,127 H188" marker-end="url(#az-ah-hand)"/>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 案件を始めた時点で、共通基盤・ログイン・鍵・データ・ファイル・AI の口は全部立っている。作る人が公開の合図で足すのは、業務アプリのコンテナ 1 つ。アプリはデータに直接触れず、すべて共通基盤を通る。<span class="lg">凡例:<i class="fl b"></i>青 = 用意されているもの (案件を始めた時点で立っている)<i class="fl o"></i>橙 = 作る人が足すもの<i class="fl m"></i>薄い枠 = 次のアプリ (同じ規格で増える)<i class="fl c"></i>枠 = Azure (会社が決めた構成)<i class="sw o"></i>橙の線 = 公開の合図<i class="sw b"></i>青の線 = 機構が自動で繋ぐ</span><span class="lg">Azure の各サービスのアイコンは Microsoft 公式 (図解での利用。改変不可のため実物の色のまま)。</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1603,7 +1646,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">公開</span><span class="q">問い ③</span>ログイン</span>
       <h2>認証・認可は、アプリの外で済んでいる — アプリが考えるのは、<em>ビジネスロジックだけ</em>。</h2>
-      <p class="lead">ログイン画面も認可のコードも書かない — ログインは会社の ID (Entra ID)、認可はロールの宣言 1 枚を置くだけで、強制するのは共通基盤。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 310" role="img" aria-label="上段の帯「作ったアプリ」の中には、大きなビジネスロジックと小さな認可の宣言の 2 つだけがあり、右側は空いている。その認可の宣言から青い矢印が下へ落ち、下段の帯「共通基盤」に並ぶ認証・認可・記録の 3 つのうち、認可へ入る">
             <rect class="box" x="30" y="20" width="940" height="120" rx="14"/>
@@ -1625,7 +1667,7 @@
             <path class="edge-auto" d="M500 118 V205"/><polygon class="head-auto" points="493,205 500,217 507,205"/>
           </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 作る人が枠の中に書くのは、上段の 2 つだけ。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 作る人が書くところ<i class="fl k"></i>白 = 作ったアプリ<i class="sw b"></i>共通基盤へ通る道<i class="fl b"></i>青の塗り = 共通基盤 (既製)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1659,7 +1701,7 @@
           <text class="t-title" x="930" y="116" text-anchor="middle">公開</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 引き金が違うから、抜けが重ならない。<span class="lg">凡例:<i class="sw k"></i>AI の操作 (送る)<i class="sw b"></i>機構が自動で繋ぐ<i class="fl b"></i>青の塗り = 機械が止める検問 / 白の検問 = 機械では止めない、必ず通る節目</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1696,7 +1738,7 @@
           <text class="t-sub" x="880" y="126" text-anchor="middle">最後に配備した版: v3</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 何度公開しても、人の手順は増えない。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw b"></i>機構が自動で繋ぐ<i class="fl b"></i>青の塗り = 台帳 (機構) / 枠 = 版の記録</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1715,9 +1757,8 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">メリット</span>到達点</span>
       <h2>使い続けると、<em>業務情報の上に、いくつものアプリ</em>が並ぶ。</h2>
-      <p class="lead">エンジニアでない人が、自分の困りごとを自分で解決できている状態。</p>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 250" role="img" aria-label="下に業務情報の青い帯が 1 枚あり、その上に同じ大きさの白いアプリが左から右へ、案件管理・経費申請・勤怠入力・見積作成と 4 つ帯に接して並び、右端にこれから増えるアプリの薄い枠が 1 つ同じ大きさで置かれている">
+        <svg viewBox="0 0 1000 250" role="img" aria-label="下に業務情報の青い帯が 1 枚あり、その上に同じ大きさの白いアプリが左から右へ、案件管理・経費申請・勤怠入力・見積作成と 4 つ帯に接して並び、右端にこれから増えるアプリの薄い枠が 1 つ同じ大きさで置かれている。右下に注記: アプリ名は例">
   <rect class="box" x="70" y="50" width="148" height="128" rx="12"/>
   <rect class="box" x="248" y="50" width="148" height="128" rx="12"/>
   <rect class="box" x="426" y="50" width="148" height="128" rx="12"/>
@@ -1732,10 +1773,11 @@
   <text class="t-title" x="678" y="116" text-anchor="middle">見積作成</text>
 
   <text class="t-title" x="55" y="206">業務情報</text>
-  <text class="t-sub" x="145" y="207">業務の語彙と構造</text>
-</svg>
+  <text class="t-sub" x="145" y="207">業務の情報整理</text>
+          <text class="t-sub" x="980" y="247" text-anchor="end">アプリ名は例</text>
+        </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 土台は 1 つのまま。その上に、同じ作りのアプリが 1 つ、また 1 つと増えていく (アプリ名は例)。<span class="lg">凡例:<i class="fl b"></i>青の塗り = 業務情報 (土台)<i class="fl k"></i>白 = 作られたアプリ<i class="fl m"></i>薄い枠 = これから増えるアプリ</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1743,7 +1785,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">メリット</span>もう一段先</span>
       <h2>ここで満足するには早い — この構造だから、<em>さらに 3 つのこと</em>ができる。</h2>
-      <p class="lead">どれも、業務情報が土台にあることから出てくる。</p>
       <ol class="qmap list"><li>① 業務の変更を伝えれば、影響範囲の調査からアプリの変更まで進む</li><li>② 作るだけで、AI から使われる口 (MCP) の形も自動で付く</li><li>③ 作る Agent としてだけでなく、使う Agent としても働く</li></ol>
     </div>
   </section>
@@ -1752,7 +1793,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">メリット</span><span class="q">メリット ①</span>追いつく</span>
       <h2>業務の変更を伝えれば、<em>影響範囲の調査からアプリの変更まで</em>進む。</h2>
-      <p class="lead">この流れは、Nkuma 自身の開発で手動の型として回っている。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 290" role="img" aria-label="左から右へ、作る人が業務が変わったと伝えると、Agent が影響範囲を調査し、アプリ A は変更・B はなし・C は連携と振り分け、直す A と C だけが Issue にするへ集まる (調査と Issue 化は破線 — 実装はこれから)">
             <defs>
@@ -1805,9 +1845,10 @@
           
             <rect class="box-ghost" x="790" y="104" width="190" height="92" rx="12"/>
             <text class="t-title" x="885" y="156" text-anchor="middle">Issue にする</text>
-          </svg>
+                    <text class="t-sub" x="980" y="282" text-anchor="end">破線 = 実装はこれから</text>
+        </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> どのアプリをどう直すかまで、Agent が振り分ける — 案件の中で回す仕組みは、実装はこれから。<span class="lg">凡例:<i class="sw o"></i>人の操作<i class="fl o"></i>橙の塗り = 人の営み<i class="sw b"></i>機構が自動で繋ぐ<i class="fl d"></i>破線 = 実装はこれから<i class="fl m"></i>薄い枠 = 直さないアプリ<i class="sw g"></i>矢印の無い灰線 = 振り分け・集約</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1815,7 +1856,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">メリット</span><span class="q">メリット ②</span>AI から使われる口</span>
       <h2>Nkuma でアプリを作ると、<em>AI から使われる口 (MCP) の形も自動で付く</em>。</h2>
-      <p class="lead">この口は設計まで決まっていて、実装はこれから。図の破線がその範囲。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 260" role="img" aria-label="左の橙の山形「作る」から青い線が上下 2 本に分かれ、上はアプリの枠の中の白い箱「人が使う画面」へ、下は同じ枠の中の青い箱「AI から使われる口 (MCP)」へ届く。下の枝には「自動で付く」と添えてあり、口の右辺から破線の帯が枠の外へ伸びて、右端の AI の箱に繋がっている (口の中身と MCP の経路は、実装はこれから)">
             <defs>
@@ -1855,7 +1895,7 @@
             <text class="t-sub" x="980" y="252" text-anchor="end">口の中身と MCP の経路は、実装はこれから</text>
           </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 人の 1 手は「作る」だけ — 2 つ目の面は自動で生える。口の形は作り方のルールで決めてあり、中身と MCP の経路は、実装はこれから。<span class="lg">凡例:<i class="fl o"></i>橙の塗り = 人の 1 手<i class="sw b"></i>機構が自動で繋ぐ<i class="fl k"></i>白 = 登場人物と、起こる結果<i class="fl b"></i>青の面 = 決めてある形 (自動で付く)<i class="fl d"></i>破線 = 実装はこれから<i class="fl c"></i>枠 = 1 つのアプリ</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1863,7 +1903,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">メリット</span><span class="q">メリット ③</span>使う Agent</span>
       <h2>Nkuma は、作る Agent としてだけでなく、<em>使う Agent</em> としても働く。</h2>
-      <p class="lead">使う側の Agent は設計まで決まっていて、実装はこれから。図の破線がその範囲。</p>
       <figure data-fig><div class="fig">
         <svg viewBox="0 0 1000 300" role="img" aria-label="左の業務情報 (業務の理解) から中央の Agent へ。Agent から右へ 2 本、上はアプリを作る、下は業務情報の言葉でデータを読む・動かす (破線 — 実装はこれから)">
           <defs>
@@ -1901,7 +1940,7 @@
           <text class="t-sub" x="810" y="220" text-anchor="middle">「先月、未入金の顧客は?」— 実装はこれから</text>
         </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 作るときに貯めた理解が、使うときにも効く。<span class="lg">凡例:<i class="sw b"></i>機構が自動で繋ぐ (業務情報を渡す)<i class="sw k"></i>AI の操作<i class="fl b"></i>青の塗り = 業務情報<i class="fl d"></i>破線 = 実装はこれから</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1909,9 +1948,8 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">メリット</span>真骨頂</span>
       <h2>真骨頂は、<em>業務情報の上にアプリが乗っている構造</em>そのもの。</h2>
-      <p class="lead">到達点の絵にもう一度戻る。3 つは別々の機能ではない — 土台そのものが持っている性質だ。</p>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 250" role="img" aria-label="帯の上に同じ大きさで並ぶ 5 つのアプリは薄く沈み、下の業務情報の青い帯の中に白い区画が 3 つ現れている。左から ① 変更に追いつく、② AI から使われる口、③ 使う Agent">
+        <svg viewBox="0 0 1000 250" role="img" aria-label="帯の上に同じ大きさで並ぶ 5 つのアプリは薄く沈み、下の業務情報の青い帯の中に白い区画が 3 つ現れている。左から ① 変更に追いつく、② AI から使われる口、③ 使う Agent。上に注記: 沈めた 5 つは到達点の絵のアプリ">
   <g class="dim">
     <rect class="box" x="70" y="50" width="148" height="128" rx="12"/>
     <rect class="box" x="248" y="50" width="148" height="128" rx="12"/>
@@ -1934,9 +1972,10 @@
   <rect class="box" x="695" y="180" width="253" height="40" rx="10"/>
   <circle class="num-b" cx="785" cy="200" r="11"/><text class="num-t" x="785" y="205" text-anchor="middle">3</text>
   <text class="t-badge" x="806" y="206">使う Agent</text>
-</svg>
+          <text class="t-sub" x="70" y="40">到達点の絵のアプリ</text>
+        </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 3 つは別の機能ではない — この 1 枚の土台が持っている性質そのもの。<span class="lg">凡例:<i class="fl b"></i>青の塗り = 業務情報 (土台)<i class="fl k"></i>白 = 土台の中にある 3 つ<i class="fl m"></i>沈めた形 = 前のコマのアプリ (ここでは主役ではない)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -1951,50 +1990,41 @@
     </div>
   </section>
 
-  <section class="slide" id="s-two-tier" data-ch="delivery">
+
+  <section class="slide" id="s-native" data-ch="delivery">
     <div class="slide-inner">
-      <span class="kicker"><span class="n">提供方法</span>売り方</span>
-      <h2>Nkuma で作るのは、<em>顧客か、南国ソフトか</em> — 提供はこの 2 通りに分かれる。</h2>
+      <span class="kicker"><span class="n">提供方法</span>デスクトップアプリ</span>
+      <h2>Nkuma デスクトップアプリ (構想) — <em>1 つのアプリをダウンロードするだけ</em>で、開発を始められる。</h2>
       <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 330" role="img" aria-label="上段は、南国ソフトの枠の中の青い箱「Nkuma」から橙の線「渡す」が枠を越えて右へ伸び、顧客の枠の中の青い箱「Nkuma」へ届く。そこから黒い線「作る」で白い箱「アプリ」ができる。下段は、南国ソフトの枠の中の青い箱「Nkuma」から黒い線「作る」で白い箱「アプリ」ができ、そこから橙の線「渡す」が枠を越えて右へ伸びて、顧客の枠の中の白い箱「アプリ」へ届く">
-            <rect class="bound" x="20" y="20" width="450" height="290" rx="16"/>
-            <rect class="bound" x="530" y="20" width="450" height="290" rx="16"/>
-          
-            <rect class="box-auto" x="50" y="62" width="170" height="64" rx="12"/>
-            <rect class="box-auto" x="560" y="62" width="170" height="64" rx="12"/>
-            <rect class="box" x="780" y="62" width="170" height="64" rx="12"/>
-          
-            <rect class="box-auto" x="50" y="204" width="170" height="64" rx="12"/>
-            <rect class="box" x="270" y="204" width="170" height="64" rx="12"/>
-            <rect class="box" x="780" y="204" width="170" height="64" rx="12"/>
-          
-            <path class="edge-hand" d="M220 94 H548"/>
-            <polygon class="head-hand" points="548,87 560,94 548,101"/>
-            <path class="edge" d="M730 94 H768"/>
-            <polygon class="head" points="768,88 780,94 768,100"/>
-          
-            <path class="edge" d="M220 236 H258"/>
-            <polygon class="head" points="258,230 270,236 258,242"/>
-            <path class="edge-hand" d="M440 236 H768"/>
-            <polygon class="head-hand" points="768,229 780,236 768,243"/>
-          
-            <text class="t-bound" x="40" y="46">南国ソフト</text>
-            <text class="t-bound" x="550" y="46">顧客</text>
-          
-            <text class="t-title" x="135" y="100" text-anchor="middle">Nkuma</text>
-            <text class="t-edge" x="390" y="82" text-anchor="middle">渡す</text>
-            <text class="t-title" x="645" y="100" text-anchor="middle">Nkuma</text>
-            <text class="t-edge" x="755" y="82" text-anchor="middle">作る</text>
-            <text class="t-title" x="865" y="100" text-anchor="middle">アプリ</text>
-          
-            <text class="t-title" x="135" y="242" text-anchor="middle">Nkuma</text>
-            <text class="t-edge" x="245" y="224" text-anchor="middle">作る</text>
-            <text class="t-title" x="355" y="242" text-anchor="middle">アプリ</text>
-            <text class="t-edge" x="610" y="224" text-anchor="middle">渡す</text>
-            <text class="t-title" x="865" y="242" text-anchor="middle">アプリ</text>
-          </svg>
+        <svg viewBox="0 0 1000 330" role="img" aria-label="Nkuma デスクトップアプリの窓 (構想段階なので破線)。中に 4 つの区画、ターミナル (Claude Code)、内蔵ランタイム (共通基盤・データベース・ストレージを内蔵、Docker のインストール不要)、Issue と CI の見える化、各アプリの管理画面">
+          <rect class="box-ghost" x="60" y="20" width="880" height="300" rx="16"/>
+          <rect x="62" y="22" width="876" height="38" rx="14" style="fill:var(--gray-fill)"/>
+          <rect x="62" y="46" width="876" height="14" style="fill:var(--gray-fill)"/>
+          <circle cx="84" cy="41" r="6" style="fill:var(--frame-dot)"/><circle cx="104" cy="41" r="6" style="fill:var(--frame-dot)"/><circle cx="124" cy="41" r="6" style="fill:var(--frame-dot)"/>
+          <text class="t-badge" x="150" y="46">Nkuma — デスクトップアプリ (構想段階)</text>
+
+          <rect x="80" y="80" width="410" height="100" rx="10" style="fill:var(--terminal)"/>
+          <text class="t-mono" x="100" y="110" style="fill:var(--term-prompt)">Claude Code (ターミナル)</text>
+          <text class="t-mono" x="100" y="134" style="fill:var(--term-text)">&gt; 業務の言葉で指示する</text>
+          <text class="t-mono" x="100" y="158" style="fill:var(--term-text)">ターミナルの設定は不要</text>
+
+          <rect class="box-auto" x="510" y="80" width="410" height="100" rx="10"/>
+          <text class="t-title" x="715" y="112" text-anchor="middle">内蔵ランタイム</text>
+          <text class="t-sub" x="715" y="138" text-anchor="middle">共通基盤・データベース・ストレージを内蔵</text>
+          <text class="t-sub" x="715" y="158" text-anchor="middle">Docker のインストールは不要</text>
+
+          <rect class="box" x="80" y="200" width="410" height="100" rx="10"/>
+          <text class="t-title" x="285" y="232" text-anchor="middle">Issue と CI の見える化</text>
+          <text class="t-sub" x="285" y="258" text-anchor="middle">進行と、検査の結果が分かる</text>
+          <text class="t-sub" x="285" y="278" text-anchor="middle">GitHub を開かなくてもよい</text>
+
+          <rect class="box" x="510" y="200" width="410" height="100" rx="10"/>
+          <text class="t-title" x="715" y="232" text-anchor="middle">各アプリの管理画面</text>
+          <text class="t-sub" x="715" y="258" text-anchor="middle">利用者・権限・データの状態</text>
+          <text class="t-sub" x="715" y="278" text-anchor="middle">見て、触って、整えられる</text>
+        </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> Nkuma を渡せば顧客が自分で作り、南国ソフトが作れば渡すのはアプリ — どちらの場で作るかで、顧客に届くものが変わる。販売と社外の実績はこれから。<span class="lg">凡例:<i class="fl b"></i>青の面 = Nkuma<i class="fl k"></i>白 = できたアプリ<i class="sw o"></i>橙の線 = 顧客へ渡す<i class="sw k"></i>AI の操作 (作る)<i class="fl c"></i>枠 = 場 (南国ソフト・顧客)</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -2002,7 +2032,6 @@
     <div class="slide-inner">
       <span class="kicker"><span class="n">提供方法</span>構成図</span>
       <h2>構成図 — 手元の PC・GitHub・Azure が、<em>1 本の経路</em>で繋がる。</h2>
-      <p class="lead">作る人は左端で対話し、送って、合図する。あとは機構が運び、一般ユーザーはいつもの社内 ID で入る。</p>
       <figure data-fig><div class="fig tall">
         <svg viewBox="0 0 1000 400" role="img" aria-label="構成図。左から手元の PC (案件の場)・GitHub (案件)・Azure (標準の構成、案件ごとに 1 つ) の 3 つの場が並ぶ。手元の PC には Claude Code + nkuma plugin、案件リポジトリ、ローカル共通基盤があり、作る人が対話で作る。GitHub にはリポジトリ + Issue と GitHub Actions があり、送ったものが公開の合図で検査・配備される。Azure には Microsoft Entra ID、Azure Container Apps の環境 (業務アプリと共通基盤サーバ)、Azure Key Vault・Azure Database for PostgreSQL・Azure Blob Storage・Azure OpenAI があり、一般ユーザーはいつもの社内 ID でログインして業務アプリを使う。データに触れるのは共通基盤サーバだけ">
   <defs>
@@ -2136,58 +2165,7 @@
   <path class="edge-auto" d="M879,272 V304" marker-end="url(#ar-ah-auto)"/>
 </svg>
       </div>
-      <figcaption><b class="figno">Figure.</b> 案件ごとに同じ形が 1 セット立つ。作る人が触るのは対話・送る・合図の 3 か所、データに触れるのは共通基盤サーバの 1 か所。<span class="lg">凡例:<i class="sw o"></i>橙の線 = 人の操作<i class="sw k"></i>黒の線 = AI の操作<i class="sw b"></i>青の線 = 機構が自動で繋ぐ<i class="fl k"></i>白 = 登場人物と、作る人が触るもの<i class="fl o"></i>橙の塗り = 作る人が足すもの<i class="fl b"></i>青の塗り = 用意されているもの (既製)<i class="fl c"></i>枠 = 場</span><span class="lg">Azure のアイコンは Microsoft 公式 (改変不可のため実物の色のまま)。GitHub のマーク (Invertocat) は Simple Icons、黒の単色 (商標は GitHub のもの)。ほかのアイコンは Lucide。</span></figcaption></figure>
-    </div>
-  </section>
-
-  <section class="slide" id="s-native" data-ch="delivery">
-    <div class="slide-inner">
-      <span class="kicker"><span class="n">提供方法</span>デスクトップアプリ</span>
-      <h2>Nkuma デスクトップアプリ (構想) — <em>1 つのアプリをダウンロードするだけ</em>で、開発を始められる。</h2>
-      <figure data-fig><div class="fig">
-        <svg viewBox="0 0 1000 330" role="img" aria-label="Nkuma デスクトップアプリの窓 (構想段階なので破線)。中に 4 つの区画、ターミナル (Claude Code)、内蔵ランタイム (共通基盤・データベース・ストレージを内蔵、Docker のインストール不要)、Issue と CI の見える化、各アプリの管理画面">
-          <rect class="box-ghost" x="60" y="20" width="880" height="300" rx="16"/>
-          <rect x="62" y="22" width="876" height="38" rx="14" style="fill:var(--gray-fill)"/>
-          <rect x="62" y="46" width="876" height="14" style="fill:var(--gray-fill)"/>
-          <circle cx="84" cy="41" r="6" style="fill:var(--frame-dot)"/><circle cx="104" cy="41" r="6" style="fill:var(--frame-dot)"/><circle cx="124" cy="41" r="6" style="fill:var(--frame-dot)"/>
-          <text class="t-badge" x="150" y="46">Nkuma — デスクトップアプリ (構想段階)</text>
-
-          <rect x="80" y="80" width="410" height="100" rx="10" style="fill:var(--terminal)"/>
-          <text class="t-mono" x="100" y="110" style="fill:var(--term-prompt)">Claude Code (ターミナル)</text>
-          <text class="t-mono" x="100" y="134" style="fill:var(--term-text)">&gt; 業務の言葉で指示する</text>
-          <text class="t-mono" x="100" y="158" style="fill:var(--term-text)">ターミナルの設定は不要</text>
-
-          <rect class="box-auto" x="510" y="80" width="410" height="100" rx="10"/>
-          <text class="t-title" x="715" y="112" text-anchor="middle">内蔵ランタイム</text>
-          <text class="t-sub" x="715" y="138" text-anchor="middle">共通基盤・データベース・ストレージを内蔵</text>
-          <text class="t-sub" x="715" y="158" text-anchor="middle">Docker のインストールは不要</text>
-
-          <rect class="box" x="80" y="200" width="410" height="100" rx="10"/>
-          <text class="t-title" x="285" y="232" text-anchor="middle">Issue と CI の見える化</text>
-          <text class="t-sub" x="285" y="258" text-anchor="middle">進行と、検査の結果が分かる</text>
-          <text class="t-sub" x="285" y="278" text-anchor="middle">GitHub を開かなくてもよい</text>
-
-          <rect class="box" x="510" y="200" width="410" height="100" rx="10"/>
-          <text class="t-title" x="715" y="232" text-anchor="middle">各アプリの管理画面</text>
-          <text class="t-sub" x="715" y="258" text-anchor="middle">利用者・権限・データの状態</text>
-          <text class="t-sub" x="715" y="278" text-anchor="middle">見て、触って、整えられる</text>
-        </svg>
-      </div>
-      <figcaption><b class="figno">Figure.</b> インストールは、この 1 つだけ。<span class="lg">凡例:<i class="fl d"></i>破線 = 構想段階<i class="fl b"></i>青の塗り = 内蔵される既製の仕組み</span></figcaption></figure>
-    </div>
-  </section>
-
-  <section class="slide" id="s-cases" data-ch="delivery">
-    <div class="slide-inner">
-      <span class="kicker"><span class="n">提供方法</span>事例</span>
-      <h2>Nkuma 製のアプリは、南国ソフトの社内で<em>作られ始めている</em>。</h2>
-      <p class="lead">南国ソフトの社内の案件で、Nkuma を使って作られたアプリの例。社外の実案件での実績はこれから。</p>
-      <figure data-fig><div class="fig shots">
-        <div><span class="shot-t">作業日報</span><img src="images/case-1.png" alt="作業日報アプリの画面。左に月のカレンダー、中央に日ごとの入力欄"></div>
-        <div><span class="shot-t">付箋ボード</span><img src="images/case-2.png" alt="付箋ボードアプリの画面。方眼の上に黄色と桃色の付箋が 3 枚貼られている"></div>
-        <div><span class="shot-t">勉強会の場</span><img src="images/case-3.png" alt="勉強会の場アプリの画面。開催中の場に投稿が 1 件、下に一言を投げる入力欄と話題が変わったボタン"></div>
-      </div>
-      <figcaption><b class="figno">Figure.</b> 社内で動いている 3 本の画面。どれも同じ作り方で作られ、いつもの社内 ID で入る。<span class="lg">画面は実物 (南国ソフト社内)。</span></figcaption></figure>
+</figure>
     </div>
   </section>
 
@@ -2201,6 +2179,7 @@
         <h2>おわり</h2>
         <p class="tagline">Claude Code は作れる。Nkuma は作り切れる。</p>
         <p class="note">図中のアイコン: Lucide — ISC License, Copyright (c) Lucide Icons and Contributors / Feather 由来分は MIT License, Copyright (c) 2013-present Cole Bemis (許諾文全文は本ファイル内のコメントに同梱)</p>
+        <p class="note">Azure の各サービスのアイコンは Microsoft 公式 (図解での利用。公式アイコンは改変不可のため、それらの図だけ実物の色のまま置いている。構成図の略名の正式名は Azure Key Vault / Azure Database for PostgreSQL / Azure Blob Storage。「身分証」の正式名は Managed Identity)。GitHub のマーク (Invertocat) は Simple Icons、黒の単色 (商標は GitHub のもの)。ほかのアイコンは Lucide。</p>
       </div>
     </div>
   </section>
@@ -2266,14 +2245,6 @@
     var pager = document.getElementById("pager");
     var map = {};
     links.forEach(function (a) { map[a.dataset.ch] = a; });
-
-    // Figure 番号: 文書順に採番する
-    var figs = Array.prototype.slice.call(document.querySelectorAll("figure[data-fig]"));
-    figs.forEach(function (f, i) {
-      f.dataset.num = i + 1;
-      var no = f.querySelector(".figno");
-      if (no) no.textContent = "Figure " + (i + 1) + ".";
-    });
 
     // 目次 (右のパネル): 章 → コマの見出し
     var chNames = { what: "第 1 章 Nkuma は何ができるのか", diff: "第 2 章 Claude Code と何が違うのか", domain: "第 3 章 何のために作ったのか、分からない", safety: "第 4 章 安全に動いているのか、分からない", release: "第 5 章 作った本人しか、使えない", loops: "第 6 章 業務情報の上にアプリが展開されるメリット", delivery: "第 7 章 提供方法" };
